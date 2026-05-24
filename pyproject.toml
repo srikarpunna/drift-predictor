@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "drift-predictor"
+version = "0.1.0"
+description = "Research framework measuring LLM prompt/schema drift during model version migrations"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Srikar Punna", email = "srikarv526@gmail.com" }]
+
+dependencies = [
+    "google-genai>=1.10.0",
+    "anthropic>=0.30.0",
+    "instructor>=1.10.0",
+    "pydantic>=2.7.0,<3.0.0",
+    "python-dotenv>=1.0.0",
+    "tenacity>=8.2.0",
+    "httpx>=0.25.0",
+    "jsonref>=1.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+log_cli = true
+log_cli_level = "INFO"
+markers = [
+    "integration: marks tests that call real APIs (requires .env with valid keys)",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["instructor.*", "google.genai.*", "tenacity.*"]
+ignore_missing_imports = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

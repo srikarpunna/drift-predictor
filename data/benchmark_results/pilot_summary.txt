@@ -1,0 +1,25 @@
+============================================================
+PILOT BENCHMARK SUMMARY
+Models: gemini-2.5-flash  →  gemini-3.1-flash-lite
+============================================================
+Total prompts:      35
+Old model pass:     34/35  (97.1%)
+New model pass:     35/35  (100.0%)
+Regressions:        0  (old✓ new✗)
+Improvements:       1  (old✗ new✓)
+
+BY TASK FAMILY
+----------------------------------------
+classification        n=5  old=5/5  new=5/5  regressions=0
+extraction            n=5  old=5/5  new=5/5  regressions=0
+multi_constraint      n=5  old=4/5  new=5/5  regressions=0
+structured_output     n=5  old=5/5  new=5/5  regressions=0
+summarization         n=5  old=5/5  new=5/5  regressions=0
+tool_calling          n=5  old=5/5  new=5/5  regressions=0
+transformation        n=5  old=5/5  new=5/5  regressions=0
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+Old model avg:  49.6 tokens/response
+New model avg:  48.2 tokens/response
+Delta:          -1.4 avg tokens/response

@@ -1,0 +1,199 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Chief of Staff</role>
+      <interview_type>final</interview_type>
+      <interviewer>Catherine Lowe (CEO), Brandon Watts (CFO), Simone Tran (VP People)</interviewer>
+      <candidate>Tom Brennan</candidate>
+      <duration>68 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Catherine (Interviewer): Tom, this is the final conversation before we make a decision. The Chief of Staff role here is a true operating partner — you'd be executing on the CEO agenda, driving cross-functional alignment, and owning special projects at the company level. Let's start: tell me about the most complex cross-functional initiative you've led.
+
+[00:02] Tom (Candidate): Sure. I've worked on a number of complex initiatives. At my previous company I was involved in a large-scale company transformation — process redesign, org alignment, that sort of thing. It was a major effort that touched multiple departments and required a lot of stakeholder management. I was at the center of a lot of the coordination work and it came out well.
+
+[00:04] Catherine (Interviewer): Can you give me specifics — what exactly was the initiative, what was your role, what did you personally do?
+
+[00:05] Tom (Candidate): It was a broad organizational redesign. I was coordinating across functions, running project management, keeping things on track. The scope was significant — we were rethinking how multiple teams worked together. I can't share too many details because some of it is sensitive, but the outcome was positive and leadership was pleased with how it was executed.
+
+[00:07] Catherine (Interviewer): I understand confidentiality concerns, but even with details anonymized — what did you specifically decide or change? What would have been different if you weren't there?
+
+[00:08] Tom (Candidate): I think the coordination would have been harder without me. I have a strong ability to build relationships quickly and get people aligned. I kept the workstreams in sync and made sure leadership was informed at each stage. It's hard to point to one thing — I was more of a connective tissue role, which is really what a Chief of Staff does well.
+
+[00:10] Brandon (Interviewer): Tom, let me try a different angle. Tell me about a time you pushed back on a CEO or C-suite executive on something you believed was wrong.
+
+[00:11] Tom (Candidate): I've definitely had those conversations. I believe in being honest with leadership. There have been times where I've shared a different perspective or raised a concern in a one-on-one setting. I think that's part of the role — being a trusted advisor who can say things that others might not.
+
+[00:13] Brandon (Interviewer): Can you walk me through a specific instance — what was the decision, what did you say, what happened?
+
+[00:14] Tom (Candidate): There are a few that come to mind. One was around a strategic priority that I felt was getting too much attention relative to some operational gaps. I raised that with my CEO and we had a good conversation about it. She appreciated the input. I try to frame things constructively so it doesn't feel like pushback — more like additional perspective.
+
+[00:16] Catherine (Interviewer): What was the strategic priority? And did she change course?
+
+[00:17] Tom (Candidate): I'd rather not name the specific strategic area — it's a sensitive topic at that company. In terms of outcome, she took it on board and I think it influenced how we approached things going forward. It's hard to draw a straight line from a conversation to a decision, but the relationship was stronger for it.
+
+[00:19] Simone (Interviewer): Tom, what do you think makes a Chief of Staff genuinely valuable versus someone who just manages schedules and takes meeting notes?
+
+[00:20] Tom (Candidate): Great question. I think the best Chiefs of Staff are connectors — they understand the CEO's priorities deeply and help translate those into organizational action. They're trusted enough that people share things with them they wouldn't say to the CEO directly, and wise enough to know what to pass on and what to handle. I think I bring a combination of relationship skills and organizational judgment that lets me operate that way. I'm someone people open up to.
+
+[00:22] Simone (Interviewer): Can you give me an example of a time you received information that the CEO didn't know and you had to decide how to handle it?
+
+[00:23] Tom (Candidate): Yes, that happens. Information flows to a Chief of Staff that the CEO hasn't heard. The judgment is always: does this need to go up, can I handle it at my level, or does it need more time to develop? I've navigated those situations and I think my judgment is generally good. I don't want to share specifics because it would involve people who trusted me with sensitive information.
+
+[00:25] Brandon (Interviewer): Let me try a numbers question. If I gave you sixty days to assess where this company's biggest operational drag is, how would you approach it?
+
+[00:26] Tom (Candidate): I'd start by listening — building relationships, understanding how people see the company, what's working and what's frustrated them. Then I'd synthesize those insights and present them to leadership. I'm a believer in bottom-up insight gathering before forming hypotheses. I'd then look at where decisions are slow or unclear, where teams are blocked waiting on each other, and where there are recurring escalations. Those tend to be the signals of operational drag.
+
+[00:29] Brandon (Interviewer): What would the deliverable look like? What have you actually delivered in a similar assessment before?
+
+[00:30] Tom (Candidate): I've done similar things — deep dives into organizational health and process efficiency. The output is usually a document or presentation that lays out findings and recommendations. The format varies depending on what leadership needs. I believe in adapting to my audience.
+
+[00:32] Catherine (Interviewer): Tom, I'm going to be direct with you. We've asked several questions looking for specific examples and you've largely described the type of work rather than specific instances. Is there a reason you're staying at a high level?
+
+[00:33] Tom (Candidate): I appreciate the directness. I think my instinct in interviews is to be careful about confidentiality — I work closely with CEOs and I'm always aware that specifics can be identifying. I'm also aware that some of my most impactful work is inherently invisible — it's the conversation that prevented the bad decision, the relationship that got the deal unstuck. That work doesn't always make for a clean anecdote. But I take your point. If you'd like, I'm happy to go back and try to add more texture to anything we've discussed.
+
+[00:36] Simone (Interviewer): Let's try once more. Tell me about a failure — something you owned that went wrong. Give me the specifics.
+
+[00:37] Tom (Candidate): I've had situations where my planning was too optimistic — timelines slipped, stakeholders weren't aligned as well as I thought. I think the biggest failure mode for someone in my type of role is assuming alignment exists when it doesn't. I've learned to over-communicate and build in more check-ins. I'm a lot more deliberate about confirming shared understanding now.
+
+[00:39] Catherine (Interviewer): Do you have questions for us?
+
+[00:40] Tom (Candidate): A few. What does success look like for this role in the first six months? And what are the biggest challenges the company is facing right now that this person would be expected to help solve?
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a senior hiring panel evaluator. Your role is to produce an objective, evidence-based evaluation of the interview transcript above. All scores must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      Determine interview_type from the transcript metadata. This controls applicability of entire checkpoint clusters.
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview.
+      RIGHT: C-09 score="N/A" on a behavioral interview, excerpt="" (empty string).
+
+      WRONG: Scoring C-14 as Y or N when interview_type is not "final".
+      RIGHT: C-14 score="N/A" on a technical interview, excerpt="".
+    </gate_check>
+
+    <scoring_guide>
+- Y (Yes): Clearly and specifically observed in the transcript
+- N (No): Expected behavior was not observed or was explicitly absent
+- N/A (Not Applicable): Checkpoint does not apply — state reason in reasoning field, set excerpt to ""
+    </scoring_guide>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      For Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+      For N/A score: excerpt = "" (empty string — not "N/A", not null, not omitted)
+
+      WRONG: "[00:24] Sarah: We reduced defects — this shows ownership and accountability"
+      RIGHT: "[00:24] Sarah: We brought defect count from 140 to 22 in one quarter"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+- C-01 through C-08: Always applicable for all interview types
+- C-09, C-10: Applicable only if interview_type is "technical" — mark N/A with explanation for behavioral interviews
+- C-11, C-12, C-13 (Leadership cluster): Applicable only if candidate explicitly mentioned managing direct reports or leading a team of 2+ people
+- C-14, C-15: Applicable only if interview_type is "final"
+- C-16: Applicable only if candidate described a situation involving conflict with a peer, stakeholder, or manager
+- C-17: Always applicable
+- C-18, C-19: Applicable only if interview_type is "technical"
+- C-20: Always applicable
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins — do not skip to a later step if an earlier one applies.
+
+      1. AUTO-DOWNGRADE — NO_HIRE:
+         If C-01 is scored N (no concrete examples provided) → overall_recommendation = "no_hire"
+         regardless of all other scores. STOP. Do not evaluate further steps.
+         WRONG: C-01=N but overall_recommendation="hold". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_recommendation="no_hire". STOP.
+
+      2. LEADERSHIP DEPENDENCY — HOLD CEILING:
+         If ANY checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N →
+         overall_recommendation cannot be "hire" unless ALL of C-01 through C-08 are scored Y.
+         If that condition is not met → maximum recommendation is "hold".
+         WRONG: C-12=N, C-03=N, overall_recommendation="hire". VIOLATION.
+         RIGHT: C-12=N, C-03=N → overall_recommendation="hold".
+
+      3. HIRE: All C-01 through C-08 scored Y, no Leadership cluster failures.
+
+      4. HOLD: Mixed evidence — some Y, some N, no auto-downgrade triggered, leadership dependency not violated.
+
+      5. NO_HIRE: Majority of core checkpoints (C-01–C-08) scored N, or auto-downgrade from step 1.
+    </scoring_decision_tree>
+
+    <dependency_rules>
+CROSS-FIELD DEPENDENCY RULE:
+If any checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N, overall_recommendation cannot be "hire" unless ALL checkpoints in C-01 through C-08 are scored Y. If this condition is not met, maximum recommendation is "hold".
+
+AUTO-DOWNGRADE RULE:
+If C-01 is scored N (no concrete examples provided), overall_recommendation must be "no_hire" regardless of all other scores. This is enforced by schema validation — any other value will be rejected.
+    </dependency_rules>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If your draft exceeds the cap, shorten the observation. Do NOT go over.
+      - reasoning (CheckpointResult): state observation + evidence, then STOP. ≤ 40 words. HARD CAP.
+      - reasoning (QualityArea): ≤ 45 words. HARD CAP.
+      - summary: covers overall impression, key strengths, key concerns. ≤ 80 words. HARD CAP.
+    </field_caps>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. Did C-01 score N? If yes, overall_recommendation MUST be "no_hire". Fix if not — schema will reject any other value.
+      2. Did any Leadership cluster checkpoint (C-11, C-12, C-13) score N AND any C-01–C-08 score N?
+         If yes, overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
+      3. All N/A checkpoints have excerpt = "" (empty string — not "N/A", not null, not omitted).
+      4. All Y/N checkpoints have excerpt = "[HH:MM] CandidateName: exact quote" (not empty).
+      5. overall_recommendation is exactly one of: "hire", "no_hire", "hold".
+      6. summary is at least 50 characters.
+
+      WRONG: overall_recommendation="hire" but C-01=N. SELF-CONTRADICTION. Schema will reject.
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only". VIOLATION. Set to "".
+      WRONG: Y checkpoint with excerpt="". VIOLATION. Must include verbatim quote.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+    </output_schema>
+  </instructions>
+</prompt>

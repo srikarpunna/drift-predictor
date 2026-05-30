@@ -1,0 +1,179 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>VP of Engineering</role>
+      <interview_type>final</interview_type>
+      <interviewer>Sandra Okafor (CEO), James Whitfield (Chief of Staff), Renata Cruise (Board Observer, Talent)</interviewer>
+      <candidate>David Osei</candidate>
+      <duration>75 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Sandra (Interviewer): David, you've met the engineering team and the product leadership. This session is about whether you're the right person to take this company through its next chapter. Let's start with how you think about building an engineering organization at scale.
+
+[00:02] David (Candidate): Engineering organizations fail at scale for one of two reasons: they either optimize for individual contributor output and lose coordination, or they optimize for process and lose speed. The answer isn't balance — it's sequencing. At Fieldstone Systems, I grew the engineering org from 22 to 110 engineers over three years. In the first year we had almost no process — we needed speed and learning. By year two we had teams shipping into each other's APIs with no contracts, causing weekly production incidents. I introduced a three-tier structure: stream-aligned teams that owned product domains end-to-end, a platform team that owned shared infrastructure, and an enabling team that moved across stream teams to raise technical capability. That's Team Topologies adapted to our specific context. Incidents dropped from 18 per quarter to four. Deployment frequency doubled from twice a week to daily within eight months.
+
+[00:07] Sandra (Interviewer): Tell me about a time you had to make a structural decision that was unpopular inside your own organization.
+
+[00:08] David (Candidate): At Fieldstone, in year two, we had a backend services team of twelve that had grown organically and was technically strong but had developed a gatekeeping culture — every API change from any other team required review and approval from them. It was slowing us down. I decided to dissolve the team and redistribute its members across the stream-aligned teams. Two of the twelve engineers quit, which I expected — they wanted to stay in a centralized specialization model. The other ten integrated into stream teams and became the strongest technical voices in their respective domains. The approval bottleneck disappeared. We measured time-from-design-to-merge on cross-team API changes: it went from an average of 14 days to three days over a six-month window. It was the right call and I knew it would cost me relationships. I had individual conversations with every one of the twelve engineers before announcing it.
+
+[00:13] James (Interviewer): How do you think about your relationship with the board and investors at this stage of the company?
+
+[00:14] David (Candidate): Proactively. I've seen VP Engs who treat board engagement as a C-suite concern and stay out of it. That's a mistake at a company this stage. The board is making risk assessments about technology — can we scale, how deep is the technical debt, how long will it take to build X — and if engineering leadership isn't in the room, those assessments are made with incomplete information. At Fieldstone, I presented at board meetings quarterly — not the CEO presenting on engineering's behalf, me presenting directly. I prepared a one-page engineering health scorecard: deployment frequency, incident rate, engineer attrition, and one forward-looking risk flag. It built trust. After 18 months, the board was willing to approve a $3.2M platform rebuild that a previous leadership team had failed to get funded, because they had 18 months of data showing we executed reliably.
+
+[00:19] Renata (Interviewer): What do you look for when you're hiring engineering leaders — staff engineers, engineering managers?
+
+[00:20] David (Candidate): Different things at different levels, but one thing I look for universally: how does this person handle being wrong? I've found that technical aptitude is table stakes for hiring at those levels — everyone I'm considering has it. What differentiates is intellectual honesty. In interviews I specifically probe for times candidates pushed hard for a position and were wrong. I'm listening for how they describe the moment they changed their mind — was it a defensive pivot or a genuine update? At Fieldstone, I built a hiring rubric for engineering managers that weighted behavioral evidence of accountability at 40% of the evaluation, higher than technical depth, which was 30%. That was a deliberate choice. The highest-performing EMs I've hired came from that process.
+
+[00:25] Sandra (Interviewer): Where have you gotten it wrong as a leader? Something consequential.
+
+[00:26] David (Candidate): In year one at Fieldstone, I delayed replacing an underperforming Head of Infrastructure for eight months longer than I should have. I kept believing the situation would improve with coaching. It didn't. During those eight months, infrastructure reliability was a persistent problem — we had five significant outages affecting customer data availability, and I knew the leadership was the root cause and didn't act. The cost to the business was real: we lost two mid-market accounts during that period who cited reliability concerns in their exit surveys. I acted eventually, but I should have acted at month three instead of month eleven. What I changed: I now set explicit thirty, sixty, and ninety day behavioral expectations in writing with every direct report at the start of their tenure, and I review those at each milestone. If we're at sixty days and the behavioral markers aren't tracking, I don't wait.
+
+[00:32] James (Interviewer): What makes this company specifically interesting to you? You could be a CTO somewhere.
+
+[00:33] David (Candidate): Two things. First, the problem domain — infrastructure observability is a space where the technical complexity is genuinely interesting and the market is not yet consolidated. I spent two weeks before this conversation reading your engineering blog and talking to two engineers on your team informally. The approach you're taking to distributed tracing at the agent layer is not what I expected — it's more architecturally ambitious than how competitors have approached it. I want to work on that. Second, the stage. You're at an inflection point where the decisions made in the next eighteen months about engineering org design, technical architecture, and hiring bar will compound for a decade. That's the kind of leverage I want. I could take a CTO title at a later-stage company with less decision-making leverage. I'm choosing this instead.
+
+[00:38] Renata (Interviewer): How would you describe your leadership style to someone joining your team for the first time?
+
+[00:39] David (Candidate): Direct and high-context. I communicate my reasoning, not just my decisions — I think people work better when they understand why, not just what. I expect the same from my team. I have a strong point of view and I'm willing to disagree openly, and I expect others to disagree with me openly. What I don't tolerate is passive disagreement — people who say yes in the room and then execute differently. I'd rather have the argument. On support: I give my direct reports a lot of autonomy, but the flip side is accountability. If you tell me you'll do something, I track it. Not to micromanage, but because I believe follow-through is the primary way trust is built in organizations.
+
+[00:44] Sandra (Interviewer): What questions do you have for us?
+
+[00:45] David (Candidate): Several. First, for Sandra — what does success look like for this role in year one, described in terms of outcomes for the business, not engineering metrics? Second, for the board observer: what's the board's current level of confidence in the engineering organization and what would move that needle? Third, for all of you: what's the most important thing the previous leadership left unresolved that you'd want this person to address first? And finally — what would make you regret this hire twelve months from now?
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a senior hiring panel evaluator. Your role is to produce an objective, evidence-based evaluation of the interview transcript above. All scores must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      Determine interview_type from the transcript metadata. This controls applicability of entire checkpoint clusters.
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview.
+      RIGHT: C-09 score="N/A" on a behavioral interview, excerpt="" (empty string).
+
+      WRONG: Scoring C-14 as Y or N when interview_type is not "final".
+      RIGHT: C-14 score="N/A" on a technical interview, excerpt="".
+    </gate_check>
+
+    <scoring_guide>
+- Y (Yes): Clearly and specifically observed in the transcript
+- N (No): Expected behavior was not observed or was explicitly absent
+- N/A (Not Applicable): Checkpoint does not apply — state reason in reasoning field, set excerpt to ""
+    </scoring_guide>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      For Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+      For N/A score: excerpt = "" (empty string — not "N/A", not null, not omitted)
+
+      WRONG: "[00:24] Sarah: We reduced defects — this shows ownership and accountability"
+      RIGHT: "[00:24] Sarah: We brought defect count from 140 to 22 in one quarter"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+- C-01 through C-08: Always applicable for all interview types
+- C-09, C-10: Applicable only if interview_type is "technical" — mark N/A with explanation for behavioral interviews
+- C-11, C-12, C-13 (Leadership cluster): Applicable only if candidate explicitly mentioned managing direct reports or leading a team of 2+ people
+- C-14, C-15: Applicable only if interview_type is "final"
+- C-16: Applicable only if candidate described a situation involving conflict with a peer, stakeholder, or manager
+- C-17: Always applicable
+- C-18, C-19: Applicable only if interview_type is "technical"
+- C-20: Always applicable
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins — do not skip to a later step if an earlier one applies.
+
+      1. AUTO-DOWNGRADE — NO_HIRE:
+         If C-01 is scored N (no concrete examples provided) → overall_recommendation = "no_hire"
+         regardless of all other scores. STOP. Do not evaluate further steps.
+         WRONG: C-01=N but overall_recommendation="hold". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_recommendation="no_hire". STOP.
+
+      2. LEADERSHIP DEPENDENCY — HOLD CEILING:
+         If ANY checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N →
+         overall_recommendation cannot be "hire" unless ALL of C-01 through C-08 are scored Y.
+         If that condition is not met → maximum recommendation is "hold".
+         WRONG: C-12=N, C-03=N, overall_recommendation="hire". VIOLATION.
+         RIGHT: C-12=N, C-03=N → overall_recommendation="hold".
+
+      3. HIRE: All C-01 through C-08 scored Y, no Leadership cluster failures.
+
+      4. HOLD: Mixed evidence — some Y, some N, no auto-downgrade triggered, leadership dependency not violated.
+
+      5. NO_HIRE: Majority of core checkpoints (C-01–C-08) scored N, or auto-downgrade from step 1.
+    </scoring_decision_tree>
+
+    <dependency_rules>
+CROSS-FIELD DEPENDENCY RULE:
+If any checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N, overall_recommendation cannot be "hire" unless ALL checkpoints in C-01 through C-08 are scored Y. If this condition is not met, maximum recommendation is "hold".
+
+AUTO-DOWNGRADE RULE:
+If C-01 is scored N (no concrete examples provided), overall_recommendation must be "no_hire" regardless of all other scores. This is enforced by schema validation — any other value will be rejected.
+    </dependency_rules>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If your draft exceeds the cap, shorten the observation. Do NOT go over.
+      - reasoning (CheckpointResult): state observation + evidence, then STOP. ≤ 40 words. HARD CAP.
+      - reasoning (QualityArea): ≤ 45 words. HARD CAP.
+      - summary: covers overall impression, key strengths, key concerns. ≤ 80 words. HARD CAP.
+    </field_caps>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. Did C-01 score N? If yes, overall_recommendation MUST be "no_hire". Fix if not — schema will reject any other value.
+      2. Did any Leadership cluster checkpoint (C-11, C-12, C-13) score N AND any C-01–C-08 score N?
+         If yes, overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
+      3. All N/A checkpoints have excerpt = "" (empty string — not "N/A", not null, not omitted).
+      4. All Y/N checkpoints have excerpt = "[HH:MM] CandidateName: exact quote" (not empty).
+      5. overall_recommendation is exactly one of: "hire", "no_hire", "hold".
+      6. summary is at least 50 characters.
+
+      WRONG: overall_recommendation="hire" but C-01=N. SELF-CONTRADICTION. Schema will reject.
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only". VIOLATION. Set to "".
+      WRONG: Y checkpoint with excerpt="". VIOLATION. Must include verbatim quote.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+    </output_schema>
+  </instructions>
+</prompt>

@@ -1,0 +1,302 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-20</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-flash</old_model>
+        <new_model>gemini-3.1-flash-lite</new_model>
+      </model_pair>
+      <prompt_set>consistency_test_v2</prompt_set>
+      <total_runs>29</total_runs>
+    </metadata>
+
+    <run_log>
+NOTE: This run set tests nondeterminism at larger scale. Six unique prompts, each run 3 times (6 × 3 = 18 total original). Expanded battery adds 11 more runs across 2 new families and 1 additional triplet for talent_matching. Consistency is evaluated on the primary classification field: `tier_assignment` (tiered_pricing), `risk_category` (contract_review), `match_score_band` (talent_matching), `grade_band` (pay_grade_assessment), `engagement_score_class` (engagement_level).
+
+run_id | prompt_id | task_family         | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-701     | tiered_pricing      | YES        | NO         | YES        | -10         | 326               | 316               | 1880           | 1690           | consistency
+R-002  | P-701     | tiered_pricing      | YES        | YES        | NO         | -10         | 325               | 315               | 1878           | 1688           | none
+R-003  | P-701     | tiered_pricing      | YES        | NO         | YES        | -10         | 326               | 316               | 1881           | 1691           | consistency
+R-004  | P-702     | tiered_pricing      | YES        | YES        | NO         | +5          | 312               | 317               | 1840           | 1660           | none
+R-005  | P-702     | tiered_pricing      | YES        | YES        | NO         | +5          | 311               | 316               | 1838           | 1658           | none
+R-006  | P-702     | tiered_pricing      | YES        | YES        | NO         | +6          | 312               | 318               | 1840           | 1660           | none
+R-007  | P-703     | contract_review     | YES        | NO         | YES        | -14         | 334               | 320               | 1910           | 1700           | consistency
+R-008  | P-703     | contract_review     | YES        | NO         | YES        | -13         | 334               | 321               | 1908           | 1698           | consistency
+R-009  | P-703     | contract_review     | YES        | YES        | NO         | -13         | 333               | 320               | 1906           | 1696           | none
+R-010  | P-704     | contract_review     | YES        | YES        | NO         | -6          | 319               | 313               | 1860           | 1660           | none
+R-011  | P-704     | contract_review     | YES        | YES        | NO         | -6          | 320               | 314               | 1861           | 1661           | none
+R-012  | P-704     | contract_review     | YES        | YES        | NO         | -6          | 319               | 313               | 1860           | 1660           | none
+R-013  | P-705     | talent_matching     | YES        | NO         | YES        | -16         | 338               | 322               | 1920           | 1710           | consistency
+R-014  | P-705     | talent_matching     | YES        | YES        | NO         | -15         | 337               | 322               | 1918           | 1708           | none
+R-015  | P-705     | talent_matching     | YES        | NO         | YES        | -15         | 338               | 323               | 1919           | 1709           | consistency
+R-016  | P-706     | talent_matching     | YES        | NO         | YES        | -12         | 330               | 318               | 1900           | 1695           | consistency
+R-017  | P-706     | talent_matching     | YES        | NO         | YES        | -12         | 329               | 317               | 1898           | 1693           | consistency
+R-018  | P-706     | talent_matching     | YES        | NO         | YES        | -11         | 330               | 319               | 1900           | 1694           | consistency
+R-019  | P-707     | tiered_pricing      | YES        | NO         | YES        | -9          | 325               | 316               | 1878           | 1688           | consistency
+R-020  | P-707     | tiered_pricing      | YES        | YES        | NO         | +5          | 312               | 317               | 1839           | 1659           | none
+R-021  | P-708     | contract_review     | YES        | NO         | YES        | -12         | 332               | 320               | 1905           | 1698           | consistency
+R-022  | P-708     | contract_review     | YES        | YES        | NO         | -11         | 330               | 319               | 1900           | 1694           | none
+R-023  | P-709     | talent_matching     | YES        | NO         | YES        | -14         | 336               | 322               | 1915           | 1708           | consistency
+R-024  | P-709     | talent_matching     | YES        | YES        | NO         | -14         | 336               | 322               | 1914           | 1707           | none
+R-025  | P-710     | pay_grade_assessment| YES        | NO         | YES        | -11         | 331               | 320               | 1904           | 1698           | consistency
+R-026  | P-710     | pay_grade_assessment| YES        | NO         | YES        | -11         | 332               | 321               | 1906           | 1700           | consistency
+R-027  | P-710     | pay_grade_assessment| YES        | YES        | NO         | -10         | 329               | 319               | 1900           | 1694           | none
+R-028  | P-711     | engagement_level    | YES        | NO         | YES        | -8          | 322               | 314               | 1882           | 1682           | consistency
+R-029  | P-711     | engagement_level    | YES        | YES        | NO         | -8          | 322               | 314               | 1882           | 1682           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-701, tiered_pricing, run 1 of 3): The `tier_assignment` field returned "enterprise" but R-002 (identical input) returned "professional". Old model returned "professional" consistently across all 3 runs. Account ARR in this prompt is $42,000 — the tier boundary between professional and enterprise is $40,000. The new model's internal threshold resolves this boundary case inconsistently.
+
+R-003 (P-701, tiered_pricing, run 3 of 3): The `tier_assignment` field returned "enterprise" again (matching R-001). For P-701: runs returned ["enterprise", "professional", "enterprise"]. The majority (2/3) disagrees with the old model's consistent "professional". This represents a systematic upward bias on borderline ARR values.
+
+R-007 (P-703, contract_review, run 1 of 3): The `risk_category` field returned "high" but R-009 (identical input) returned "medium". Old model returned "medium" consistently. The contract contains a non-standard indemnification clause rated as moderate severity. The new model classifies this clause as high risk in 2 of 3 runs.
+
+R-008 (P-703, contract_review, run 2 of 3): The `risk_category` field returned "high" again (matching R-007). Additionally, the `risk_summary` text varied significantly between runs — different reasoning chains led to the same classification. For P-703: ["high", "high", "medium"] — 2/3 disagrees with old model's "medium".
+
+R-013 (P-705, talent_matching, run 1 of 3): The `match_score_band` field returned "strong" but R-014 (identical input) returned "moderate". Old model returned "moderate" consistently. Candidate match score is 71% — the strong/moderate boundary for this task family is 70%. The new model again resolves a near-boundary score inconsistently.
+
+R-015 (P-705, talent_matching, run 3 of 3): The `match_score_band` field returned "strong" (matching R-013). For P-705: ["strong", "moderate", "strong"]. Same pattern as P-701 — 2/3 runs produce the boundary-crossing value.
+
+R-016 (P-706, talent_matching, run 1 of 3): The `match_score_band` field returned "strong" but old model returned "moderate". Candidate match score is 68%, which should comfortably be in the "moderate" band (below the 70% threshold). Unlike P-705, this case is not a boundary case — 68% is 2 points below threshold.
+
+R-017 (P-706, talent_matching, run 2 of 3): The `match_score_band` field again returned "strong". For P-706: all 3 runs returned "strong" for a 68% match score. The new model is systematically wrong (not just inconsistent) on P-706 — all runs disagree with the correct "moderate" classification.
+
+R-018 (P-706, talent_matching, run 3 of 3): The `match_score_band` field again returned "strong". All 3 runs for P-706 are consistent but consistently incorrect, suggesting a fixed threshold miscalibration (68% classified as "strong") rather than stochastic behavior.
+
+R-019 (P-707, tiered_pricing, run 1 of 3): New prompt for tiered_pricing. The `tier_assignment` field returned "enterprise" but R-020 (identical input) returned "professional". Account ARR is $43,500 — again borderline near the $40,000 threshold. New model returns "enterprise" in 1 of 2 observed runs.
+
+R-021 (P-708, contract_review, run 1 of 3): New prompt for contract_review. The `risk_category` field returned "high" but R-022 (identical input) returned "medium". Contract contains a limitation-of-liability clause capped at 1x contract value — moderate-severity. New model classifies as high risk in 1 of 2 observed runs.
+
+R-023 (P-709, talent_matching, run 1 of 3): New prompt for talent_matching. The `match_score_band` field returned "strong" but R-024 (identical input) returned "moderate". Match score is 72% — 2 points above the 70% threshold. New model inconsistently resolves this near-boundary case.
+
+R-025 (P-710, pay_grade_assessment, run 1 of 3): New family. The `grade_band` field returned "grade_5" but R-027 (identical input) returned "grade_4". Total compensation aligns with mid-grade_4 to low-grade_5 range — a boundary case. Old model returned "grade_4" consistently (not observed in pre-expansion data, inferred from P-710 design). New model oscillates.
+
+R-026 (P-710, pay_grade_assessment, run 2 of 3): The `grade_band` field returned "grade_5" again (matching R-025). For P-710: ["grade_5", "grade_5", "grade_4"] — 2/3 runs disagree with the stable "grade_4" classification expected from the grading rubric.
+
+R-028 (P-711, engagement_level, run 1 of 3): New family. The `engagement_score_class` field returned "highly_engaged" but R-029 (identical input) returned "engaged". Survey response score is 4.2/5.0 — the "engaged" to "highly_engaged" boundary is 4.0. The new model inconsistently resolves a score 0.2 above boundary.
+    </failure_detail_log>
+
+    <pattern_analysis>
+This run set reveals two distinct consistency failure subtypes. The first is stochastic boundary oscillation: the new model's classification output for boundary-case inputs varies across runs due to temperature-induced sampling variation near internal decision thresholds. P-701 ($42K ARR near $40K boundary), P-703 (moderate-severity clause), P-705 (71% match near 70% threshold), P-707 ($43.5K ARR near $40K boundary), P-708 (moderate liability clause), P-709 (72% match near 70% threshold), P-710 (grade boundary case), P-711 (4.2/5.0 near 4.0 boundary) all exhibit 1/2 or 2/3 run inconsistency. The old model resolved all these cases deterministically.
+
+The second subtype, exemplified by P-706, is systematic miscalibration: all 3 runs produce the same wrong answer. A 68% match score returning "strong" is not boundary ambiguity — it is a threshold shift in the new model's internal calibration. Unlike stochastic oscillation (which would self-correct with lower temperature), systematic miscalibration requires the model's scoring calibration to be corrected in the prompt or via fine-tuning.
+
+The two new task families — pay_grade_assessment (R-025 through R-027) and engagement_level (R-028 through R-029) — both exhibit the boundary_oscillation pattern. P-710 shows 2/3 inconsistency on a grade boundary case; P-711 shows 1/2 inconsistency on a near-threshold engagement score. This cross-family consistency confirms the failure mechanism is model-level sensitivity to near-boundary inputs, not prompt-specific.
+
+No pre-existing failures exist in this dataset (all 29 runs have old_passed=YES). 15 regressions occurred on 29 previously passing runs — a 51.7% regression rate. Talent_matching leads with 6 regressions (75% rate across 8 rows), followed by contract_review with 3 regressions (37.5%), tiered_pricing with 3 regressions (37.5%), pay_grade_assessment with 2 regressions (66.7%), and engagement_level with 1 regression (50.0%).
+    </pattern_analysis>
+
+    <token_summary>
+Old model (gemini-2.5-flash):
+  Average output tokens: 326.4
+  Average latency: 1,883 ms
+
+New model (gemini-3.1-flash-lite):
+  Average output tokens: 317.7
+  Average latency: 1,684 ms
+
+Average token delta: -8.7 tokens per run (-2.7%)
+Average latency delta: -199 ms per run (-10.6%)
+
+Per-task-family breakdown:
+  tiered_pricing:       avg old=318.7, avg new=316.2, delta=-2.5 (-0.8%)
+  contract_review:      avg old=326.2, avg new=317.5, delta=-8.7 (-2.7%)
+  talent_matching:      avg old=333.3, avg new=320.3, delta=-13.0 (-3.9%)
+  pay_grade_assessment: avg old=330.7, avg new=320.0, delta=-10.7 (-3.2%)
+  engagement_level:     avg old=322.0, avg new=314.0, delta=-8.0 (-2.5%)
+
+Token delta is uniform within same-prompt triplicates (within ±1 token), confirming consistency failures are field-value changes rather than length changes. Talent_matching shows the largest token reduction (3.9%) — the family with the most regressions and the systematic miscalibration failure on P-706.
+    </token_summary>
+
+    <family_summary>
+task_family          | total_runs | regressions | regression_rate | dominant_failure_type
+tiered_pricing       | 8          | 3           | 37.5%           | consistency (boundary_oscillation)
+contract_review      | 8          | 3           | 37.5%           | consistency (boundary_oscillation)
+talent_matching      | 8          | 6           | 75.0%           | consistency (boundary_oscillation + systematic_miscalibration)
+pay_grade_assessment | 3          | 2           | 66.7%           | consistency (boundary_oscillation)
+engagement_level     | 2          | 1           | 50.0%           | consistency (boundary_oscillation)
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will inform an engineering go/no-go migration decision.</role>
+
+    <domain_context>
+      This benchmark tests nondeterminism at scale. Each prompt_id was run 3 times (or 2 times for newer prompts) with identical inputs. Consistency failures occur when same-prompt runs produce different values for the primary classification field.
+
+      Critical distinction: stochastic boundary oscillation (different output each run) vs systematic miscalibration (same wrong output every run). P-706 talent_matching is systematic — all 3 runs return "strong" for a 68% match score that should be "moderate". This is a threshold error, not stochastic noise.
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      This dataset has no pre-existing failures (all 29 runs have old_passed=YES).
+      Denominator = 29.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan run_log and extract all valid run IDs (R-001 through R-029).
+      Build this list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-030"] when run_log ends at R-029. VIOLATION.
+      WRONG: example_run_ids=[] when the pattern has multiple observable examples. VIOLATION.
+      RIGHT: example_run_ids=["R-001", "R-003", "R-007", "R-008"] — all visible in run_log.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes ≥ 2 items.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from run_log.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         Key insight: structure is consistent — the failure is classification value instability.
+      4. regression_by_family must list all 5 task_families.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+         Example: talent_matching has 8 rows, 6 regressions → rate = 6/8*100 = 75.0
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration".
+         15/29 = 51.7% → "block_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      WRONG: Citing 50% regression rate when data shows 15/29 = 51.7%. VIOLATION.
+      RIGHT: "15 regressions out of 29 previously passing runs (51.7%)."
+      Distinguish between stochastic oscillation (different output each run) and systematic miscalibration (same wrong output every run — P-706).
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must include: 29 total runs, 29 previously passing, 15 regressions, 51.7% rate, consistency dominant, block_migration.
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Two subtypes: boundary_oscillation (stochastic near-threshold flips) and systematic_miscalibration (P-706 consistently wrong).
+        Each: ≥1 run ID in example_run_ids, root_cause min 35 chars, recommendation min 35 chars.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Note that structure/format is consistent across all runs. Only classification accuracy degrades.
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Consistency-specific fixes for both subtypes.
+        RIGHT: ["Add explicit numeric boundary definitions in system prompt for each threshold (e.g., 'strong: match_score >= 0.70; moderate: match_score < 0.70')", "For P-706 type systematic errors: add calibration examples showing boundary cases with correct classifications in few-shot format"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        regression_rate_pct = 15/29*100 = 51.72% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 15/29*100 = 51.72. All 29 runs have old_passed=YES.
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        5 families: tiered_pricing(8 rows), contract_review(8 rows), talent_matching(8 rows), pay_grade_assessment(3 rows), engagement_level(2 rows).
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing: all 29 runs (no pre-existing failures)
+        Regressions (old=YES, new=NO): R-001,R-003,R-007,R-008,R-013,R-015,R-016,R-017,R-018,R-019,R-021,R-023,R-025,R-026,R-028 = 15 runs
+        Families: tiered_pricing, contract_review, talent_matching, pay_grade_assessment, engagement_level
+
+      Step 2 — regression_rate_pct = 15/29*100 = 51.72
+
+      Step 3 — Group regressions by subtype:
+        boundary_oscillation: R-001,R-003,R-007,R-008,R-013,R-015,R-019,R-021,R-023,R-025,R-026,R-028 (stochastic)
+        systematic_miscalibration: R-016,R-017,R-018 (P-706 all 3 runs wrong on 68% match score)
+
+      Step 4 — FamilyBreakdown counts from run_log:
+        tiered_pricing: 8 rows (R-001–R-006,R-019–R-020), regressions=R-001,R-003,R-019 = 3 → 3/8=37.5%
+        contract_review: 8 rows (R-007–R-012,R-021–R-022), regressions=R-007,R-008,R-021 = 3 → 3/8=37.5%
+        talent_matching: 8 rows (R-013–R-018,R-023–R-024), regressions=R-013,R-015,R-016,R-017,R-018,R-023 = 6 → 6/8=75.0%
+        pay_grade_assessment: 3 rows (R-025–R-027), regressions=R-025,R-026 = 2 → 2/3=66.7%
+        engagement_level: 2 rows (R-028–R-029), regressions=R-028 = 1 → 1/2=50.0%
+
+      Step 5 — recommended_action: 51.72% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: all 29 runs have old_passed=YES so denominator=29.
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-029 only.
+      ERROR 3 — Missing families: pay_grade_assessment and engagement_level required in regression_by_family.
+      ERROR 4 — rate_pct arithmetic: engagement_level has only 2 rows (R-028,R-029), 1 regression → 1/2*100=50.0.
+      ERROR 5 — Treating P-706 (systematic) as same failure type as P-705 (stochastic) — they require different remediation.
+      ERROR 6 — consistency_vs_accuracy_note ignores format consistency (format is fine in this dataset).
+      ERROR 7 — recommended_action="conditional_proceed" when rate=51.7%. Schema rejects (>50% requires block_migration).
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 29 total runs (all 29 previously passing), 15 regressions, 51.7%, consistency failures (boundary oscillation + systematic miscalibration), block_migration",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "51.7%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-8.7 tokens", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-199 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "15", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "boundary_oscillation",
+            "frequency": "12/29 runs",
+            "example_run_ids": ["R-001", "R-003", "R-007", "R-013", "R-025"],
+            "root_cause": "min 35 chars",
+            "recommendation": "min 35 chars"
+          },
+          {
+            "pattern_name": "systematic_miscalibration",
+            "frequency": "3/29 runs",
+            "example_run_ids": ["R-016", "R-017", "R-018"],
+            "root_cause": "...",
+            "recommendation": "..."
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words",
+
+        "priority_fixes": ["fix 1 — specific for boundary_oscillation", "fix 2 — specific for systematic_miscalibration"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 51.72,
+
+        "regression_by_family": [
+          {"task_family": "tiered_pricing",       "regression_count": 3, "total_count": 8, "rate_pct": 37.5},
+          {"task_family": "contract_review",      "regression_count": 3, "total_count": 8, "rate_pct": 37.5},
+          {"task_family": "talent_matching",      "regression_count": 6, "total_count": 8, "rate_pct": 75.0},
+          {"task_family": "pay_grade_assessment", "regression_count": 2, "total_count": 3, "rate_pct": 66.7},
+          {"task_family": "engagement_level",     "regression_count": 1, "total_count": 2, "rate_pct": 50.0}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-029).
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH dimensions.
+      5. executive_summary ≥ 80 characters.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 15/29*100 = 51.72 (denominator=29, all old_passed=YES).
+      10. recommended_action = "block_migration" (51.7% > 50%).
+      11. regression_by_family has exactly 5 entries.
+      12. Each rate_pct within ±1% of regression_count/total_count*100.
+
+      WRONG: engagement_level rate_pct=33.3 (using denominator 3) — only 2 rows exist for this family. VIOLATION.
+      WRONG: recommended_action="conditional_proceed" when rate=51.7%. Schema rejects.
+      WRONG: regression_rate_pct=50.0 — actual is 51.72. VIOLATION.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from run_log (R-001 through R-029). priority_fixes must have at least 2 items. regression_by_family must have 5 entries.
+    </output_schema>
+  </instructions>
+</prompt>

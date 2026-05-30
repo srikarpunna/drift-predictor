@@ -1,0 +1,339 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Director of Operations</role>
+      <interview_type>behavioral</interview_type>
+      <interviewer>Marcus Bell (Chief Operating Officer)</interviewer>
+      <candidate>Priya Nair</candidate>
+      <duration>62 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Marcus (Interviewer): Priya, thanks for making time. Let's start with the most operationally complex initiative you've led. Walk me through it.
+
+[00:02] Priya (Candidate): Sure. I led a pretty big initiative around improving our supply chain. We were having issues with vendor delays and it was causing problems downstream. I worked with several teams to address it and we made improvements over time.
+
+[00:04] Marcus (Interviewer): Can you give me specifics? What were the delays, what did you implement, and what changed?
+
+[00:05] Priya (Candidate): Yeah so the delays were pretty significant. I think we were missing SLAs a fair amount. We brought in some new processes, updated our vendor scorecards, and things got better. I don't have the exact numbers memorized but the trend was clearly positive.
+
+[00:07] Marcus (Interviewer): Let me push on this. What specific SLA were you missing? What was the miss rate before, and what did it become after your changes?
+
+[00:08] Priya (Candidate): It was a pretty significant miss rate. I want to say we were on-time maybe 70% of the time, or maybe lower — I honestly don't have that number in front of me. What I can say is that by the time I moved to a different scope the numbers were clearly better. The vendor scorecard was a key piece of that.
+
+[00:10] Marcus (Interviewer): Tell me about a time you had to make a major resource allocation decision under pressure.
+
+[00:11] Priya (Candidate): We had a situation where we had more projects than people. I had to figure out who to assign where. I talked to the team leads, understood the priorities, and made some staffing decisions. Some people weren't happy with where they were placed, but we got through the quarter.
+
+[00:13] Marcus (Interviewer): What was your framework for making those decisions, and what were the tradeoffs?
+
+[00:14] Priya (Candidate): I mostly relied on gut feel and relationships. I knew who was good at what from working with them. The main tradeoff was between what the business needed versus what individual team members preferred. I tried to balance those.
+
+[00:16] Marcus (Interviewer): How do you drive accountability across teams that don't report to you?
+
+[00:17] Priya (Candidate): Communication is key. I try to have regular check-ins and make sure everyone knows what they're supposed to be doing. When things slip, I follow up. I've found that being consistent and persistent usually works.
+
+[00:19] Marcus (Interviewer): Can you give me a specific example where that approach was tested?
+
+[00:20] Priya (Candidate): There was a cross-functional project at my last company where one of the teams kept missing deadlines. I escalated to their manager after a few weeks. Their manager handled it. Things improved after that.
+
+[00:22] Marcus (Interviewer): What specifically did you escalate, and what did the manager do that made the difference?
+
+[00:23] Priya (Candidate): I communicated the pattern — that the team had missed three consecutive check-ins and it was blocking other workstreams. Their manager was surprised, I think. After that the team started showing up to the syncs. I don't know exactly what the manager said to them. The dynamic shifted though.
+
+[00:25] Marcus (Interviewer): Tell me about an operational failure you were responsible for. What happened?
+
+[00:26] Priya (Candidate): We had a process breakdown in how we onboarded new vendors. It caused some delays in product availability. Honestly it was a combination of things — the process documentation was unclear, training was inconsistent, and there was some communication breakdown. It's hard to point to one specific cause.
+
+[00:28] Marcus (Interviewer): What role did you specifically play in that failure, and what did you change?
+
+[00:29] Priya (Candidate): I was overseeing that area so I bear some responsibility. I should have been paying more attention to how the onboarding process was being executed. We updated the documentation and I think we added a checkpoint. I moved on to a new role not long after so I don't know the full downstream impact.
+
+[00:31] Marcus (Interviewer): You said you bear "some" responsibility. What specifically was your contribution to the failure?
+
+[00:32] Priya (Candidate): I think my contribution was in not having more oversight of the process execution layer. I set the strategy but I assumed the team would execute it well without me checking in more frequently. In retrospect I should have had more touchpoints in the first 30 days of implementation. That's on me.
+
+[00:34] Marcus (Interviewer): If you had to identify your biggest operational blind spot, what would it be?
+
+[00:35] Priya (Candidate): Probably that I can be too focused on the big picture sometimes and miss details. I rely on my team to catch things in the weeds. That's generally fine but sometimes things slip through. I'm working on that.
+
+[00:37] Marcus (Interviewer): How do you think about continuous improvement in operations? What systems do you use?
+
+[00:38] Priya (Candidate): I like retrospectives. I try to run them after major initiatives. I also do quarterly reviews of our key metrics. I'm a fan of lean principles in theory, though implementation varies by context.
+
+[00:40] Marcus (Interviewer): Can you walk me through a specific retrospective or improvement cycle that led to a measurable change in how your team operated?
+
+[00:41] Priya (Candidate): We ran a retrospective after a rough product launch — there were delays in our go-to-market coordination. The team identified that communication between operations and marketing was too informal. We created a shared launch checklist afterward. It helped with the next launch, I think — things felt smoother. I wasn't tracking a specific before-and-after metric for that particular improvement.
+
+[00:43] Marcus (Interviewer): Tell me about a time you had to advocate for a process change that faced internal resistance. How did you build support for it?
+
+[00:44] Priya (Candidate): We wanted to move from weekly to daily standups with a cross-functional group that included people from finance and legal. A few people felt it was too much overhead. I made the case that the weekly meetings were causing delays because issues surfaced too late. Some people came around, others remained skeptical. We ran it as a pilot for a month. The attendance was inconsistent and we eventually went back to weekly. In hindsight I should have gotten stronger buy-in from leadership before launching the pilot — that probably would have helped with attendance.
+
+[00:47] Marcus (Interviewer): What's your approach to building relationships with teams you depend on but don't control?
+
+[00:48] Priya (Candidate): I try to be reliable and responsive — if someone from another team asks me something I try to get back to them quickly. I make sure they know what I need from them and by when. I think mutual respect goes a long way. I try not to escalate unless I have to.
+
+[00:50] Marcus (Interviewer): What questions do you have for us?
+
+[00:51] Priya (Candidate): What is the team structure here? And how does this role interact with finance?
+
+[00:52] Marcus (Interviewer): We can cover both of those. Thanks, Priya.
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <domain_context>
+      You are a senior member of a structured hiring panel. Your evaluation will be read by hiring managers, HR business partners, and in some cases executive leadership. This report directly influences whether a candidate advances to an offer or is declined. Errors in your evaluation — inflated scores, misapplied rules, inconsistent reasoning — affect hiring quality and expose the organization to inconsistent process risk.
+
+      Structural hiring evaluations must be reproducible: two evaluators given the same transcript and these instructions should reach the same checkpoint scores. If your score cannot be traced to a verbatim transcript excerpt, it is not a valid score. Candidate impressions ("seemed confident"), tone judgments ("came across as polished"), and interviewer sentiment ("the panel liked them") are NOT evidence. Only transcript content is evidence.
+
+      Checkpoint applicability is determined by two things: (1) interview_type from metadata, and (2) what the candidate explicitly described. A checkpoint gated on "candidate mentioned managing direct reports" is only applicable if the candidate used language indicating direct management — not implied, not paraphrased, not inferred from job title. When in doubt, apply N/A rather than N.
+
+      The three new schema fields — panel_recommendation, candidate_level_assessed, and competency_scores — carry cross-field dependencies. panel_recommendation must be consistent with overall_recommendation. Inconsistency will cause schema validation failure. Derive these from the same evidence chain as overall_recommendation.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      (A) Read interview_type from transcript metadata.
+      (B) Check whether candidate explicitly mentioned managing direct reports or leading a team of 2+ people. This gates C-11, C-12, C-13.
+      (C) Check whether candidate described a conflict with a peer, stakeholder, or manager. This gates C-16.
+
+      interview_type="behavioral" → C-09, C-10, C-18, C-19 = N/A. C-14, C-15 = N/A.
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview. VIOLATION.
+      RIGHT: C-09 score="N/A", excerpt="" on a behavioral interview.
+      WRONG: Scoring C-11 as N because "no coaching examples" when candidate never mentioned managing anyone.
+      RIGHT: C-11 score="N/A" because leadership cluster gate not triggered.
+    </gate_check>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      FORMAT:
+        Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+        N/A score:    excerpt = "" (empty string — never "N/A", never null, never omitted)
+
+      WRONG: "[00:08] Priya: The trend was clearly positive — shows operational awareness"
+      RIGHT: "[00:08] Priya: by the time I moved to a different scope the numbers were clearly better"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+      C-01 through C-08: Always applicable for all interview types.
+      C-09, C-10: Applicable ONLY if interview_type is "technical".
+      C-11, C-12, C-13: Applicable ONLY if candidate explicitly mentioned managing direct reports or leading a team of 2+ people.
+      C-14, C-15: Applicable ONLY if interview_type is "final".
+      C-16: Applicable ONLY if candidate explicitly described a conflict with a peer, stakeholder, or manager.
+      C-17: Always applicable.
+      C-18, C-19: Applicable ONLY if interview_type is "technical".
+      C-20: Always applicable.
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins.
+
+      STEP 1 — AUTO-DOWNGRADE (NO_HIRE):
+        C-01 = N → overall_recommendation = "no_hire". STOP. panel_recommendation = "decline".
+        WRONG: C-01=N, overall_recommendation="hold". Schema rejects.
+
+      STEP 2 — LEADERSHIP DEPENDENCY (HOLD CEILING):
+        Any of C-11/C-12/C-13 = N, AND any of C-01–C-08 = N:
+        → overall_recommendation maximum = "hold". panel_recommendation = "defer".
+
+      STEP 3 — HIRE:
+        All C-01–C-08 = Y. Leadership cluster N/A or all Y. No auto-downgrade.
+        → overall_recommendation="hire", panel_recommendation="advance".
+
+      STEP 4 — HOLD: Mixed evidence. → overall_recommendation="hold", panel_recommendation="defer".
+
+      STEP 5 — NO_HIRE: Majority N. → overall_recommendation="no_hire", panel_recommendation="decline".
+    </scoring_decision_tree>
+
+    <field_definitions>
+      <field name="interview_type" type="string" required="true">
+        Read from transcript metadata. "behavioral", "technical", or "final".
+      </field>
+
+      <field name="checkpoints" type="array" required="true">
+        All 20 checkpoints C-01 through C-20 required. score in {"Y","N","N/A"}. reasoning min 25 chars.
+        WRONG: Missing any checkpoint. VIOLATION.
+      </field>
+
+      <field name="quality_areas" type="array" required="true">
+        Exactly 5 entries. rating in {"G","Y","R"}. reasoning min 30 chars.
+        WRONG: Missing any of the 5 areas. VIOLATION.
+      </field>
+
+      <field name="overall_recommendation" type="string" required="true">
+        Permitted: "hire", "no_hire", "hold". From scoring_decision_tree ONLY.
+        WRONG: overall_recommendation="hire" when C-01=N. Auto-downgrade violated.
+      </field>
+
+      <field name="panel_recommendation" type="string" required="true">
+        hire→advance, no_hire→decline, hold→defer. ALWAYS consistent.
+        WRONG: overall_recommendation="no_hire", panel_recommendation="defer". Schema rejects.
+      </field>
+
+      <field name="candidate_level_assessed" type="string" required="true">
+        "L4", "L5", "L6", "L7", or "unknown". From evidence, not job title.
+      </field>
+
+      <field name="competency_scores" type="array" required="true">
+        At least one entry. competency in {"system_design","behavioral_depth","cross_functional","communication","technical_accuracy"}. score 1-5.
+        WRONG: competency_scores=[]. Schema rejects.
+      </field>
+
+      <field name="key_strengths" type="array" required="true">
+        Specific observations. At least one even for weak candidates.
+      </field>
+
+      <field name="key_concerns" type="array" required="true">
+        Specific gaps with transcript basis.
+        WRONG: key_concerns=["Vague overall"] — not actionable.
+      </field>
+
+      <field name="risk_flags" type="array" required="true">
+        [] if none. Risk patterns warranting follow-up, not impressions.
+      </field>
+
+      <field name="summary" type="string" required="true">
+        Min 50 chars, max 80 words.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — checkpoint clearly and specifically observed with named evidence.
+        Generic statements = N, not Y.
+        "Trend was clearly positive" without a metric = N for business impact checkpoints.
+
+      N — behavior absent or insufficient despite clear opportunity from interviewer.
+        Weak evidence = N. N/A is only for gating conditions.
+
+      N/A — gating condition not met. Read applicability_rules first.
+        WRONG N/A: "No clear impact data" → should be N.
+        RIGHT N/A: interview_type="behavioral", C-09 gate not met → C-09="N/A", excerpt="".
+
+      NOTE FOR THIS TRANSCRIPT: The candidate consistently deflects specifics with phrases like "I don't have the exact numbers," "things got better," and "the trend was clearly positive." This pattern is evidence of C-01=N, not evidence of vague Y. The interviewer probed multiple times; the candidate could not or did not provide specific data. Score accordingly.
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Excerpt contamination.
+        WRONG: "[00:08] Priya: things got better — shows improvement orientation"
+        RIGHT: "[00:08] Priya: I don't have the exact numbers memorized but the trend was clearly positive"
+
+      ERROR 2 — N/A excerpt non-empty.
+        WRONG: score="N/A", excerpt="Not applicable"
+        RIGHT: score="N/A", excerpt=""
+
+      ERROR 3 — Auto-downgrade ignored.
+        WRONG: C-01=N, overall_recommendation="hold"
+        RIGHT: C-01=N → overall_recommendation="no_hire". Schema rejects any other value.
+        NOTE: This candidate provided no specific metrics, names, or outcomes in any answer. C-01=N is the correct assessment.
+
+      ERROR 4 — Leadership cluster applied without trigger.
+        NOTE: This candidate described cross-functional work but never mentioned managing direct reports. C-11, C-12, C-13 = N/A.
+
+      ERROR 5 — panel_recommendation inconsistent.
+        WRONG: overall_recommendation="no_hire", panel_recommendation="defer". Schema rejects.
+        RIGHT: no_hire→decline.
+
+      ERROR 6 — competency_scores empty.
+        WRONG: competency_scores=[]. Score at least "behavioral_depth" for this candidate.
+
+      ERROR 7 — Charitable inflation of vague answers.
+        WRONG: Scoring C-03=Y because "she mentioned SLA improvements." She described an improvement without any numbers.
+        RIGHT: C-03=N because no measurable business impact was articulated.
+
+      ERROR 8 — Missing checkpoints.
+        RIGHT: All 20 must appear, C-01 through C-20.
+    </common_errors>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <output_format_template>
+      Return valid JSON matching this exact structure. All fields required.
+
+      {
+        "interview_type": "behavioral",
+        "checkpoints": [
+          { "checkpoint_id": "C-01", "score": "Y"|"N"|"N/A", "excerpt": "...", "reasoning": "..." },
+          { "checkpoint_id": "C-02", ... },
+          // ... through C-20
+        ],
+        "quality_areas": [
+          { "area": "Opening", "description": "...", "rating": "G"|"Y"|"R", "reasoning": "..." },
+          { "area": "Behavioral Evidence", ... },
+          { "area": "Technical Depth", ... },
+          { "area": "Leadership &amp; Influence", ... },
+          { "area": "Closing", ... }
+        ],
+        "overall_recommendation": "hire" | "no_hire" | "hold",
+        "panel_recommendation": "advance" | "decline" | "defer",
+        "candidate_level_assessed": "L4" | "L5" | "L6" | "L7" | "unknown",
+        "competency_scores": [
+          { "competency": "behavioral_depth", "score": 1|2|3|4|5, "rationale": "..." }
+          // at least one entry
+        ],
+        "key_strengths": ["..."],
+        "key_concerns": ["..."],
+        "risk_flags": ["..."],
+        "summary": "min 50 chars, max 80 words"
+      }
+
+      CROSS-FIELD CONSTRAINTS:
+      - C-01=N → overall_recommendation MUST be "no_hire", panel_recommendation MUST be "decline"
+      - hire→advance, no_hire→decline, hold→defer
+      - competency_scores MUST NOT be empty
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. C-01 = N? → overall_recommendation="no_hire", panel_recommendation="decline". Fix if not.
+      2. All N/A checkpoints: excerpt="". Fix any non-empty.
+      3. All Y/N checkpoints: excerpt has verbatim quote. Fix any empty.
+      4. panel_recommendation consistent with overall_recommendation.
+      5. All 20 checkpoints present.
+      6. All 5 quality areas present.
+      7. competency_scores not empty.
+      8. summary >= 50 chars, <= 80 words.
+
+      WRONG: overall_recommendation="hold" when C-01=N. Schema rejects — must be "no_hire".
+      WRONG: overall_recommendation="no_hire", panel_recommendation="defer". Must be "decline".
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+panel_recommendation must be consistent with overall_recommendation (hire→advance, no_hire→decline, hold→defer).
+    </output_schema>
+  </instructions>
+</prompt>

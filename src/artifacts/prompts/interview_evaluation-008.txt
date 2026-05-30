@@ -1,0 +1,175 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Head of Product</role>
+      <interview_type>final</interview_type>
+      <interviewer>Elliot Rao (CEO), Nina Bergstrom (Chief Revenue Officer), Marcus Yuen (VP Engineering)</interviewer>
+      <candidate>Maria Volkov</candidate>
+      <duration>72 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Elliot (Interviewer): Maria, this is the final step. We've been impressed with your tactical depth in the earlier rounds. Today I want to understand how you think at the company level. Start here: how do you think about product strategy for a company at our stage — roughly $20M ARR, entering a crowded market?
+
+[00:02] Maria (Candidate): When you're entering a crowded market at $20M ARR, the first question I ask is: who are we actually winning against today, and why? Not the answer we tell investors — the honest answer. Most companies at this stage are winning in a specific segment against a specific competitor for a specific reason. The strategy work is to find that and make it defensible. At Prism Software, when I joined as Head of Product, we were winning deals in the mid-market against one incumbent, primarily because we had a better onboarding experience — customers were up and running in four hours versus twelve days. We took that insight and turned it into a product strategy: every product investment over 18 months was evaluated on whether it extended that time-to-value advantage or protected it. We grew mid-market ARR from $8M to $19M over that period.
+
+[00:07] Nina (Interviewer): Walk me through how you've worked with sales and revenue teams. Where do you draw the line between what product builds and what sales asks for?
+
+[00:08] Maria (Candidate): I've learned to think about this as a spectrum rather than a binary. On one end: features that only one customer wants and no one else ever will — I say no to those, clearly, with data. On the other end: patterns that appear across five or more accounts in the same segment, consistently blocking deals — those go to the top of my backlog and I treat them as product debt. The middle is where the judgment calls live. At Prism, sales had a list of about thirty requests at any given time. I ran a quarterly process: every request was scored on three dimensions — how many accounts have expressed it, how many deals has it blocked in the last two quarters, and how much engineering time to ship. The output was a ranked list that sales could see and critique. We disagreed on prioritization about 40% of the time. But the disagreements were about data, not instinct, which made them resolvable.
+
+[00:14] Marcus (Interviewer): How do you work with engineering on sequencing? What happens when the roadmap conflicts with technical debt?
+
+[00:15] Maria (Candidate): I treat technical debt as a first-class product input, not an engineering concern that I should be shielded from. At Prism, I introduced a monthly "technical debt review" in the roadmap planning cycle — engineering leads would present the three highest-risk areas of technical debt and I would assess business impact alongside product roadmap items. We maintained an informal rule: no more than 25% of any quarter's capacity goes to feature work if there are active debt items that carry customer risk. That said, I'll be honest: I wasn't always consistent about enforcing that rule when there was pressure from revenue. In Q3 2023, we had a big renewal tied to a specific feature, and I let debt accumulate for one more quarter to hit the revenue milestone. We had an incident six weeks later that was probably connected. I don't think that was the wrong call — the renewal was worth more than the incident cost — but I wasn't transparent with engineering about the tradeoff I was making.
+
+[00:22] Elliot (Interviewer): What's your theory of how product organizations should be structured? And where do you think most companies get it wrong?
+
+[00:23] Maria (Candidate): Most companies structure product orgs by function — one PM per feature area or engineering team. That works fine tactically. Where it breaks down is strategic coherence. You end up with PMs who are excellent feature owners but have no shared view of the customer journey, and no one is accountable for the end-to-end experience. At Prism, I restructured from functional alignment to customer journey alignment. PMs owned segments of the customer lifecycle — acquisition, onboarding, expansion — rather than engineering teams. The adjustment was painful: it required remapping PM scope, renegotiating relationships with engineering leads, and one PM who couldn't adapt eventually left. But within a year, we saw a meaningful change in NPS for the onboarding segment specifically — it went from 42 to 61 — because one person was accountable for the entire journey, not a handoff between three PMs.
+
+[00:29] Nina (Interviewer): What's your blind spot as a product leader? Where do you struggle?
+
+[00:30] Maria (Candidate): I'm strong at the tactical and operational layer — prioritization frameworks, stakeholder alignment, translating customer problems into features. Where I've gotten weaker feedback is on the longer-term vision side. I've been told by two CEOs in feedback that I'm more comfortable building the plan for the next two quarters than articulating a credible product vision for three years. I think that's fair. My instinct is to anchor in what the data says now, and three-year product vision is necessarily more speculative. I've actively worked on this — I've pushed myself to articulate longer-term bets and defend them — but I don't think I've fully closed the gap.
+
+[00:35] Elliot (Interviewer): That's candid. Let me follow up: if you had to name a three-to-five year product bet for a company in this space, what would it be?
+
+[00:36] Maria (Candidate): Honestly, I'd need more time with the business and the market before I could give you a credible answer. I could give you a generic answer about AI-driven personalization or platform extensibility, but those would be guesses, not conviction. What I can tell you is how I'd develop that view: I'd spend the first three months mapping where customers are under-served, where we're losing deals we shouldn't be losing, and what structural trends in the market suggest about what customers will need in three years. Then I'd build the thesis from that base. I'm not comfortable speculating without that foundation.
+
+[00:40] Marcus (Interviewer): Fair enough. What questions do you have for us?
+
+[00:41] Maria (Candidate): Two for Marcus — how mature is the current engineering organization's capacity to estimate work reliably, and how does your team currently feel about the product organization's ability to make prioritization decisions they can trust? And one for Elliot: where does the board think the biggest product risk is today?
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a senior hiring panel evaluator. Your role is to produce an objective, evidence-based evaluation of the interview transcript above. All scores must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      Determine interview_type from the transcript metadata. This controls applicability of entire checkpoint clusters.
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview.
+      RIGHT: C-09 score="N/A" on a behavioral interview, excerpt="" (empty string).
+
+      WRONG: Scoring C-14 as Y or N when interview_type is not "final".
+      RIGHT: C-14 score="N/A" on a technical interview, excerpt="".
+    </gate_check>
+
+    <scoring_guide>
+- Y (Yes): Clearly and specifically observed in the transcript
+- N (No): Expected behavior was not observed or was explicitly absent
+- N/A (Not Applicable): Checkpoint does not apply — state reason in reasoning field, set excerpt to ""
+    </scoring_guide>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      For Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+      For N/A score: excerpt = "" (empty string — not "N/A", not null, not omitted)
+
+      WRONG: "[00:24] Sarah: We reduced defects — this shows ownership and accountability"
+      RIGHT: "[00:24] Sarah: We brought defect count from 140 to 22 in one quarter"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+- C-01 through C-08: Always applicable for all interview types
+- C-09, C-10: Applicable only if interview_type is "technical" — mark N/A with explanation for behavioral interviews
+- C-11, C-12, C-13 (Leadership cluster): Applicable only if candidate explicitly mentioned managing direct reports or leading a team of 2+ people
+- C-14, C-15: Applicable only if interview_type is "final"
+- C-16: Applicable only if candidate described a situation involving conflict with a peer, stakeholder, or manager
+- C-17: Always applicable
+- C-18, C-19: Applicable only if interview_type is "technical"
+- C-20: Always applicable
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins — do not skip to a later step if an earlier one applies.
+
+      1. AUTO-DOWNGRADE — NO_HIRE:
+         If C-01 is scored N (no concrete examples provided) → overall_recommendation = "no_hire"
+         regardless of all other scores. STOP. Do not evaluate further steps.
+         WRONG: C-01=N but overall_recommendation="hold". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_recommendation="no_hire". STOP.
+
+      2. LEADERSHIP DEPENDENCY — HOLD CEILING:
+         If ANY checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N →
+         overall_recommendation cannot be "hire" unless ALL of C-01 through C-08 are scored Y.
+         If that condition is not met → maximum recommendation is "hold".
+         WRONG: C-12=N, C-03=N, overall_recommendation="hire". VIOLATION.
+         RIGHT: C-12=N, C-03=N → overall_recommendation="hold".
+
+      3. HIRE: All C-01 through C-08 scored Y, no Leadership cluster failures.
+
+      4. HOLD: Mixed evidence — some Y, some N, no auto-downgrade triggered, leadership dependency not violated.
+
+      5. NO_HIRE: Majority of core checkpoints (C-01–C-08) scored N, or auto-downgrade from step 1.
+    </scoring_decision_tree>
+
+    <dependency_rules>
+CROSS-FIELD DEPENDENCY RULE:
+If any checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N, overall_recommendation cannot be "hire" unless ALL checkpoints in C-01 through C-08 are scored Y. If this condition is not met, maximum recommendation is "hold".
+
+AUTO-DOWNGRADE RULE:
+If C-01 is scored N (no concrete examples provided), overall_recommendation must be "no_hire" regardless of all other scores. This is enforced by schema validation — any other value will be rejected.
+    </dependency_rules>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If your draft exceeds the cap, shorten the observation. Do NOT go over.
+      - reasoning (CheckpointResult): state observation + evidence, then STOP. ≤ 40 words. HARD CAP.
+      - reasoning (QualityArea): ≤ 45 words. HARD CAP.
+      - summary: covers overall impression, key strengths, key concerns. ≤ 80 words. HARD CAP.
+    </field_caps>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. Did C-01 score N? If yes, overall_recommendation MUST be "no_hire". Fix if not — schema will reject any other value.
+      2. Did any Leadership cluster checkpoint (C-11, C-12, C-13) score N AND any C-01–C-08 score N?
+         If yes, overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
+      3. All N/A checkpoints have excerpt = "" (empty string — not "N/A", not null, not omitted).
+      4. All Y/N checkpoints have excerpt = "[HH:MM] CandidateName: exact quote" (not empty).
+      5. overall_recommendation is exactly one of: "hire", "no_hire", "hold".
+      6. summary is at least 50 characters.
+
+      WRONG: overall_recommendation="hire" but C-01=N. SELF-CONTRADICTION. Schema will reject.
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only". VIOLATION. Set to "".
+      WRONG: Y checkpoint with excerpt="". VIOLATION. Must include verbatim quote.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+    </output_schema>
+  </instructions>
+</prompt>

@@ -1,0 +1,398 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Engineering Manager</role>
+      <interview_type>behavioral</interview_type>
+      <interviewer>Rachel Odom (VP of Engineering)</interviewer>
+      <candidate>Sarah Chen</candidate>
+      <duration>78 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Rachel (Interviewer): Sarah, thanks for coming in. Let's jump right in. Tell me about the most challenging engineering team you've managed and what made it difficult.
+
+[00:02] Sarah (Candidate): Absolutely. In early 2023 I inherited a team of seven engineers at Lumio Health — a Series B startup — who had shipped almost nothing in the prior two quarters. Morale was low, the tech debt was severe, and two senior engineers were actively interviewing elsewhere. The challenge was threefold: I needed to stop the attrition, restore credibility with the product org, and reduce a backlog of 140-plus open defects on our patient-facing mobile app without slowing feature delivery.
+
+[00:04] Rachel (Interviewer): What did you actually do?
+
+[00:04] Sarah (Candidate): First week I did one-on-ones with every engineer, not to fix anything — just to listen. By day five I had a clear picture: the two seniors felt unheard on architecture decisions, and the mid-level engineers had no visibility into how their work connected to patient outcomes. I made two structural changes immediately. I created a weekly architecture review where the two seniors co-facilitated — they went from looking for jobs to feeling ownership within three weeks. Neither left. For the broader team I started attaching a "patient impact" note to every ticket — a two-sentence description of which patient workflow it affected and what would happen if we didn't fix it. Defect count dropped from 140 to 22 over 11 weeks while we still shipped two major features: medication reminders and appointment scheduling. Velocity measured in story points went up 34%.
+
+[00:08] Rachel (Interviewer): Who else was involved in the architecture review decision — was that something you got buy-in on from product or your own manager?
+
+[00:09] Sarah (Candidate): My skip-level, Jordan Park, knew I was going to restructure how architecture decisions were made — I told her in my first week check-in that I was seeing gatekeeping patterns and planned to change them. She gave me latitude. Product was not directly involved in the architecture review format — I kept that as an engineering process — but I did align with Lena, our CPO at the time, on the fact that I was making changes to how the team operated. She cared about outcomes, not process specifics. The two senior engineers, Marcus and Divya, drove the actual meeting formats within the structure I gave them.
+
+[00:12] Rachel (Interviewer): Tell me about a time you had to make a difficult technical decision under time pressure.
+
+[00:13] Sarah (Candidate): Mid-2023, our data pipeline for clinical lab results was failing intermittently — about 3% of lab result notifications were not reaching patients. That sounds small but in healthcare 3% of 80,000 monthly results meant roughly 2,400 patients not getting a notification. We found the root cause: a race condition in our Kafka consumer group during partition rebalancing. We had two options. Option A was a surgical fix — add idempotency keys and a dead-letter queue — estimated four days of engineering time, lower risk. Option B was a broader rewrite of the consumer layer using a saga pattern, which would fully eliminate the class of problem but would take three weeks and carry real regression risk. I chose Option A. I made that call by framing it as a patient safety calculation: every day we delayed, roughly 80 patients were missing a notification. A three-week runway was not acceptable. I documented the decision in our architectural decision log with the patient-harm framing explicitly written in. Option A shipped in three and a half days. We scheduled Option B for Q1 2024 and completed it on time. Zero recurrence of the race condition since.
+
+[00:18] Rachel (Interviewer): Let's talk about a time you had to deliver critical feedback to an engineer. How did you handle it?
+
+[00:19] Sarah (Candidate): About eight months ago I had an engineer — I'll call him T — who was technically strong but consistently delivered work without communicating blockers until they became crises. Three sprints in a row he missed commitments because of issues he'd known about for days. I had a direct conversation: I told him specifically what I'd observed — three sprint misses, the pattern of late disclosure, and the downstream impact on the two engineers who depended on his output as a prerequisite. I wasn't vague. I also told him I wanted to understand what was happening from his side before drawing conclusions. He disclosed he'd been dealing with a family health situation and felt uncomfortable asking for help. We adjusted his workload for six weeks and I set up a lightweight weekly check-in — fifteen minutes, just the two of us. Within two months he was consistently communicating blockers early. At his next performance review I was able to write a genuinely strong assessment. He's now a technical lead on our infrastructure team.
+
+[00:24] Rachel (Interviewer): How do you think about growing engineers on your team who are at very different levels?
+
+[00:25] Sarah (Candidate): I run what I call a growth matrix: for each engineer I map two axes — their current skill level against the skills the team needs twelve months from now. Where those don't align, that's where I focus development conversations. For junior engineers I pair them with specific stretch projects — not stretch in the "sink or swim" sense but with a defined mentor and a weekly thirty-minute debrief. For seniors I look for sponsorship opportunities outside the team: getting them in front of leadership on cross-functional projects, inviting them to present at our engineering all-hands. My most recent example: I sponsored a mid-level engineer named Preet to lead the HIPAA compliance audit for our new data residency feature. She had zero compliance experience but strong technical judgment. She delivered a 47-page audit report that our external compliance firm called "the most thorough self-assessment" they'd seen from a startup. She was promoted to senior two months later.
+
+[00:30] Rachel (Interviewer): Tell me about a time you had to make a promotion decision that was genuinely difficult — not a clear yes or a clear no.
+
+[00:31] Sarah (Candidate): Last year I had an engineer, Kenji, who was performing at the senior level on technical work — his code quality, design contributions, and mentorship of juniors were all there. But his cross-team communication was inconsistent. He'd produce excellent output inside the team and then stumble when presenting or advocating for his team's work to product or design stakeholders. He'd been on the team two years and the expectation was he'd be promoted to senior by now. Two of his peers had already been promoted. I had a specific conversation with him: I laid out exactly what I saw — what was promotion-ready and what wasn't — and I told him I was going to make a hold decision for this cycle but give him a concrete development plan and a six-month timeline with specific milestones. He was frustrated, understandably. I held the decision. Five months later, after two cross-functional design reviews where I specifically put him in the presenter role, his communication was markedly improved. He was promoted in the next cycle. He told me afterward that the specificity of the feedback made the difference — he said prior managers had told him to "work on communication" but never said what that looked like in practice.
+
+[00:36] Rachel (Interviewer): What about a time you failed as a manager — something you own and would do differently?
+
+[00:37] Sarah (Candidate): Early in my management career at my previous company, Vertex Analytics, I had a direct report — Amara — who was struggling with the technical demands of a project that had been scoped too aggressively. I could see she was stressed, but I kept adding resources to the project rather than having the direct conversation about whether the timeline itself was wrong. I was conflict-averse in that specific way: I was good at giving feedback on behavior or technical quality, but bad at telling product leadership that we'd committed to something we couldn't deliver. Amara burned out and took medical leave for three weeks. The project slipped by six weeks anyway. What I learned: the discomfort of a difficult conversation with a stakeholder is almost always smaller than the cost of not having it. When the signals are there — engineer stress, increasing hours, scope not shrinking — I now escalate the timeline conversation immediately rather than trying to absorb the problem with more people.
+
+[00:42] Rachel (Interviewer): How do you handle disagreements with product leadership on priorities?
+
+[00:43] Sarah (Candidate): I believe that most priority disagreements are actually information asymmetry problems in disguise. When our CPO last year pushed hard to ship a new provider-facing dashboard before we'd resolved critical performance regressions in the patient app, I didn't just say no. I built a cost-of-delay model: I calculated that every week the patient app performance issues persisted was costing us approximately $18,000 in increased support ticket volume and roughly 400 churned sessions per day based on our drop-off analytics. I presented that to the CPO alongside a sequencing proposal — two engineering sprints to close the performance gap, then a clean sprint for the dashboard with no tech debt drag. She agreed. The dashboard shipped four weeks later, a week ahead of the revised schedule, because the engineering team wasn't context-switching between fire-fighting and new feature work.
+
+[00:48] Rachel (Interviewer): How do you think about managing remote or distributed teams? Any specific changes to how you operate?
+
+[00:49] Sarah (Candidate): At Lumio we shifted to a distributed model in late 2023 — two engineers moved to Portugal, one to Canada. The biggest thing I changed was defaulting to asynchronous decision-making rather than synchronous. For decisions that don't need real-time discussion, I started writing a "decision brief" in Notion — context, options, tradeoffs, my recommendation — and giving the team 48 hours to comment before I finalized. That kept the Europeans from feeling excluded from decisions made in morning standups they couldn't attend. I also moved our 1:1s to biweekly rather than weekly for the distributed engineers but made them longer — 45 minutes instead of 30 — because informal corridor feedback doesn't happen naturally when you're remote. The one thing I got wrong initially: I underestimated how much I needed to be explicit about team norms in writing. Things that were implicit in the office — when to escalate, when it's okay to interrupt someone, what counts as urgent — I had to write them all down. That took about a month of incidents before I realized the gap.
+
+[00:54] Rachel (Interviewer): Sarah, do you have questions for us?
+
+[00:55] Sarah (Candidate): I do. First — what does engineering leadership here consider the biggest structural challenge to shipping high-quality software right now — is it team topology, tooling, process, or something else? Second — how does this organization handle the tension between platform investment and product feature delivery? And third — what's the biggest thing you'd want an incoming engineering manager in this role to change or improve in the first six months?
+
+[00:57] Rachel (Interviewer): Really thoughtful questions. We'll dig into all three. Thank you, Sarah — this was an excellent conversation.
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <domain_context>
+      You are a senior member of a structured hiring panel. Your evaluation will be read by hiring managers, HR business partners, and in some cases executive leadership. This report directly influences whether a candidate advances to an offer or is declined. Errors in your evaluation — inflated scores, misapplied rules, inconsistent reasoning — affect hiring quality and expose the organization to inconsistent process risk.
+
+      Structural hiring evaluations must be reproducible: two evaluators given the same transcript and these instructions should reach the same checkpoint scores. If your score cannot be traced to a verbatim transcript excerpt, it is not a valid score. Candidate impressions ("seemed confident"), tone judgments ("came across as polished"), and interviewer sentiment ("the panel liked them") are NOT evidence. Only transcript content is evidence.
+
+      Checkpoint applicability is determined by two things: (1) interview_type from metadata, and (2) what the candidate explicitly described. A checkpoint gated on "candidate mentioned managing direct reports" is only applicable if the candidate used language indicating direct management — not implied, not paraphrased, not inferred from job title. When in doubt, apply N/A rather than N.
+
+      The three new schema fields — panel_recommendation, candidate_level_assessed, and competency_scores — carry cross-field dependencies. panel_recommendation must be consistent with overall_recommendation. Inconsistency will cause schema validation failure. Derive these from the same evidence chain as overall_recommendation.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      (A) Read interview_type from transcript metadata.
+      (B) Check whether candidate explicitly mentioned managing direct reports or leading a team of 2+ people. This gates C-11, C-12, C-13.
+      (C) Check whether candidate described a conflict with a peer, stakeholder, or manager. This gates C-16.
+
+      interview_type="behavioral" → C-09, C-10, C-18, C-19 = N/A. C-14, C-15 = N/A.
+      interview_type="technical"  → C-14, C-15 = N/A.
+      interview_type="final"      → all checkpoints potentially applicable (subject to other gates).
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview. VIOLATION.
+      RIGHT: C-09 score="N/A", excerpt="" on a behavioral interview.
+      WRONG: Scoring C-14 as Y or N on a technical interview. VIOLATION.
+      RIGHT: C-14 score="N/A", excerpt="" on a technical interview.
+      WRONG: Scoring C-11 as N because "no strong examples" when candidate never mentioned managing anyone.
+      RIGHT: C-11 score="N/A" because leadership cluster gate not triggered.
+    </gate_check>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      FORMAT:
+        Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+        N/A score:    excerpt = "" (empty string — never "N/A", never null, never omitted, never "Not applicable")
+
+      WRONG: "[00:04] Sarah: Defect count dropped from 140 to 22 — demonstrates ownership"
+      RIGHT: "[00:04] Sarah: Defect count dropped from 140 to 22 over 11 weeks"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — behavioral interview only"
+      RIGHT: N/A checkpoint with excerpt=""
+
+      WRONG: Y checkpoint with excerpt="" (empty)
+      RIGHT: Y checkpoint with excerpt="[HH:MM] CandidateName: verbatim quote"
+    </excerpt_format>
+
+    <applicability_rules>
+      C-01 through C-08: Always applicable for all interview types.
+      C-09, C-10: Applicable ONLY if interview_type is "technical".
+      C-11, C-12, C-13 (Leadership cluster): Applicable ONLY if candidate explicitly mentioned managing direct reports or leading a team of 2+ people. NOT triggered by: managing projects, managing up, influencing without authority.
+      C-14, C-15: Applicable ONLY if interview_type is "final".
+      C-16: Applicable ONLY if candidate explicitly described a situation involving conflict with a peer, stakeholder, or manager. Not triggered by vague mentions of "friction."
+      C-17: Always applicable.
+      C-18, C-19: Applicable ONLY if interview_type is "technical".
+      C-20: Always applicable.
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins.
+
+      STEP 1 — AUTO-DOWNGRADE (NO_HIRE):
+        C-01 = N → overall_recommendation = "no_hire". STOP. panel_recommendation = "decline".
+        WRONG: C-01=N, overall_recommendation="hold". Schema rejects.
+        RIGHT: C-01=N → overall_recommendation="no_hire", panel_recommendation="decline". STOP.
+
+      STEP 2 — LEADERSHIP DEPENDENCY (HOLD CEILING):
+        Any of C-11/C-12/C-13 = N, AND any of C-01–C-08 = N:
+        → overall_recommendation cannot be "hire". Maximum = "hold". panel_recommendation = "defer".
+        WRONG: C-12=N, C-03=N, overall_recommendation="hire". Schema rejects.
+        RIGHT: C-12=N + any core checkpoint N → overall_recommendation="hold", panel_recommendation="defer".
+
+      STEP 3 — HIRE:
+        All C-01–C-08 = Y. Leadership cluster either N/A or all Y. No auto-downgrade.
+        → overall_recommendation="hire", panel_recommendation="advance".
+
+      STEP 4 — HOLD:
+        Mixed evidence in C-01–C-08. Some Y, some N. No auto-downgrade. No leadership dependency.
+        → overall_recommendation="hold", panel_recommendation="defer".
+
+      STEP 5 — NO_HIRE:
+        Majority of C-01–C-08 = N. No auto-downgrade needed.
+        → overall_recommendation="no_hire", panel_recommendation="decline".
+    </scoring_decision_tree>
+
+    <field_definitions>
+      ONE ENTRY PER OUTPUT FIELD. Read before scoring each field.
+
+      <field name="interview_type" type="string" required="true">
+        Permitted values: "behavioral", "technical", "final" — exactly one.
+        Read from transcript metadata. Do NOT infer from content.
+        WRONG: interview_type="technical" when metadata says "behavioral". VIOLATION.
+      </field>
+
+      <field name="checkpoints" type="array" required="true">
+        One entry per checkpoint C-01 through C-20. All 20 required.
+        Each: checkpoint_id ("C-01"..."C-20"), score ("Y"/"N"/"N/A"), excerpt (verbatim or ""), reasoning (min 25 chars, max 40 words).
+        WRONG: Missing any checkpoint. VIOLATION.
+        WRONG: checkpoint_id="C-1". Use "C-01".
+        WRONG: score="Yes". Permitted: "Y", "N", "N/A".
+      </field>
+
+      <field name="quality_areas" type="array" required="true">
+        Exactly 5 entries: "Opening", "Behavioral Evidence", "Technical Depth", "Leadership &amp; Influence", "Closing".
+        Each: area (exact string), description, rating ("G"/"Y"/"R"), reasoning (min 30 chars).
+        G=good/meets bar, Y=yellow/needs coaching, R=red/below bar.
+        WRONG: rating="Green". Use "G".
+        WRONG: Missing any of the 5 areas. VIOLATION.
+      </field>
+
+      <field name="overall_recommendation" type="string" required="true">
+        Permitted: "hire", "no_hire", "hold" — exactly one.
+        Determined SOLELY by scoring_decision_tree. Do NOT derive independently.
+        WRONG: overall_recommendation="strong hire". Not a permitted value.
+        WRONG: overall_recommendation="hire" when C-01=N. Auto-downgrade violated.
+      </field>
+
+      <field name="panel_recommendation" type="string" required="true">
+        Permitted: "advance", "decline", "defer".
+        MUST be consistent:
+          overall_recommendation="hire"    → panel_recommendation="advance"
+          overall_recommendation="no_hire" → panel_recommendation="decline"
+          overall_recommendation="hold"    → panel_recommendation="defer"
+        WRONG: overall_recommendation="hire", panel_recommendation="defer". Schema rejects.
+      </field>
+
+      <field name="candidate_level_assessed" type="string" required="true">
+        Permitted: "L4", "L5", "L6", "L7", "unknown".
+        Assess from complexity/scope of examples — not from job title.
+        L4: individual contributor limited scope. L5: senior IC, cross-team. L6: staff/principal, org-wide. L7: VP/Director+, strategic.
+        Use "unknown" if transcript lacks sufficient evidence.
+        WRONG: candidate_level_assessed="L4-L5". Must be exactly one value.
+      </field>
+
+      <field name="competency_scores" type="array" required="true">
+        At least one entry required. Score each dimension the interview covered.
+        Permitted competencies: "system_design", "behavioral_depth", "cross_functional", "communication", "technical_accuracy".
+        Score 1-5: 1=far below bar, 2=below bar, 3=meets bar, 4=above bar, 5=exceptional.
+        Each: competency (exact string), score (int 1-5), rationale (min 25 chars).
+        WRONG: competency_scores=[] (empty). Schema rejects.
+        WRONG: competency="systems_design". Must be "system_design".
+        WRONG: score=0 or score=6. Range 1-5 only.
+      </field>
+
+      <field name="key_strengths" type="array" required="true">
+        List of strings. Each = one distinct observed strength with specific basis.
+        WRONG: key_strengths=["Good communicator"] — too generic.
+        RIGHT: key_strengths=["Named 5 specific engineers by name across stories, with outcomes"]
+      </field>
+
+      <field name="key_concerns" type="array" required="true">
+        List of strings. Each = one distinct observed concern with transcript basis.
+        WRONG: key_concerns=["Weak overall"] — not actionable.
+        RIGHT: key_concerns=["No quantified business impact in any example"]
+      </field>
+
+      <field name="risk_flags" type="array" required="true">
+        Specific risk signals warranting follow-up. Empty list [] if none.
+        WRONG: risk_flags=["They seemed nervous"] — inference, not evidence.
+        RIGHT: risk_flags=[] if no risk patterns observed.
+      </field>
+
+      <field name="summary" type="string" required="true">
+        Min 50 chars. Max 80 words. Overall impression, key strengths, key concerns, level signal.
+        WRONG: summary less than 50 chars. Schema rejects.
+        WRONG: summary exceeding 80 words. Trim to fit.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y (Yes) — checkpoint clearly and specifically observed:
+        Transcript contains direct evidence satisfying the criterion.
+        "Directly" = specific name, number, project, outcome, or described behavior.
+        Generic statements do NOT qualify as Y — they qualify as N.
+        WRONG Y: "I always focus on business impact" — generic statement, no evidence.
+        RIGHT Y: "Defect count dropped from 140 to 22 over 11 weeks" — specific metric.
+        WRONG Y: "working with stakeholders" without a specific interaction described.
+        RIGHT Y: Specific conflict with named stakeholder and specific outcome described.
+
+      N (No) — expected behavior absent or specifically insufficient:
+        Interviewer gave opportunity, candidate did not demonstrate the behavior.
+        OR checkpoint always applicable and no relevant evidence appears.
+        Weak evidence = N, not N/A. N/A is only for gating conditions.
+        WRONG N: C-11=N because "no strong leadership examples" when candidate never mentioned managing.
+        RIGHT N: C-01=N because every answer was generic, no metrics or names cited.
+
+      N/A (Not Applicable) — gating condition not met:
+        Read applicability_rules. If gate condition absent, score N/A.
+        N/A is NOT a way to avoid scoring something difficult. Weak evidence = N.
+        WRONG N/A: "No clear business impact" → should be N, not N/A.
+        RIGHT N/A: interview_type="behavioral", C-09 gate not met → C-09="N/A", excerpt="".
+
+      QUALITY AREA RATINGS:
+        G (Good/Meets bar): Candidate met the standard, no coaching needed.
+        Y (Yellow/Coaching needed): Partial evidence — some gaps, some strengths.
+        R (Red/Below bar): Candidate clearly failed this area.
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Excerpt contamination: appending interpretation after verbatim quote.
+        WRONG: "[00:04] Sarah: Defect count dropped — demonstrates ownership and follow-through"
+        RIGHT: "[00:04] Sarah: Defect count dropped from 140 to 22 over 11 weeks"
+        Rule: excerpt ends at candidate's closing word. Nothing appended.
+
+      ERROR 2 — N/A excerpt non-empty.
+        WRONG: score="N/A", excerpt="Not applicable — behavioral interview"
+        RIGHT: score="N/A", excerpt=""
+        Rule: N/A excerpts are ALWAYS empty string.
+
+      ERROR 3 — Auto-downgrade ignored.
+        WRONG: C-01=N, overall_recommendation="hold"
+        RIGHT: C-01=N → overall_recommendation="no_hire". Schema rejects any other value.
+
+      ERROR 4 — Leadership cluster applied without trigger.
+        WRONG: C-11=N because candidate "didn't describe coaching" when they never mentioned managing.
+        RIGHT: If candidate never mentioned managing direct reports, C-11/C-12/C-13 = N/A, excerpt="".
+
+      ERROR 5 — panel_recommendation inconsistent with overall_recommendation.
+        WRONG: overall_recommendation="hire", panel_recommendation="defer"
+        RIGHT: hire→advance, no_hire→decline, hold→defer. ALWAYS.
+
+      ERROR 6 — competency_scores empty.
+        WRONG: competency_scores=[]
+        RIGHT: Score at least one competency covered by the interview.
+
+      ERROR 7 — Generic key_strengths or key_concerns.
+        WRONG: key_strengths=["Strong communicator", "Good leader"]
+        RIGHT: key_strengths=["Structured failure story with named engineer, disclosed root cause, and tracked 2-month outcome"]
+
+      ERROR 8 — Missing checkpoints.
+        WRONG: Only 18 entries (missing C-04 and C-17).
+        RIGHT: All 20 checkpoints must appear, C-01 through C-20.
+    </common_errors>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <output_format_template>
+      Return valid JSON matching this exact structure. All fields required.
+
+      {
+        "interview_type": "behavioral" | "technical" | "final",
+        "checkpoints": [
+          {
+            "checkpoint_id": "C-01",
+            "score": "Y" | "N" | "N/A",
+            "excerpt": "[HH:MM] CandidateName: verbatim quote" | "",
+            "reasoning": "string, min 25 chars, max 40 words, observation + evidence"
+          }
+          // ... entries C-01 through C-20 (all 20 required)
+        ],
+        "quality_areas": [
+          {
+            "area": "Opening" | "Behavioral Evidence" | "Technical Depth" | "Leadership &amp; Influence" | "Closing",
+            "description": "string — what this area evaluates",
+            "rating": "G" | "Y" | "R",
+            "reasoning": "string, min 30 chars, max 45 words"
+          }
+          // ... exactly 5 entries (all 5 required)
+        ],
+        "overall_recommendation": "hire" | "no_hire" | "hold",
+        "panel_recommendation": "advance" | "decline" | "defer",
+        "candidate_level_assessed": "L4" | "L5" | "L6" | "L7" | "unknown",
+        "competency_scores": [
+          {
+            "competency": "system_design" | "behavioral_depth" | "cross_functional" | "communication" | "technical_accuracy",
+            "score": 1 | 2 | 3 | 4 | 5,
+            "rationale": "string, min 25 chars, specific transcript evidence"
+          }
+          // at least one entry required
+        ],
+        "key_strengths": ["string", ...],
+        "key_concerns": ["string", ...],
+        "risk_flags": ["string", ...],
+        "summary": "string, min 50 chars, max 80 words"
+      }
+
+      CROSS-FIELD CONSTRAINTS (schema enforces):
+      - overall_recommendation="hire"    → panel_recommendation MUST be "advance"
+      - overall_recommendation="no_hire" → panel_recommendation MUST be "decline"
+      - overall_recommendation="hold"    → panel_recommendation MUST be "defer"
+      - C-01=N → overall_recommendation MUST be "no_hire"
+      - competency_scores MUST NOT be empty
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. C-01 scored N? → overall_recommendation MUST be "no_hire". panel_recommendation MUST be "decline".
+      2. Any Leadership cluster (C-11/C-12/C-13) = N AND any C-01–C-08 = N?
+         → overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
+      3. All N/A checkpoints: excerpt = "" (empty string). Fix any non-empty N/A excerpt.
+      4. All Y/N checkpoints: excerpt = "[HH:MM] CandidateName: verbatim quote". Fix any empty Y/N excerpt.
+      5. overall_recommendation in {"hire", "no_hire", "hold"}. Fix any variant.
+      6. panel_recommendation in {"advance", "decline", "defer"} and consistent with overall_recommendation.
+      7. All 20 checkpoints present (C-01 through C-20).
+      8. All 5 quality areas present.
+      9. competency_scores not empty.
+      10. summary length >= 50 chars and <= 80 words.
+
+      WRONG: overall_recommendation="hire" but C-01=N. Schema rejects.
+      WRONG: N/A checkpoint with excerpt="Not applicable". Set to "".
+      WRONG: Y checkpoint with excerpt="". Must include verbatim quote.
+      WRONG: overall_recommendation="hire", panel_recommendation="defer". Schema rejects.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+panel_recommendation must be consistent with overall_recommendation (hire→advance, no_hire→decline, hold→defer).
+    </output_schema>
+  </instructions>
+</prompt>

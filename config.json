@@ -1,0 +1,33 @@
+{
+  "schema_path": "src/artifacts/schemas",
+  "prompt_sets": [
+    { "path": "src/artifacts/prompts" }
+  ],
+  "model_pairs": [
+    {
+      "name": "gemini_migration",
+      "provider": "gemini",
+      "old_model": "gemini-2.5-flash",
+      "new_model": "gemini-3.1-flash-lite"
+    },
+    {
+      "name": "claude_migration",
+      "provider": "claude",
+      "old_model": "claude-sonnet-4-5-20250929",
+      "new_model": "claude-sonnet-4-6"
+    }
+  ],
+  "output_dir": "data/benchmark_results",
+  "taxonomy_labels": [
+    "format_drift",
+    "verbosity_drift",
+    "schema_adherence",
+    "tool_call_failure",
+    "instruction_drift",
+    "underspecification_exposure"
+  ],
+  "run": {
+    "verbose": true,
+    "save_outputs": true
+  }
+}

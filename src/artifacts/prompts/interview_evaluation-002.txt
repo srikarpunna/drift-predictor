@@ -1,0 +1,408 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Product Manager</role>
+      <interview_type>behavioral</interview_type>
+      <interviewer>Danielle Park (Director of Product)</interviewer>
+      <candidate>James Okafor</candidate>
+      <duration>68 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Danielle (Interviewer): James, great to meet you. Let's start with a product you owned end-to-end. Walk me through how you defined the strategy and how it played out.
+
+[00:02] James (Candidate): Sure, yeah. So at my last company I was working on a payments product. We were trying to improve the checkout experience. I did a lot of customer research, talked to some users, looked at the data. We made some improvements and things got better. The team was pretty happy with how it went.
+
+[00:04] Danielle (Interviewer): Can you be more specific? What did the data show before you started, what changes did you actually ship, and how did you measure success?
+
+[00:05] James (Candidate): Right, so the drop-off rate was high — I think somewhere in the range of like, a lot of people were dropping off. We simplified the form fields and added a progress bar. After that the numbers improved. I don't remember the exact percentages off the top of my head but it was a meaningful improvement. The team felt we were moving in the right direction.
+
+[00:07] Danielle (Interviewer): Okay. Tell me about a time you had to make a product decision when the data was ambiguous or incomplete.
+
+[00:08] James (Candidate): That happens pretty often. I think the key is to just make a call. You can't wait forever for perfect data. I remember one time we weren't sure whether to invest in a mobile-first redesign or stick with our existing responsive layout. There were arguments on both sides. I weighed the pros and cons and decided we should go with the mobile-first redesign. It ended up being the right call because mobile traffic was growing.
+
+[00:11] Danielle (Interviewer): What was the basis for your decision? Were there specific signals you used, and what was the outcome?
+
+[00:12] James (Candidate): We looked at the traffic data and mobile was definitely going up. I talked to a few stakeholders. The engineering team gave me a rough estimate of the effort. I just felt like the timing was right. Looking back I think it worked out — I moved on to my next role shortly after so I didn't see the full rollout, but the team seemed positive about the direction.
+
+[00:14] Danielle (Interviewer): Let me push on that. When you say mobile traffic was growing — what was the actual number? What percentage of traffic was mobile, and by how much had it grown?
+
+[00:15] James (Candidate): I want to say it was maybe around, I don't know, somewhere north of 50% of traffic was mobile. It had been climbing over the past year. I don't have the exact figure in front of me. The direction was clearly there, though — it wasn't a close call in terms of the signal.
+
+[00:17] Danielle (Interviewer): Tell me about a time you had to work with a difficult stakeholder or navigate a conflict between teams.
+
+[00:18] James (Candidate): Yeah, we had some friction with the engineering team at one point. They felt like the roadmap was being handed down to them without enough input. I listened to their concerns and tried to be more collaborative. I started having regular syncs with the tech lead and I think that helped. The relationship improved over the next few months.
+
+[00:20] Danielle (Interviewer): Was there a specific moment of conflict or a specific outcome you can point to?
+
+[00:21] James (Candidate): It was more of a gradual tension than a single moment. I can't point to one specific incident. It was just a general feeling on the team. Once we improved communication things got smoother. I think the main thing I did was show them I was listening.
+
+[00:23] Danielle (Interviewer): What changed specifically? You mentioned regular syncs — what happened in those syncs that shifted the relationship?
+
+[00:24] James (Candidate): We would go over the upcoming roadmap and I'd give them a chance to raise concerns. I think the main thing was that they felt heard. The syncs created a space for that. Before, I might have just been sending Jira tickets. After, there was more of a dialogue. The relationship was better. I'm not sure I can point to one specific metric that changed, but the vibe was noticeably different.
+
+[00:26] Danielle (Interviewer): Tell me about a product initiative you worked on that failed or significantly underperformed. What happened?
+
+[00:27] James (Candidate): We launched a referral program that didn't get the uptake we expected. Honestly, I think the timing was off — the market conditions weren't great and the incentive structure wasn't as compelling as we thought. The team worked hard on it. It happens sometimes. We learned from it and moved on.
+
+[00:29] Danielle (Interviewer): What did you specifically do differently as a result of that experience?
+
+[00:30] James (Candidate): I think I became more careful about validating assumptions before investing heavily. We probably should have done more upfront research. After that I tried to build in more checkpoints. It's the kind of thing you learn by doing.
+
+[00:32] Danielle (Interviewer): What checkpoints specifically? What did that look like in your next initiative?
+
+[00:33] James (Candidate): I'd try to get more user feedback earlier in the process. Before committing to a full build, do some lighter-weight validation — maybe a prototype or a survey. I did that on a subsequent project around a new notification feature. We got some early signal that the initial approach wasn't quite right and adjusted before we were too far in. I think we saved maybe a few weeks of engineering time.
+
+[00:36] Danielle (Interviewer): What does your prioritization framework look like day to day?
+
+[00:37] James (Candidate): I use a mix of RICE and gut feel. I think frameworks are helpful but you also have to know when to override them. I look at reach, impact, confidence, and effort, and then I talk to stakeholders and see what feels right. I've also used story mapping and jobs-to-be-done in different contexts. I adapt to what the team is comfortable with.
+
+[00:39] Danielle (Interviewer): Walk me through a real decision where RICE gave you a clear signal but you overrode it. What happened?
+
+[00:40] James (Candidate): There was a case where by the numbers a lower-priority item scored higher on RICE because it had broad reach even though the actual impact per user was low. I decided to prioritize a different item that affected fewer users but was a much bigger pain point for a high-value segment. I felt the RICE score was misleading because our impact estimate wasn't granular enough. The decision felt right in context.
+
+[00:42] Danielle (Interviewer): What was the outcome of that decision?
+
+[00:43] James (Candidate): I think it was positive. The high-value segment responded well. I don't have a specific metric I can point to, but the feedback we got from customers and from the sales team was good. It validated the judgment call.
+
+[00:45] Danielle (Interviewer): If you had to pick one decision from your career where you showed the most independent judgment — where there was real ambiguity and real stakes — what would it be?
+
+[00:46] James (Candidate): That's a tough one. I guess I'd say the mobile redesign decision I mentioned earlier. That felt like a real judgment call because there wasn't a clear right answer. Mobile was growing but the redesign was expensive. I made the call and we went for it.
+
+[00:48] Danielle (Interviewer): James, what questions do you have for us?
+
+[00:49] James (Candidate): A few things. What does the team culture look like? And how does product work with engineering here? I'm also curious about the roadmap process — is it more top-down or bottom-up?
+
+[00:51] Danielle (Interviewer): Good questions. We'll definitely address those. Thanks, James.
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <domain_context>
+      You are a senior member of a structured hiring panel. Your evaluation will be read by hiring managers, HR business partners, and in some cases executive leadership. This report directly influences whether a candidate advances to an offer or is declined. Errors in your evaluation — inflated scores, misapplied rules, inconsistent reasoning — affect hiring quality and expose the organization to inconsistent process risk.
+
+      Structural hiring evaluations must be reproducible: two evaluators given the same transcript and these instructions should reach the same checkpoint scores. If your score cannot be traced to a verbatim transcript excerpt, it is not a valid score. Candidate impressions ("seemed confident"), tone judgments ("came across as polished"), and interviewer sentiment ("the panel liked them") are NOT evidence. Only transcript content is evidence.
+
+      Checkpoint applicability is determined by two things: (1) interview_type from metadata, and (2) what the candidate explicitly described. A checkpoint gated on "candidate mentioned managing direct reports" is only applicable if the candidate used language indicating direct management — not implied, not paraphrased, not inferred from job title. When in doubt, apply N/A rather than N.
+
+      The three new schema fields — panel_recommendation, candidate_level_assessed, and competency_scores — carry cross-field dependencies. panel_recommendation must be consistent with overall_recommendation. Inconsistency will cause schema validation failure. Derive these from the same evidence chain as overall_recommendation.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      (A) Read interview_type from transcript metadata.
+      (B) Check whether candidate explicitly mentioned managing direct reports or leading a team of 2+ people. This gates C-11, C-12, C-13.
+      (C) Check whether candidate described a conflict with a peer, stakeholder, or manager. This gates C-16.
+
+      interview_type="behavioral" → C-09, C-10, C-18, C-19 = N/A. C-14, C-15 = N/A.
+      interview_type="technical"  → C-14, C-15 = N/A.
+      interview_type="final"      → all checkpoints potentially applicable (subject to other gates).
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview. VIOLATION.
+      RIGHT: C-09 score="N/A", excerpt="" on a behavioral interview.
+      WRONG: Scoring C-14 as Y or N on a technical interview. VIOLATION.
+      RIGHT: C-14 score="N/A", excerpt="" on a technical interview.
+      WRONG: Scoring C-11 as N because "no strong examples" when candidate never mentioned managing anyone.
+      RIGHT: C-11 score="N/A" because leadership cluster gate not triggered.
+    </gate_check>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      FORMAT:
+        Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+        N/A score:    excerpt = "" (empty string — never "N/A", never null, never omitted, never "Not applicable")
+
+      WRONG: "[00:04] James: We improved conversion — shows data-driven thinking"
+      RIGHT: "[00:04] James: After that the numbers improved"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — behavioral interview only"
+      RIGHT: N/A checkpoint with excerpt=""
+
+      WRONG: Y checkpoint with excerpt="" (empty)
+      RIGHT: Y checkpoint with excerpt="[HH:MM] CandidateName: verbatim quote"
+    </excerpt_format>
+
+    <applicability_rules>
+      C-01 through C-08: Always applicable for all interview types.
+      C-09, C-10: Applicable ONLY if interview_type is "technical".
+      C-11, C-12, C-13 (Leadership cluster): Applicable ONLY if candidate explicitly mentioned managing direct reports or leading a team of 2+ people. NOT triggered by: managing projects, managing up, influencing without authority.
+      C-14, C-15: Applicable ONLY if interview_type is "final".
+      C-16: Applicable ONLY if candidate explicitly described a situation involving conflict with a peer, stakeholder, or manager. Not triggered by vague mentions of "friction."
+      C-17: Always applicable.
+      C-18, C-19: Applicable ONLY if interview_type is "technical".
+      C-20: Always applicable.
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins.
+
+      STEP 1 — AUTO-DOWNGRADE (NO_HIRE):
+        C-01 = N → overall_recommendation = "no_hire". STOP. panel_recommendation = "decline".
+        WRONG: C-01=N, overall_recommendation="hold". Schema rejects.
+        RIGHT: C-01=N → overall_recommendation="no_hire", panel_recommendation="decline". STOP.
+
+      STEP 2 — LEADERSHIP DEPENDENCY (HOLD CEILING):
+        Any of C-11/C-12/C-13 = N, AND any of C-01–C-08 = N:
+        → overall_recommendation cannot be "hire". Maximum = "hold". panel_recommendation = "defer".
+
+      STEP 3 — HIRE:
+        All C-01–C-08 = Y. Leadership cluster either N/A or all Y. No auto-downgrade.
+        → overall_recommendation="hire", panel_recommendation="advance".
+
+      STEP 4 — HOLD:
+        Mixed evidence in C-01–C-08. Some Y, some N. No auto-downgrade. No leadership dependency.
+        → overall_recommendation="hold", panel_recommendation="defer".
+
+      STEP 5 — NO_HIRE:
+        Majority of C-01–C-08 = N. No auto-downgrade needed.
+        → overall_recommendation="no_hire", panel_recommendation="decline".
+    </scoring_decision_tree>
+
+    <field_definitions>
+      ONE ENTRY PER OUTPUT FIELD. Read before scoring each field.
+
+      <field name="interview_type" type="string" required="true">
+        Permitted values: "behavioral", "technical", "final" — exactly one.
+        Read from transcript metadata. Do NOT infer from content.
+        WRONG: interview_type="technical" when metadata says "behavioral". VIOLATION.
+      </field>
+
+      <field name="checkpoints" type="array" required="true">
+        One entry per checkpoint C-01 through C-20. All 20 required.
+        Each: checkpoint_id ("C-01"..."C-20"), score ("Y"/"N"/"N/A"), excerpt (verbatim or ""), reasoning (min 25 chars, max 40 words).
+        WRONG: Missing any checkpoint. VIOLATION.
+        WRONG: checkpoint_id="C-1". Use "C-01".
+        WRONG: score="Yes". Permitted: "Y", "N", "N/A".
+      </field>
+
+      <field name="quality_areas" type="array" required="true">
+        Exactly 5 entries: "Opening", "Behavioral Evidence", "Technical Depth", "Leadership &amp; Influence", "Closing".
+        Each: area (exact string), description, rating ("G"/"Y"/"R"), reasoning (min 30 chars).
+        G=good/meets bar, Y=yellow/needs coaching, R=red/below bar.
+        WRONG: rating="Green". Use "G".
+        WRONG: Missing any of the 5 areas. VIOLATION.
+      </field>
+
+      <field name="overall_recommendation" type="string" required="true">
+        Permitted: "hire", "no_hire", "hold" — exactly one.
+        Determined SOLELY by scoring_decision_tree. Do NOT derive independently.
+        WRONG: overall_recommendation="strong hire". Not a permitted value.
+        WRONG: overall_recommendation="hire" when C-01=N. Auto-downgrade violated.
+      </field>
+
+      <field name="panel_recommendation" type="string" required="true">
+        Permitted: "advance", "decline", "defer".
+        MUST be consistent:
+          overall_recommendation="hire"    → panel_recommendation="advance"
+          overall_recommendation="no_hire" → panel_recommendation="decline"
+          overall_recommendation="hold"    → panel_recommendation="defer"
+        WRONG: overall_recommendation="no_hire", panel_recommendation="advance". Schema rejects.
+      </field>
+
+      <field name="candidate_level_assessed" type="string" required="true">
+        Permitted: "L4", "L5", "L6", "L7", "unknown".
+        Assess from complexity/scope of examples — not from job title.
+        Use "unknown" if transcript lacks sufficient evidence.
+        WRONG: candidate_level_assessed="L4-L5". Must be exactly one value.
+      </field>
+
+      <field name="competency_scores" type="array" required="true">
+        At least one entry required.
+        Permitted competencies: "system_design", "behavioral_depth", "cross_functional", "communication", "technical_accuracy".
+        Score 1-5. Each: competency (exact string), score (int 1-5), rationale (min 25 chars).
+        WRONG: competency_scores=[] (empty). Schema rejects.
+        WRONG: score=0 or score=6. Range 1-5 only.
+      </field>
+
+      <field name="key_strengths" type="array" required="true">
+        List of strings. Each = one distinct observed strength with specific basis.
+        WRONG: key_strengths=["Good communicator"] — too generic.
+        Provide at least one strength even for weak candidates (e.g., awareness of gaps, professional communication).
+      </field>
+
+      <field name="key_concerns" type="array" required="true">
+        List of strings. Each = one distinct observed concern with transcript basis.
+        WRONG: key_concerns=["Weak overall"] — not actionable.
+        RIGHT: key_concerns=["No specific metrics cited across six answers", "Cannot recall outcomes of own decisions"]
+      </field>
+
+      <field name="risk_flags" type="array" required="true">
+        Specific risk signals. Empty list [] if none.
+        WRONG: risk_flags=["They seemed evasive"] — inference.
+        RIGHT: risk_flags=["Attribution gap — every outcome attributed to team or market, no personal contribution named"]
+      </field>
+
+      <field name="summary" type="string" required="true">
+        Min 50 chars. Max 80 words.
+        WRONG: summary less than 50 chars. Schema rejects.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y (Yes) — checkpoint clearly and specifically observed:
+        Transcript contains direct evidence satisfying the criterion.
+        "Directly" = specific name, number, project, outcome, or described behavior.
+        Generic statements do NOT qualify as Y — they qualify as N.
+        WRONG Y: "I always focus on business impact" — generic statement.
+        RIGHT Y: "we reduced drop-off by 18 percentage points in the first quarter" — specific metric.
+        WRONG Y: "I talked to stakeholders" without a specific interaction.
+        RIGHT Y: Named stakeholder, described specific conversation, specific outcome.
+
+      N (No) — expected behavior absent or specifically insufficient:
+        Interviewer gave opportunity; candidate did not demonstrate the behavior.
+        Weak evidence = N, not N/A. N/A is only for gating conditions.
+        WRONG N: C-01=N but candidate cited "mobile traffic was growing" — still need specifics like percentages to score Y.
+        RIGHT N: C-01=N because every answer avoided specific names, numbers, projects.
+
+      N/A (Not Applicable) — gating condition not met:
+        Read applicability_rules. If gate condition absent, score N/A.
+        N/A is NOT a way to avoid scoring something difficult. Weak evidence = N.
+        RIGHT N/A: interview_type="behavioral", C-09 gate not met → C-09="N/A", excerpt="".
+
+      QUALITY AREA RATINGS:
+        G: Candidate met the standard, no coaching needed.
+        Y: Partial evidence — some gaps, some strengths.
+        R: Candidate clearly failed this area.
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Excerpt contamination.
+        WRONG: "[00:12] James: mobile traffic was growing — shows data awareness"
+        RIGHT: "[00:12] James: We looked at the traffic data and mobile was definitely going up"
+        Rule: excerpt ends at candidate's closing word.
+
+      ERROR 2 — N/A excerpt non-empty.
+        WRONG: score="N/A", excerpt="Not applicable — behavioral interview"
+        RIGHT: score="N/A", excerpt=""
+
+      ERROR 3 — Auto-downgrade ignored.
+        WRONG: C-01=N, overall_recommendation="hold"
+        RIGHT: C-01=N → overall_recommendation="no_hire". Schema rejects any other value.
+        NOTE: This candidate's C-01 evidence is entirely vague — "numbers improved", "things got better", no specific metrics ever named. Evaluate carefully.
+
+      ERROR 4 — Leadership cluster applied without trigger.
+        WRONG: C-11=N because candidate "didn't describe coaching anyone."
+        RIGHT: If candidate never mentioned managing direct reports, C-11/C-12/C-13 = N/A, excerpt="".
+        NOTE: This candidate managed a product, not a team. Leadership cluster is NOT triggered.
+
+      ERROR 5 — panel_recommendation inconsistent.
+        WRONG: overall_recommendation="no_hire", panel_recommendation="defer"
+        RIGHT: no_hire→decline. ALWAYS.
+
+      ERROR 6 — competency_scores empty.
+        WRONG: competency_scores=[]
+        RIGHT: Score at least one competency. For this candidate, "behavioral_depth" is testable.
+
+      ERROR 7 — Generic key_concerns.
+        WRONG: key_concerns=["Lacks specificity"]
+        RIGHT: key_concerns=["No outcome metric cited in any of six answers despite repeated probing", "Checkout drop-off rate described only as 'high' with no baseline or post-improvement figure"]
+
+      ERROR 8 — Missing checkpoints.
+        RIGHT: All 20 checkpoints must appear, C-01 through C-20.
+    </common_errors>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <output_format_template>
+      Return valid JSON matching this exact structure. All fields required.
+
+      {
+        "interview_type": "behavioral" | "technical" | "final",
+        "checkpoints": [
+          {
+            "checkpoint_id": "C-01",
+            "score": "Y" | "N" | "N/A",
+            "excerpt": "[HH:MM] CandidateName: verbatim quote" | "",
+            "reasoning": "string, min 25 chars, max 40 words"
+          }
+          // ... C-01 through C-20 (all 20 required)
+        ],
+        "quality_areas": [
+          {
+            "area": "Opening" | "Behavioral Evidence" | "Technical Depth" | "Leadership &amp; Influence" | "Closing",
+            "description": "string",
+            "rating": "G" | "Y" | "R",
+            "reasoning": "string, min 30 chars, max 45 words"
+          }
+          // ... exactly 5 entries
+        ],
+        "overall_recommendation": "hire" | "no_hire" | "hold",
+        "panel_recommendation": "advance" | "decline" | "defer",
+        "candidate_level_assessed": "L4" | "L5" | "L6" | "L7" | "unknown",
+        "competency_scores": [
+          {
+            "competency": "system_design" | "behavioral_depth" | "cross_functional" | "communication" | "technical_accuracy",
+            "score": 1 | 2 | 3 | 4 | 5,
+            "rationale": "string, min 25 chars"
+          }
+          // at least one entry required
+        ],
+        "key_strengths": ["string", ...],
+        "key_concerns": ["string", ...],
+        "risk_flags": ["string", ...],
+        "summary": "string, min 50 chars, max 80 words"
+      }
+
+      CROSS-FIELD CONSTRAINTS (schema enforces):
+      - overall_recommendation="hire"    → panel_recommendation MUST be "advance"
+      - overall_recommendation="no_hire" → panel_recommendation MUST be "decline"
+      - overall_recommendation="hold"    → panel_recommendation MUST be "defer"
+      - C-01=N → overall_recommendation MUST be "no_hire"
+      - competency_scores MUST NOT be empty
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. C-01 scored N? → overall_recommendation MUST be "no_hire". panel_recommendation MUST be "decline".
+      2. Any Leadership cluster (C-11/C-12/C-13) = N AND any C-01–C-08 = N? → Fix if overall_recommendation="hire".
+      3. All N/A checkpoints: excerpt = "". Fix any non-empty N/A excerpt.
+      4. All Y/N checkpoints: excerpt = "[HH:MM] CandidateName: verbatim quote". Fix any empty.
+      5. overall_recommendation in {"hire", "no_hire", "hold"}.
+      6. panel_recommendation consistent with overall_recommendation.
+      7. All 20 checkpoints present.
+      8. All 5 quality areas present.
+      9. competency_scores not empty.
+      10. summary >= 50 chars, <= 80 words.
+
+      WRONG: overall_recommendation="hold" when C-01=N. Schema rejects — must be "no_hire".
+      WRONG: N/A checkpoint with excerpt="Not applicable". Set to "".
+      WRONG: overall_recommendation="no_hire", panel_recommendation="defer". Schema rejects — must be "decline".
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+panel_recommendation must be consistent with overall_recommendation (hire→advance, no_hire→decline, hold→defer).
+    </output_schema>
+  </instructions>
+</prompt>

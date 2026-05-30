@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
+from src.artifacts.schemas import get_schema
 from src.benchmark.prompt_item import BenchmarkRun, PromptItem
-from src.benchmark.schemas import get_schema
-from src.oracles import make_oracle
 from src.runners.base_runner import BaseRunner
 
 
@@ -14,25 +12,23 @@ def run_prompt(
     old_runner: BaseRunner,
     new_runner: BaseRunner,
 ) -> BenchmarkRun:
-    """Run one PromptItem on both models, apply oracle, return BenchmarkRun."""
-    oracle = make_oracle(prompt.oracle)
+    """Run one PromptItem on both models, return BenchmarkRun.
 
-    if prompt.schema_name:
-        # Instructor path — tests schema adherence (H2)
-        schema = get_schema(prompt.schema_name)
+    Validation is fully delegated to Pydantic — if Instructor parses the
+    response into the schema successfully, all fields (including nested ones)
+    already passed their constraints. No separate assertion layer needed.
+    """
+    if prompt.output_schema:
+        schema = get_schema(prompt.output_schema)
         old_result = old_runner.run_structured(prompt.prompt_text, prompt.id, schema)
         new_result = new_runner.run_structured(prompt.prompt_text, prompt.id, schema)
     else:
-        # Text path — tests format/instruction following
         old_result = old_runner.run_text(prompt.prompt_text, prompt.id)
         new_result = new_runner.run_text(prompt.prompt_text, prompt.id)
 
-    old_passed, old_evidence = oracle.check(old_result)
-    new_passed, new_evidence = oracle.check(new_result)
-
     return BenchmarkRun(
         prompt_id=prompt.id,
-        task_family=prompt.task_family,
+        schema_name=prompt.output_schema,
         old_model_id=old_runner.model_id,
         new_model_id=new_runner.model_id,
         old_output=old_result.output_text,
@@ -43,12 +39,12 @@ def run_prompt(
         new_tokens_out=new_result.tokens_out,
         old_latency_ms=old_result.latency_ms,
         new_latency_ms=new_result.latency_ms,
-        old_passed=old_passed,
-        new_passed=new_passed,
-        old_evidence=old_evidence,
-        new_evidence=new_evidence,
-        migration_failed=(old_passed and not new_passed),
-        migration_improved=(not old_passed and new_passed),
+        old_passed=old_result.succeeded,
+        new_passed=new_result.succeeded,
+        old_evidence=old_result.error,
+        new_evidence=new_result.error,
+        migration_failed=(old_result.succeeded and not new_result.succeeded),
+        migration_improved=(not old_result.succeeded and new_result.succeeded),
     )
 
 
@@ -74,7 +70,6 @@ def run_benchmark(
             run = run_prompt(prompt, old_runner, new_runner)
             results.append(run)
 
-            # Write immediately — crash-safe
             f.write(run.model_dump_json() + "\n")
             f.flush()
 

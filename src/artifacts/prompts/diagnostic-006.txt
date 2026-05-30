@@ -1,0 +1,298 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-17</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-flash</old_model>
+        <new_model>gemini-3.1-flash-lite</new_model>
+      </model_pair>
+      <prompt_set>consistency_test_v1</prompt_set>
+      <total_runs>28</total_runs>
+    </metadata>
+
+    <run_log>
+NOTE: This run set tests nondeterminism. Each distinct prompt ID was run 3 times (5 unique prompts × 3 runs = 15 original total). Consistency failures occur when same-prompt runs produce different values for the primary classification field. Expanded battery adds 13 more runs (2 new prompt families × 3 runs + 1 additional triplet for salary_benchmark).
+
+run_id | prompt_id | task_family      | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-601     | candidate_eval   | YES        | YES        | NO         | -7          | 318               | 311               | 1850           | 1660           | none
+R-002  | P-601     | candidate_eval   | YES        | NO         | YES        | -7          | 318               | 311               | 1840           | 1650           | consistency
+R-003  | P-601     | candidate_eval   | YES        | NO         | YES        | -7          | 317               | 310               | 1845           | 1655           | consistency
+R-004  | P-602     | candidate_eval   | YES        | YES        | NO         | +4          | 309               | 313               | 1810           | 1670           | none
+R-005  | P-602     | candidate_eval   | YES        | YES        | NO         | +4          | 310               | 314               | 1815           | 1675           | none
+R-006  | P-602     | candidate_eval   | YES        | NO         | YES        | +3          | 309               | 312               | 1812           | 1668           | consistency
+R-007  | P-603     | risk_assessment  | YES        | NO         | YES        | -11         | 322               | 311               | 1870           | 1670           | consistency
+R-008  | P-603     | risk_assessment  | YES        | YES        | NO         | -11         | 323               | 312               | 1872           | 1671           | none
+R-009  | P-603     | risk_assessment  | YES        | NO         | YES        | -12         | 322               | 310               | 1869           | 1668           | consistency
+R-010  | P-604     | risk_assessment  | YES        | YES        | NO         | -5          | 315               | 310               | 1840           | 1650           | none
+R-011  | P-604     | risk_assessment  | YES        | YES        | NO         | -5          | 316               | 311               | 1842           | 1652           | none
+R-012  | P-604     | risk_assessment  | YES        | YES        | NO         | -5          | 315               | 310               | 1839           | 1649           | none
+R-013  | P-605     | salary_benchmark | YES        | NO         | YES        | -9          | 320               | 311               | 1860           | 1665           | consistency
+R-014  | P-605     | salary_benchmark | YES        | NO         | YES        | -9          | 321               | 312               | 1862           | 1667           | consistency
+R-015  | P-605     | salary_benchmark | YES        | YES        | NO         | -8          | 319               | 311               | 1858           | 1663           | none
+R-016  | P-606     | candidate_eval   | YES        | YES        | NO         | -6          | 316               | 310               | 1848           | 1658           | none
+R-017  | P-606     | candidate_eval   | YES        | NO         | YES        | -7          | 317               | 310               | 1846           | 1656           | consistency
+R-018  | P-607     | risk_assessment  | YES        | NO         | YES        | -10         | 320               | 310               | 1862           | 1662           | consistency
+R-019  | P-607     | risk_assessment  | YES        | YES        | NO         | -10         | 321               | 311               | 1864           | 1664           | none
+R-020  | P-608     | salary_benchmark | YES        | NO         | YES        | -9          | 319               | 310               | 1858           | 1658           | consistency
+R-021  | P-608     | salary_benchmark | YES        | NO         | YES        | -9          | 320               | 311               | 1860           | 1660           | consistency
+R-022  | P-608     | salary_benchmark | YES        | YES        | NO         | -8          | 318               | 310               | 1855           | 1655           | none
+R-023  | P-609     | performance_tier | YES        | NO         | YES        | -8          | 318               | 310               | 1852           | 1656           | consistency
+R-024  | P-609     | performance_tier | YES        | YES        | NO         | -7          | 316               | 309               | 1848           | 1652           | none
+R-025  | P-609     | performance_tier | YES        | NO         | YES        | -8          | 317               | 309               | 1849           | 1653           | consistency
+R-026  | P-610     | compensation_band| YES        | NO         | YES        | -11         | 322               | 311               | 1868           | 1668           | consistency
+R-027  | P-610     | compensation_band| YES        | YES        | NO         | -10         | 320               | 310               | 1865           | 1665           | none
+R-028  | P-610     | compensation_band| YES        | NO         | YES        | -10         | 320               | 310               | 1862           | 1662           | consistency
+    </run_log>
+
+    <failure_detail_log>
+R-002 (P-601, candidate_eval, run 2 of 3): The `overall_recommendation` field returned "hold" but R-001 (identical input) returned "pass". The candidate data shows moderate technical scores and strong cultural fit. Old model consistently returned "pass" across all 3 runs. New model returned "pass" once, "hold" twice.
+
+R-003 (P-601, candidate_eval, run 3 of 3): The `overall_recommendation` field returned "hold" (same as R-002). The `confidence_score` field also varied: R-001 returned 0.74, R-002 returned 0.68, R-003 returned 0.71. The old model returned 0.74 on all three runs. The recommendation flip from "pass" to "hold" changes downstream routing logic (hold candidates require committee review).
+
+R-006 (P-602, candidate_eval, run 3 of 3): The `overall_recommendation` field returned "fail" but R-004 and R-005 (identical input) both returned "pass". This is a more severe inconsistency — the flip is from "pass" to "fail" rather than "pass" to "hold". The candidate data has mixed signals (strong technical, weak communication) which may activate different decision paths across temperature samples.
+
+R-007 (P-603, risk_assessment, run 1 of 3): The `risk_level` field returned "medium" but R-008 (identical input) returned "low". Old model returned "low" on all 3 runs. The risk assessment context involves a candidate with a minor employment gap (3 months). The new model inconsistently interprets this gap as medium vs low risk.
+
+R-009 (P-603, risk_assessment, run 3 of 3): The `risk_level` field returned "medium" (matching R-007). For P-603, the new model returned: "medium", "low", "medium" — 2 of 3 runs disagree with the old model's consistent "low". The old model resolved the employment gap as low risk in all runs.
+
+R-013 (P-605, salary_benchmark, run 1 of 3): The `market_position` field returned "above_market" but R-015 (identical input) returned "at_market". Old model returned "at_market" consistently across all 3 runs. Salary data in this prompt sits at the 54th percentile for the role. The new model inconsistently classifies this as "above_market" (implying 54th > 50th crosses a threshold in 2 of 3 runs).
+
+R-014 (P-605, salary_benchmark, run 2 of 3): The `market_position` field returned "above_market" again (matching R-013). For P-605: runs returned ["above_market", "above_market", "at_market"]. This suggests the new model has a marginally different internal threshold for the "above_market" classification.
+
+R-017 (P-606, candidate_eval, run 2 of 3): New prompt for candidate_eval family. The `overall_recommendation` field returned "hold" but R-016 (identical input) returned "pass". Candidate has borderline technical scores (3.8/5) with strong behavioral indicators. New model produces different recommendation on 1 of 2 observed runs for this prompt.
+
+R-018 (P-607, risk_assessment, run 1 of 3): New prompt for risk_assessment family. The `risk_level` field returned "medium" but R-019 (identical input) returned "low". Risk context involves a 6-month career break. Old model returned "low" for this prompt. New model resolves ambiguity as "medium" in 1 of 2 observed runs.
+
+R-020 (P-608, salary_benchmark, run 1 of 3): New prompt for salary_benchmark family. The `market_position` field returned "above_market" but R-022 (identical input) returned "at_market". Salary at 52nd percentile — 2 points above 50th, same borderline scenario as P-605.
+
+R-021 (P-608, salary_benchmark, run 2 of 3): The `market_position` field returned "above_market" again. For P-608: ["above_market", "above_market", "at_market"]. Same 2/3 inconsistency pattern as P-605 — the new model's internal threshold for "above_market" is consistently miscalibrated for near-50th-percentile salary inputs.
+
+R-023 (P-609, performance_tier, run 1 of 3): New family. The `tier_assignment` field returned "high_performer" but R-024 (identical input) returned "solid_contributor". Performance data shows 88th percentile score. Old model returned "solid_contributor" (boundary at 90th percentile). New model inconsistently classifies 88th percentile as either high_performer or solid_contributor.
+
+R-025 (P-609, performance_tier, run 3 of 3): The `tier_assignment` field returned "high_performer" (matching R-023). For P-609: ["high_performer", "solid_contributor", "high_performer"]. Same 2/3 boundary-crossing pattern as salary_benchmark.
+
+R-026 (P-610, compensation_band, run 1 of 3): New family. The `band_assignment` field returned "band_4" but R-027 (identical input) returned "band_3". Total compensation in this prompt is $142,000 — the band_3/band_4 boundary is $140,000. New model inconsistently resolves this 2-unit boundary overshoot.
+
+R-028 (P-610, compensation_band, run 3 of 3): The `band_assignment` field returned "band_4" (matching R-026). For P-610: ["band_4", "band_3", "band_4"]. Consistent 2/3 upward-boundary-crossing pattern — new model resolves $142K as band_4 in majority of runs but band_3 in 1 of 3 runs.
+    </failure_detail_log>
+
+    <pattern_analysis>
+This run set isolates nondeterministic behavior in the new model. The original 5 prompt groups show: P-601 (2/3 inconsistency on candidate_eval), P-602 (1/3 inconsistency with severe "pass"→"fail" flip), P-603 (2/3 inconsistency on risk_assessment), P-604 (stable, 3/3 consistent passing), P-605 (2/3 inconsistency on salary_benchmark). The expanded battery adds new prompts in the same families plus two new families (performance_tier, compensation_band), all of which exhibit the same boundary-oscillation pattern.
+
+The consistency failures cluster around prompts with borderline inputs: a candidate with moderate scores (P-601, P-602, P-606), an employment gap of ambiguous severity (P-603, P-607), a salary at a boundary percentile (P-605, P-608), a performance score near a tier threshold (P-609), and a compensation total $2K above a band boundary (P-610). P-604 was the only stable prompt — it had clear-cut low-risk indicators with no decision boundary ambiguity. This confirms the borderline-input hypothesis: new model consistency failures are triggered specifically by near-threshold inputs.
+
+The cross-family pattern is consistent: in every case where a new triplet shows inconsistency (P-606, P-607, P-608, P-609, P-610), the input was designed to sit within 5% of a classification boundary. The old model resolved all these cases deterministically, suggesting its internal thresholds were better calibrated to produce stable outputs at the boundary values present in these prompts. The new model's temperature-induced sampling variation activates near-boundary inputs and is not present on clear-cut inputs (P-604 equivalent prompts).
+
+Excluding no pre-existing failures (all 28 runs have old_passed=YES), 15 regressions occurred on 28 previously passing runs — a 53.6% regression rate distributed across all five task families. No family shows a zero regression rate, confirming this is a model-level sensitivity to borderline inputs rather than a family-specific prompt issue.
+    </pattern_analysis>
+
+    <token_summary>
+Old model (gemini-2.5-flash):
+  Average output tokens: 318.4
+  Average latency: 1,853 ms
+
+New model (gemini-3.1-flash-lite):
+  Average output tokens: 310.8
+  Average latency: 1,661 ms
+
+Average token delta: -7.6 tokens per run (-2.4%)
+Average latency delta: -192 ms per run (-10.4%)
+
+Per-task-family breakdown:
+  candidate_eval:    avg old=313.7, avg new=310.7, delta=-3.0 (-1.0%)
+  risk_assessment:   avg old=319.7, avg new=310.5, delta=-9.2 (-2.9%)
+  salary_benchmark:  avg old=319.5, avg new=310.8, delta=-8.7 (-2.7%)
+  performance_tier:  avg old=317.0, avg new=309.3, delta=-7.7 (-2.4%)
+  compensation_band: avg old=320.7, avg new=310.3, delta=-10.4 (-3.2%)
+
+Token delta is small and consistent across same-prompt triplicates, confirming the inconsistency is in field values rather than output length. The new model's latency is stable across repeated runs of the same prompt, ruling out variable processing time as a contributing factor to inconsistency.
+    </token_summary>
+
+    <family_summary>
+task_family       | total_runs | regressions | regression_rate | dominant_failure_type
+candidate_eval    | 8          | 4           | 50.0%           | consistency (boundary_oscillation)
+risk_assessment   | 8          | 3           | 37.5%           | consistency (boundary_oscillation)
+salary_benchmark  | 6          | 4           | 66.7%           | consistency (threshold_miscalibration)
+performance_tier  | 3          | 2           | 66.7%           | consistency (boundary_oscillation)
+compensation_band | 3          | 2           | 66.7%           | consistency (boundary_oscillation)
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will inform an engineering go/no-go migration decision.</role>
+
+    <domain_context>
+      This benchmark tests nondeterminism: each prompt_id was run 3 times with identical inputs. Consistency failures occur when same-prompt runs produce different values for the primary classification field. These failures are distinct from schema or format failures — the output structure is correct, but the classification value varies across runs.
+
+      Key insight: consistency failures cluster on borderline inputs. Clear-cut inputs (like P-604) show no consistency failures. Near-boundary inputs show 2/3 or 3/3 inconsistency. Analyze which prompts are borderline when grouping failure patterns.
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      This dataset has no pre-existing failures (all 28 runs have old_passed=YES).
+      Denominator = 28, not the count of unique prompt IDs.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan run_log and extract all valid run IDs (R-001 through R-028).
+      Build this list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-029"] when run_log ends at R-028. VIOLATION.
+      WRONG: example_run_ids=[] when the pattern has observable examples. VIOLATION.
+      RIGHT: example_run_ids=["R-002", "R-003", "R-006", "R-007"] — all visible in run_log.
+
+      For regression_by_family: count ALL rows per task_family. Count regressions (old=YES, new=NO). Compute rate. Do NOT estimate.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes ≥ 2 items. Schema rejects if fewer.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from run_log.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         Note: for consistency failures, the field structure and type are correct — the failure is decision instability.
+         RIGHT: "Output format consistent (correct field types and schema structure in all runs). Value accuracy degraded — 15 of 28 runs produced different classification values than the old model, specifically on boundary-case inputs."
+      4. regression_by_family must list all 5 task_families from the run_log.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration".
+         regression_rate_pct = 53.6% → "block_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      All claims must be verifiable from the data table.
+      WRONG: "The new model was inconsistent on about half the runs" — imprecise. VIOLATION.
+      RIGHT: "15 regressions out of 28 previously passing runs (53.6%)."
+      When citing consistency failure counts, reference specific run IDs and prompt IDs.
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must include: 28 total runs, 28 previously passing, 15 regressions, 53.6% rate, consistency dominant failure, block_migration.
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Two subtypes: boundary_oscillation (stochastic flips near thresholds) and systematic_upward_bias (salary_benchmark consistent "above_market" for near-50th-percentile inputs).
+        Each pattern: ≥1 run ID, root_cause min 35 chars, recommendation min 35 chars.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Key insight for consistency tests: structure is consistent, decision values are not. Both dimensions must be addressed.
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Consistency-specific fixes: boundary anchoring and temperature reduction.
+        RIGHT: ["Add explicit numeric threshold definitions for each classification boundary in system prompt", "Reduce temperature to 0 for classification fields to eliminate sampling-induced boundary oscillation"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        regression_rate_pct = 15/28*100 = 53.57% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 15/28*100 = 53.57. All 28 runs have old_passed=YES so denominator = 28.
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        5 families: candidate_eval(8 rows), risk_assessment(8 rows), salary_benchmark(6 rows), performance_tier(3 rows), compensation_band(3 rows).
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing: all 28 runs (no pre-existing failures)
+        Regressions (old=YES, new=NO): R-002,R-003,R-006,R-007,R-009,R-013,R-014,R-017,R-018,R-020,R-021,R-023,R-025,R-026,R-028 = 15 runs
+        Families: candidate_eval, risk_assessment, salary_benchmark, performance_tier, compensation_band
+
+      Step 2 — regression_rate_pct = 15/28*100 = 53.57
+
+      Step 3 — Group regressions by subtype:
+        boundary_oscillation: R-002,R-003,R-006,R-007,R-009,R-017,R-018,R-023,R-025,R-026,R-028 (stochastic near boundary)
+        salary_threshold_bias: R-013,R-014,R-020,R-021 (consistent upward bias for near-50th-percentile)
+
+      Step 4 — FamilyBreakdown: count from run_log table.
+
+      Step 5 — recommended_action: 53.57% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: all 28 runs have old_passed=YES, so denominator=28 (not 15 unique prompt runs).
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-028 only.
+      ERROR 3 — Missing families: performance_tier and compensation_band required in regression_by_family.
+      ERROR 4 — rate_pct arithmetic: candidate_eval 4/8*100=50.0 (not 50.1). risk_assessment 3/8*100=37.5.
+      ERROR 5 — consistency_vs_accuracy_note ignores format consistency (which is actually fine in this dataset).
+      ERROR 6 — recommended_action="conditional_proceed" when rate=53.6%. Schema rejects.
+      ERROR 7 — Treating P-606 as the same prompt as P-601 — they are different prompt IDs testing the same family.
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 28 total runs (all 28 previously passing), 15 regressions, 53.6%, consistency failures on borderline inputs, block_migration",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "53.6%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-7.6 tokens", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-192 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "15", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "boundary_oscillation",
+            "frequency": "11/28 runs",
+            "example_run_ids": ["R-002", "R-003", "R-007", "R-009", "R-023"],
+            "root_cause": "min 35 chars",
+            "recommendation": "min 35 chars"
+          },
+          {
+            "pattern_name": "salary_threshold_bias",
+            "frequency": "4/28 runs",
+            "example_run_ids": ["R-013", "R-014", "R-020", "R-021"],
+            "root_cause": "...",
+            "recommendation": "..."
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words",
+
+        "priority_fixes": ["fix 1 — specific", "fix 2 — specific"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 53.57,
+
+        "regression_by_family": [
+          {"task_family": "candidate_eval",    "regression_count": 4, "total_count": 8, "rate_pct": 50.0},
+          {"task_family": "risk_assessment",   "regression_count": 3, "total_count": 8, "rate_pct": 37.5},
+          {"task_family": "salary_benchmark",  "regression_count": 4, "total_count": 6, "rate_pct": 66.7},
+          {"task_family": "performance_tier",  "regression_count": 2, "total_count": 3, "rate_pct": 66.7},
+          {"task_family": "compensation_band", "regression_count": 2, "total_count": 3, "rate_pct": 66.7}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-028).
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH dimensions.
+      5. executive_summary ≥ 80 characters.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 15/28*100 = 53.57 (denominator=28).
+      10. recommended_action = "block_migration" (53.6% > 50%).
+      11. regression_by_family has exactly 5 entries.
+      12. Each rate_pct within ±1% of regression_count/total_count*100.
+
+      WRONG: regression_rate_pct=46.7 (from original 15-run dataset) — must use expanded 28-run data. VIOLATION.
+      WRONG: regression_rate_pct=53.6, recommended_action="conditional_proceed". Schema rejects.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from run_log (R-001 through R-028). priority_fixes must have at least 2 items. regression_by_family must have 5 entries.
+    </output_schema>
+  </instructions>
+</prompt>

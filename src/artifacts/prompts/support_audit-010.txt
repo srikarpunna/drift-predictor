@@ -1,0 +1,161 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20240430-162214</call_id>
+      <agent>Marcus Webb</agent>
+      <queue>Billing Support</queue>
+      <duration>9:52</duration>
+      <date>2024-04-30</date>
+    </metadata>
+    <dialogue>
+[00:00:04] Marcus Webb (Agent): Horizon Cloud Billing Support, this is Marcus Webb. How can I help you today?
+[00:00:10] Sandra Kowalski (Customer): Hi Marcus. I'd like to cancel my subscription. I've been on the Professional plan but I'm just not using it enough to justify the cost.
+[00:00:19] Marcus Webb (Agent): I'm sorry to hear that. I can help you with that today. Before I access your account, can I get the email address on file?
+[00:00:27] Sandra Kowalski (Customer): It's sandra.kowalski at thinkblue.org.
+[00:00:32] Marcus Webb (Agent): Thank you. And to verify your identity, could you confirm the name on the account and the billing zip code?
+[00:00:38] Sandra Kowalski (Customer): Sandra Kowalski. Zip is 30301.
+[00:00:43] Marcus Webb (Agent): Thank you, verified. Let me pull up your account.
+[00:00:47] [SYSTEM LOOKUP — account retrieved]
+[00:01:01] Marcus Webb (Agent): Okay, I have your account here. You're on the Professional plan, billed annually — it looks like your renewal date is coming up on May 14th. So you're about two weeks out from your next billing date. Is there anything specific about the plan that hasn't been working for you, or is this purely a budget decision?
+[00:01:19] Sandra Kowalski (Customer): Mostly budget. The features are fine — I just don't use it as much as I thought I would when I signed up.
+[00:01:27] Marcus Webb (Agent): That makes sense. Let me go ahead and get the cancellation processed for you. I'll apply it effective today so you won't be charged on May 14th. You'll retain access to your Professional features through the end of the current billing period, which is May 13th. After that, your account will revert to the free Starter tier and your data will be preserved.
+[00:01:48] Sandra Kowalski (Customer): Great. And my data won't be deleted?
+[00:01:52] Marcus Webb (Agent): Correct — your data stays on the account. If you ever come back to a paid plan in the future, everything will be right where you left it. I'll submit the cancellation now.
+[00:01:59] [SYSTEM UPDATE — cancellation submitted; effective date May 13th]
+[00:02:14] Marcus Webb (Agent): Done. You'll receive a cancellation confirmation email at sandra.kowalski at thinkblue.org within a few minutes. The email will include the effective date and a summary of what happens to your account at plan end. Is the email on file still the best address for you?
+[00:02:29] Sandra Kowalski (Customer): Yes, that's current.
+[00:02:32] Marcus Webb (Agent): Perfect. Just to confirm: your Professional plan is cancelled, effective May 13th. You keep all current access until then, your data is preserved on the free tier, and you'll receive a confirmation email shortly. Is there anything else I can help you with today?
+[00:02:48] Sandra Kowalski (Customer): I do have one question — if I want to come back at some point, is there any kind of rejoining discount?
+[00:02:56] Marcus Webb (Agent): That's a great question. We do run promotional offers periodically, and former subscribers sometimes receive win-back offers by email. I can't guarantee a specific discount, but it's definitely worth keeping an eye on your inbox.
+[00:03:09] Sandra Kowalski (Customer): Fair enough. And just to double-check — you said I keep access until May 13th. Does that include the integrations I have set up? Like my Slack and Google Drive connections?
+[00:03:19] Marcus Webb (Agent): Yes — all integrations remain active until May 13th. After that, integrations that require a paid plan will be suspended. You can re-enable them if you return to a paid tier. The integrations themselves aren't deleted, just paused.
+[00:03:33] Sandra Kowalski (Customer): Okay, that's good to know. I appreciate you explaining everything clearly.
+[00:03:38] Marcus Webb (Agent): Of course. We're sorry to see you go, Sandra. If there's anything that would change your mind, don't hesitate to reach out. Is there anything else today?
+[00:03:47] Sandra Kowalski (Customer): No, that covers it. Thank you, Marcus.
+[00:03:51] Marcus Webb (Agent): Thank you for being a Horizon Cloud customer. Take care and have a great afternoon.
+[00:03:56] Sandra Kowalski (Customer): You too. Bye.
+[00:03:58] [CALL END]
+[00:04:44] [WRAP-UP COMPLETE — 46 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before evaluating any compliance check:
+      Determine ticket_type from call content. This controls which checks are applicable.
+      Make this determination BEFORE scoring any check.
+
+      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
+      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
+      - "account": customer issue involves profile settings, name/email changes, plan management
+      - "general": does not fit above categories
+
+      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
+      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
+
+      WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
+      RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
+    </gate_check>
+
+    <compliance_scoring>
+      - Y: Check was completed as required
+      - N: Check was required but not completed
+      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+    </compliance_scoring>
+
+    <grading_decision_tree priority="CRITICAL">
+      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+
+      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
+         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
+         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
+         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+
+      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+
+      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+
+      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+    </grading_decision_tree>
+
+    <escalation_rule priority="CRITICAL">
+      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
+      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
+      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+
+      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
+      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
+      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      RIGHT: escalation_required=false, escalation_reason=null.
+    </escalation_rule>
+
+    <evidence_purity priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
+      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
+      evidence min length = 10 characters. Empty string will fail schema validation.
+
+      WRONG: "Agent greeted customer professionally and identified themselves clearly"
+      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
+
+      WRONG: "N/A" (too short, 3 chars)
+      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+    </evidence_purity>
+
+    <compliance_checks>
+      C-01: Agent stated their name at the start of the call — ALWAYS applicable
+      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
+      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
+      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
+      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
+      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
+      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
+      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
+      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
+      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
+      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
+      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+    </compliance_checks>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
+      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
+      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
+      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+    </field_caps>
+
+    <quality_dimensions>
+      QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
+      - Professionalism: Tone, empathy, language quality throughout the call
+      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
+      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
+      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
+      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+    </quality_dimensions>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
+      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
+      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
+      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
+      5. escalation_required = true? → escalation_reason must not be null.
+      6. escalation_required = false? → escalation_reason must be null.
+      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
+      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
+
+      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
+      RIGHT: Two applicable N checks → overall_grade="FAIL".
+
+      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
+      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+    </pre_emit_check>
+
+    <output_schema>
+      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+    </output_schema>
+  </instructions>
+</prompt>

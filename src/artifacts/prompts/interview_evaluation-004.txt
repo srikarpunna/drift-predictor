@@ -1,0 +1,310 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Senior Software Engineer</role>
+      <interview_type>technical</interview_type>
+      <interviewer>Nadia Voss (Staff Engineer)</interviewer>
+      <candidate>Alex Kovacs</candidate>
+      <duration>75 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Nadia (Interviewer): Alex, let's jump into system design. Design a distributed rate limiter that can handle 500,000 requests per second across a fleet of 50 API servers. It needs to be accurate to within 5% and add no more than 5ms of latency.
+
+[00:02] Alex (Candidate): Good problem. Let me start with requirements clarification: are we doing per-user limits, per-endpoint limits, or both? And is the 500K RPS aggregate across all servers, or per server?
+
+[00:03] Nadia (Interviewer): Per-user limits, 500K RPS aggregate across all 50 servers, so about 10K RPS per server on average.
+
+[00:04] Alex (Candidate): Got it. The core challenge is that with 50 servers, a local counter per server would let users exceed their limit by up to 50x if they spread requests evenly. We need a shared state layer. Options: a centralized counter store like Redis, or a token-bucket gossip protocol where servers share counts periodically.
+
+I'd go with Redis in cluster mode with a sliding window log algorithm. Here's the tradeoff: sliding window is more accurate than fixed window — it avoids the boundary burst problem — but it uses more memory because we store timestamps per request. For a user with a limit of 1,000 requests per minute, we store up to 1,000 timestamps. At 500K RPS with say 100,000 active users, that's manageable.
+
+The Redis implementation: for each request I do a Lua script atomically — ZADD the current timestamp, ZREMRANGEBYSCORE to drop entries older than the window, ZCARD to get the count, then check against the limit. One round-trip. At 50 servers each doing 10K RPS, Redis gets 500K ops/second. Redis can handle about 1 million ops/second on a single node, so we're fine with headroom. For the 5ms latency budget: Redis round-trip within the same datacenter is typically under 1ms, so we're well within budget.
+
+For failure mode: if Redis is unavailable, I'd fail open with a local fallback counter that's conservative — say 50% of the normal limit — rather than blocking all traffic. The 5% accuracy requirement relaxes during the outage window.
+
+[00:09] Nadia (Interviewer): What if a single user suddenly sends 100K RPS — 20% of total capacity — trying to overwhelm your Redis layer?
+
+[00:10] Alex (Candidate): Two protections. First, the Lua script is O(log n + m) where n is existing entries and m is new entries — for a user sending 100K RPS in a 60-second window, that Lua script processes at most 100K * 60 = 6 million entries. That's a problem. So I'd cap the sorted set size: if ZCARD exceeds the per-user limit, stop adding and immediately reject — the user is already over limit. That bounds the Lua script cost. Second, I'd add a circuit breaker per user at the API gateway layer — if a user hits the limit 10 times in 5 seconds, temporarily block them for 30 seconds at the edge without touching Redis at all.
+
+[00:13] Nadia (Interviewer): Let's switch to a coding problem. Given a string, find the length of the longest substring without repeating characters.
+
+[00:14] Alex (Candidate): Classic sliding window. I'll use a hashmap to track the last seen index of each character, and two pointers for the window boundaries. When I see a character I've seen before within the current window, I move the left pointer to the character after its last occurrence.
+
+```python
+def length_of_longest_substring(s: str) -> int:
+    last_seen = {}
+    left = 0
+    max_len = 0
+    for right, char in enumerate(s):
+        if char in last_seen and last_seen[char] >= left:
+            left = last_seen[char] + 1
+        last_seen[char] = right
+        max_len = max(max_len, right - left + 1)
+    return max_len
+```
+
+Time O(n), space O(min(n, k)) where k is the character set size — for ASCII that's a constant 128 so effectively O(1) space.
+
+[00:16] Nadia (Interviewer): Walk me through your solution on the input "abcabcbb".
+
+[00:17] Alex (Candidate): Start: left=0, max_len=0, last_seen={}. right=0 'a': not seen, last_seen={'a':0}, window [a], max_len=1. right=1 'b': not seen, last_seen={'a':0,'b':1}, window [ab], max_len=2. right=2 'c': not seen, window [abc], max_len=3. right=3 'a': seen at 0, which is >= left=0, so left moves to 1. last_seen['a']=3, window [bca], max_len stays 3. right=4 'b': seen at 1, >= left=1, left=2. window [cab], max_len=3. right=5 'c': seen at 2, >= left=2, left=3. window [abc], max_len=3. right=6 'b': seen at 4, >= left=3, left=5. window [cb], max_len=3. right=7 'b': seen at 6, >= left=5, left=7. window [b], max_len=3. Final answer: 3, which is correct — "abc".
+
+[00:20] Nadia (Interviewer): Tell me about a production incident you debugged. Walk me through your methodology.
+
+[00:21] Alex (Candidate): About ten months ago, we had an intermittent latency spike on our search API — P99 latency was jumping from 80ms to 2,400ms for about 90 seconds every 15 minutes, then recovering. It looked like a clock. First hypothesis: a scheduled job. I pulled our cron job list — we had a job that ran every 15 minutes to rebuild a search index cache. I correlated timestamps: the latency spikes aligned within 2 seconds of the job start. Confirmed causation by temporarily disabling the job — spikes stopped immediately.
+
+Root cause: the cache rebuild job was doing a full table scan on a 40-million-row table without a covering index, locking rows in a way that blocked concurrent search queries. The fix had two parts. Short-term: I added a covering index on the three columns the job was querying — reduced the job from 90 seconds to 4 seconds, which eliminated the lock contention window. Long-term: I rebuilt the job to use a read replica instead of the primary, so it never contended with write-path queries. Deployed both fixes in the same release. Zero recurrence since.
+
+[00:26] Nadia (Interviewer): How did you rule out network as the cause before going to the database hypothesis?
+
+[00:27] Alex (Candidate): The regularity of the spike pattern was the first signal. Network issues don't typically occur on a 15-minute clock. I also checked our infrastructure dashboards — CPU, network I/O, memory — all flat during spike windows. The only metric that spiked was database connection wait time, which I saw in our APM tool. That pointed directly to the database tier. I confirmed network was clean by looking at inter-service latency on endpoints that didn't touch the database — they were fine during the same windows.
+
+[00:30] Nadia (Interviewer): Walk me through how you'd design a job queue system for background tasks. Assume you need exactly-once semantics and you're handling roughly 10,000 tasks per minute.
+
+[00:31] Alex (Candidate): Exactly-once is the hard part. I'd build this on top of a transactional database combined with a queue. The pattern: when a client wants to enqueue a task, they INSERT a row into a `jobs` table with status="pending" inside a database transaction — that INSERT is atomic and durable. A background worker polls the table using SELECT FOR UPDATE SKIP LOCKED — this atomically locks a row for one worker without blocking others. The worker processes the job, then UPDATE status="completed" in the same transaction. If the worker crashes mid-processing, the transaction rolls back and the job goes back to "pending." SELECT FOR UPDATE SKIP LOCKED ensures no two workers grab the same row.
+
+The tradeoff versus a dedicated queue like Kafka or SQS: the database approach has better exactly-once guarantees because you're using ACID transactions, but it doesn't scale as well for very high throughput. At 10,000 tasks per minute — about 167 per second — a well-tuned Postgres with proper indexing can handle that easily. If you needed 10,000 per second, you'd move to a dedicated queue.
+
+[00:36] Nadia (Interviewer): What's your approach to database migration strategy in a high-traffic system? You need to add a NOT NULL column to a table with 50 million rows.
+
+[00:37] Alex (Candidate): Never do it in one step on a production table that size. The naive approach — ALTER TABLE ADD COLUMN NOT NULL — blocks the table for potentially minutes on a 50M row table, which is a production outage. The safe approach is three steps. Step one: ADD COLUMN with a DEFAULT value — this is instant on Postgres 11+ because it just updates the catalog, not the rows. Step two: backfill in batches — UPDATE the new column in chunks of 10,000 rows with a sleep between batches to avoid overwhelming I/O. Step three: once backfill is complete, add the NOT NULL constraint as a separate operation. In Postgres, you can add a constraint as NOT VALID, which skips existing rows, then VALIDATE CONSTRAINT in a later deploy, which takes only a share lock instead of a table lock. We did this at my previous company for a column we added to our `transactions` table — the table had about 60 million rows and we completed the migration with zero downtime and less than 5% I/O overhead during the backfill phase.
+
+[00:42] Nadia (Interviewer): Tell me about a time you had to influence a technical decision made by a more senior engineer who you disagreed with.
+
+[00:43] Alex (Candidate): About a year ago we were building our notification delivery system. A staff engineer on the team had proposed using Kafka for everything — ingestion, processing, and state tracking — which felt over-engineered for our use case. We were processing around 50,000 notifications per day, not per second. I put together a lightweight document: I modeled the operational overhead — Kafka cluster management, consumer group coordination, offset management — against the simpler alternative of Postgres + background workers at our actual scale. I estimated Kafka would add 15-20 hours per month of operational burden for our team of three with no reliability benefit at that traffic level. The staff engineer pushed back initially — he'd built Kafka systems before and was comfortable with it. I suggested we run a two-week spike where one engineer built the Postgres-based approach and we compared. He agreed. The Postgres version worked fine and we shipped it. He acknowledged afterward that Kafka would have been premature at our scale.
+
+[00:48] Nadia (Interviewer): Alex, what questions do you have for me?
+
+[00:49] Alex (Candidate): Three things. First — how does the team decide when to address technical debt versus shipping new features? I've worked in both extremes and I'm curious where you land. Second — what's the biggest architectural decision this team has made in the last twelve months and how was the decision process structured? And third — what does the oncall experience look like here in terms of alert quality and how often engineers are actually paged?
+
+[00:51] Nadia (Interviewer): All three are things I care a lot about. We'll dig into each. Great interview, Alex.
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <domain_context>
+      You are a senior member of a structured hiring panel. Your evaluation will be read by hiring managers, HR business partners, and in some cases executive leadership. This report directly influences whether a candidate advances to an offer or is declined. Errors in your evaluation — inflated scores, misapplied rules, inconsistent reasoning — affect hiring quality and expose the organization to inconsistent process risk.
+
+      Structural hiring evaluations must be reproducible: two evaluators given the same transcript and these instructions should reach the same checkpoint scores. If your score cannot be traced to a verbatim transcript excerpt, it is not a valid score. Only transcript content is evidence.
+
+      Checkpoint applicability is determined by two things: (1) interview_type from metadata, and (2) what the candidate explicitly described. For a technical interview, C-09, C-10, C-18, and C-19 are applicable. C-14 and C-15 are NOT applicable for a technical interview.
+
+      The three new schema fields — panel_recommendation, candidate_level_assessed, and competency_scores — carry cross-field dependencies. panel_recommendation must be consistent with overall_recommendation. Inconsistency will cause schema validation failure.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      (A) Read interview_type from transcript metadata: "technical"
+      (B) interview_type="technical" → C-14, C-15 = N/A. C-09, C-10, C-18, C-19 are all applicable.
+      (C) Check whether candidate explicitly mentioned managing direct reports. Gates C-11, C-12, C-13.
+      (D) Check whether candidate described a conflict. Gates C-16.
+
+      WRONG: Scoring C-14 as Y or N on a technical interview. VIOLATION.
+      RIGHT: C-14 score="N/A", excerpt="" on a technical interview.
+    </gate_check>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim.
+
+      FORMAT:
+        Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+        N/A score:    excerpt = "" (empty string — never "N/A", never null)
+
+      WRONG: "[00:04] Alex: Lua script atomically — this eliminates race conditions"
+      RIGHT: "[00:04] Alex: for each request I do a Lua script atomically — ZADD the current timestamp, ZREMRANGEBYSCORE to drop entries older than the window, ZCARD to get the count, then check against the limit"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+      C-01 through C-08: Always applicable.
+      C-09, C-10: Applicable — interview_type is "technical".
+      C-11, C-12, C-13: Applicable ONLY if candidate explicitly mentioned managing direct reports.
+      C-14, C-15: NOT applicable — interview_type is "technical", not "final".
+      C-16: Applicable ONLY if candidate described a conflict with a peer/stakeholder/manager.
+      C-17: Always applicable.
+      C-18, C-19: Applicable — interview_type is "technical".
+      C-20: Always applicable.
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins.
+
+      STEP 1 — AUTO-DOWNGRADE (NO_HIRE):
+        C-01 = N → overall_recommendation = "no_hire". STOP. panel_recommendation = "decline".
+
+      STEP 2 — LEADERSHIP DEPENDENCY (HOLD CEILING):
+        Any of C-11/C-12/C-13 = N, AND any of C-01–C-08 = N:
+        → maximum = "hold". panel_recommendation = "defer".
+
+      STEP 3 — HIRE:
+        All C-01–C-08 = Y. No auto-downgrade. Leadership cluster N/A or all Y.
+        → overall_recommendation="hire", panel_recommendation="advance".
+
+      STEP 4 — HOLD: Mixed. → "hold", panel_recommendation="defer".
+      STEP 5 — NO_HIRE: Majority N. → "no_hire", panel_recommendation="decline".
+    </scoring_decision_tree>
+
+    <field_definitions>
+      <field name="interview_type">
+        "technical" — read from metadata.
+      </field>
+
+      <field name="checkpoints">
+        All 20 required. C-14, C-15 = N/A (not final interview). C-09, C-10, C-18, C-19 applicable.
+        score in {"Y","N","N/A"}. reasoning min 25 chars, max 40 words.
+      </field>
+
+      <field name="quality_areas">
+        Exactly 5. rating in {"G","Y","R"}. reasoning min 30 chars.
+        Technical Depth area is especially important for this technical interview — rate based on depth and accuracy of technical responses.
+      </field>
+
+      <field name="overall_recommendation">
+        "hire", "no_hire", or "hold". From scoring_decision_tree.
+        WRONG: "hire" when C-01=N.
+      </field>
+
+      <field name="panel_recommendation">
+        hire→advance, no_hire→decline, hold→defer.
+        WRONG: overall_recommendation="hire", panel_recommendation="defer". Schema rejects.
+      </field>
+
+      <field name="candidate_level_assessed">
+        "L4", "L5", "L6", "L7", or "unknown". From complexity of technical examples.
+        Technical depth, scope of incident ownership, influence on design decisions inform level.
+      </field>
+
+      <field name="competency_scores">
+        At least one required. For this technical interview, relevant competencies:
+        "system_design" (rate limiter design quality), "technical_accuracy" (correctness of algorithms, DB migration strategy), "behavioral_depth" (incident debugging story), "communication" (clarity of technical explanations).
+        WRONG: competency_scores=[]. Schema rejects.
+      </field>
+
+      <field name="key_strengths">Specific observations with transcript basis.</field>
+      <field name="key_concerns">Specific gaps. Even strong candidates may have one.</field>
+      <field name="risk_flags">[] if none. Pattern-level signals only, not impressions.</field>
+      <field name="summary">Min 50 chars, max 80 words.</field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — specific, technically correct response with named details.
+        "Lua script atomically" + the specific commands = Y for technical accuracy.
+        Correct algorithm trace on "abcabcbb" = Y for problem-solving methodology.
+
+      N — incorrect, absent, or insufficiently specific.
+        If candidate says "I'd use a database" without explaining the tradeoff = N for C-10.
+
+      N/A — gating condition not met.
+        C-14 = N/A because interview_type="technical" (not "final").
+        C-11 = N/A if candidate never mentioned managing direct reports.
+
+      QUALITY AREA — Technical Depth:
+        G: Explained Redis Lua atomicity, sliding window tradeoffs, DB migration zero-downtime approach correctly.
+        Y: Some technical depth but gaps in one major area.
+        R: Significant technical errors or inability to explain core concepts.
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Excerpt contamination.
+        WRONG: "[00:21] Alex: covered index fix — demonstrates root cause analysis"
+        RIGHT: "[00:21] Alex: I added a covering index on the three columns the job was querying — reduced the job from 90 seconds to 4 seconds"
+
+      ERROR 2 — N/A excerpt non-empty.
+        WRONG: score="N/A", excerpt="Final round only"
+        RIGHT: score="N/A", excerpt=""
+
+      ERROR 3 — Auto-downgrade ignored.
+        WRONG: C-01=N, overall_recommendation="hold"
+        RIGHT: C-01=N → overall_recommendation="no_hire".
+        NOTE: This candidate gave specific named details throughout. C-01 evidence is strong.
+
+      ERROR 4 — Scoring C-14 or C-15 as Y/N.
+        WRONG: C-14="Y" on a technical interview. VIOLATION.
+        RIGHT: C-14="N/A", excerpt="" — not a final interview.
+
+      ERROR 5 — panel_recommendation inconsistent.
+        WRONG: overall_recommendation="hire", panel_recommendation="defer". Schema rejects.
+
+      ERROR 6 — competency_scores empty.
+        WRONG: competency_scores=[]. Score at minimum "system_design" and "technical_accuracy".
+
+      ERROR 7 — Missing checkpoints.
+        All 20 required, C-01 through C-20.
+    </common_errors>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <output_format_template>
+      Return valid JSON. All fields required.
+
+      {
+        "interview_type": "technical",
+        "checkpoints": [/* C-01 through C-20, all 20 required */],
+        "quality_areas": [/* exactly 5: Opening, Behavioral Evidence, Technical Depth, Leadership & Influence, Closing */],
+        "overall_recommendation": "hire" | "no_hire" | "hold",
+        "panel_recommendation": "advance" | "decline" | "defer",
+        "candidate_level_assessed": "L4" | "L5" | "L6" | "L7" | "unknown",
+        "competency_scores": [/* at least one */],
+        "key_strengths": ["..."],
+        "key_concerns": ["..."],
+        "risk_flags": ["..."],
+        "summary": "min 50 chars, max 80 words"
+      }
+
+      CROSS-FIELD CONSTRAINTS:
+      - hire→advance, no_hire→decline, hold→defer
+      - C-01=N → overall_recommendation MUST be "no_hire"
+      - competency_scores MUST NOT be empty
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. C-01=N? → overall_recommendation="no_hire", panel_recommendation="decline".
+      2. Any C-11/C-12/C-13=N AND any C-01–C-08=N? → Fix if overall_recommendation="hire".
+      3. All N/A checkpoints: excerpt="". Fix any non-empty.
+      4. All Y/N checkpoints: excerpt has verbatim quote.
+      5. panel_recommendation consistent with overall_recommendation.
+      6. C-14, C-15 = "N/A" (not a final interview).
+      7. All 20 checkpoints present.
+      8. All 5 quality areas present.
+      9. competency_scores not empty.
+      10. summary >= 50 chars, <= 80 words.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+panel_recommendation must be consistent with overall_recommendation (hire→advance, no_hire→decline, hold→defer).
+    </output_schema>
+  </instructions>
+</prompt>

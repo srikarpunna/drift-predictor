@@ -1,0 +1,172 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20240327-019056</call_id>
+      <agent>Carl Webb</agent>
+      <queue>Technical Support</queue>
+      <duration>7:54</duration>
+      <date>2024-03-27</date>
+    </metadata>
+    <dialogue>
+[00:00:02] Carl Webb (Agent): Technical support, how can I help?
+[00:00:06] Diana Romero (Customer): Hi — who am I speaking with?
+[00:00:09] Carl Webb (Agent): This is technical support. What's your issue?
+[00:00:13] Diana Romero (Customer): Okay... I'm having an issue with the dashboard — my charts aren't loading. Just spinning indefinitely.
+[00:00:20] Carl Webb (Agent): Alright. What's your account email?
+[00:00:24] Diana Romero (Customer): It's d.romero at vantagepoint-analytics.com.
+[00:00:30] Carl Webb (Agent): And confirm the organization name.
+[00:00:33] Diana Romero (Customer): Vantage Point Analytics.
+[00:00:35] Carl Webb (Agent): Got it. I'm in your account. What browser are you using?
+[00:00:39] Diana Romero (Customer): Chrome. Latest version — I just updated it yesterday.
+[00:00:43] Carl Webb (Agent): Okay. Try clearing your browser cache and reload the dashboard.
+[00:00:47] Diana Romero (Customer): I already tried that. I cleared cache twice before calling in.
+[00:00:52] Carl Webb (Agent): Try a different browser then — Firefox or Edge. See if the same thing happens.
+[00:00:57] Diana Romero (Customer): Hold on... Okay I'm in Firefox now. Same thing. The charts are still spinning.
+[00:01:06] Carl Webb (Agent): Alright. Can you check your internet connection? Sometimes slow connections cause rendering timeouts.
+[00:01:12] Diana Romero (Customer): My connection is fine. I'm running a speed test right now — 240 megabits down. The issue is on your side.
+[00:01:19] Carl Webb (Agent): Let me check the status page... I'm not seeing any active incidents.
+[00:01:24] Diana Romero (Customer): Can I get your name? I want to have a reference if I need to call back.
+[00:01:28] Carl Webb (Agent): It's Carl.
+[00:01:30] Diana Romero (Customer): Carl what? What's your full name or agent ID?
+[00:01:34] Carl Webb (Agent): Just Carl. Look, the status page is clear so let me dig into your account specifically. I see you have a Business Pro plan. How many data sources do you have connected?
+[00:01:43] Diana Romero (Customer): Seven data sources.
+[00:01:46] Carl Webb (Agent): Let me check the render queue for your account... I can see your chart jobs are stuck in a processing queue. Looks like there was a timeout on your largest data source — it has 4.2 million rows. That's causing the entire dashboard render to stall.
+[00:02:01] Diana Romero (Customer): So what do I do about that?
+[00:02:04] Carl Webb (Agent): You can either reduce the row count in that data source by filtering, or I can manually clear the stuck job from the queue on my end. Once I clear it, your other charts should load while the large one reprocesses.
+[00:02:15] Diana Romero (Customer): Can you clear it now?
+[00:02:17] Carl Webb (Agent): Yeah, clearing it now... done. Try refreshing your dashboard.
+[00:02:24] Diana Romero (Customer): Okay, six of the seven charts are loading now. The big one is still spinning but I can work with this.
+[00:02:31] Carl Webb (Agent): Right, the large data source will take a while to reprocess — probably 15 to 20 minutes for 4.2 million rows. You can monitor the progress in the Data Sources tab under Settings.
+[00:02:42] Diana Romero (Customer): Okay. Why did this happen? Did something change on your end?
+[00:02:47] Carl Webb (Agent): There was a platform update last night. Some large data sources hit a processing threshold change. It's a known issue — the engineering team is working on a patch.
+[00:02:57] Diana Romero (Customer): That's good to know. It would have been nice to get an email about it. So this might happen again?
+[00:03:04] Carl Webb (Agent): It's being patched. Should be fixed within 48 hours.
+[00:03:08] Diana Romero (Customer): Alright. Is there anything else I should do?
+[00:03:12] Carl Webb (Agent): Just keep an eye on that large data source. Anything else?
+[00:03:15] Diana Romero (Customer): No. Thanks Carl.
+[00:03:18] Carl Webb (Agent): Yep. Bye.
+[00:03:20] [CALL END]
+[00:04:02] [WRAP-UP COMPLETE — 42 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before evaluating any compliance check:
+      Determine ticket_type from call content. This controls which checks are applicable.
+      Make this determination BEFORE scoring any check.
+
+      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
+      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
+      - "account": customer issue involves profile settings, name/email changes, plan management
+      - "general": does not fit above categories
+
+      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
+      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
+
+      WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
+      RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
+    </gate_check>
+
+    <compliance_scoring>
+      - Y: Check was completed as required
+      - N: Check was required but not completed
+      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+    </compliance_scoring>
+
+    <grading_decision_tree priority="CRITICAL">
+      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+
+      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
+         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
+         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
+         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+
+      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+
+      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+
+      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+    </grading_decision_tree>
+
+    <escalation_rule priority="CRITICAL">
+      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
+      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
+      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+
+      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
+      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
+      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      RIGHT: escalation_required=false, escalation_reason=null.
+    </escalation_rule>
+
+    <evidence_purity priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
+      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
+      evidence min length = 10 characters. Empty string will fail schema validation.
+
+      WRONG: "Agent greeted customer professionally and identified themselves clearly"
+      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
+
+      WRONG: "N/A" (too short, 3 chars)
+      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+    </evidence_purity>
+
+    <compliance_checks>
+      C-01: Agent stated their name at the start of the call — ALWAYS applicable
+      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
+      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
+      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
+      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
+      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
+      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
+      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
+      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
+      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
+      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
+      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+    </compliance_checks>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
+      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
+      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
+      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+    </field_caps>
+
+    <quality_dimensions>
+      QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
+      - Professionalism: Tone, empathy, language quality throughout the call
+      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
+      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
+      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
+      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+    </quality_dimensions>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
+      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
+      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
+      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
+      5. escalation_required = true? → escalation_reason must not be null.
+      6. escalation_required = false? → escalation_reason must be null.
+      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
+      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
+
+      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
+      RIGHT: Two applicable N checks → overall_grade="FAIL".
+
+      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
+      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+    </pre_emit_check>
+
+    <output_schema>
+      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+    </output_schema>
+  </instructions>
+</prompt>

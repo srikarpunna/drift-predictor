@@ -1,0 +1,157 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20240422-105518</call_id>
+      <agent>Jason Park</agent>
+      <queue>General Inquiries</queue>
+      <duration>5:53</duration>
+      <date>2024-04-22</date>
+    </metadata>
+    <dialogue>
+[00:00:04] Jason Park (Agent): Horizon Cloud Support, this is Jason Park. How can I help you today?
+[00:00:09] Camille Torres (Customer): Hi Jason. I'm looking into Horizon Cloud for my team — we're a small marketing agency and I'm trying to figure out if it fits what we need. I have a few questions about features.
+[00:00:20] Jason Park (Agent): Of course — happy to help. What would you like to know?
+[00:00:24] Camille Torres (Customer): First question: does Horizon Cloud support real-time collaboration? Like, can multiple people edit the same project at the same time?
+[00:00:33] Jason Park (Agent): Yes, Horizon Cloud supports live collaborative editing. Multiple team members can work in the same project simultaneously and you'll see each other's cursors and changes in real time. Changes are auto-saved every 30 seconds, and there's a full revision history so you can revert to any previous version.
+[00:00:50] Camille Torres (Customer): That's great. What about integrations — do you connect with tools like Slack or Asana?
+[00:00:57] Jason Park (Agent): We do. Horizon Cloud has native integrations with Slack, Asana, Trello, Google Workspace, and Microsoft 365. There's also a Zapier connector that opens up integrations with several hundred additional tools. The integrations are managed from the Integrations Hub in your account settings — no developer work required for the standard connectors.
+[00:01:17] Camille Torres (Customer): Nice. What about file storage — is there a limit on how much we can upload?
+[00:01:23] Jason Park (Agent): Storage limits depend on the plan. The Starter plan includes 10 gigabytes of file storage, Team includes 100 gigabytes, and the Business plan offers unlimited storage. Files can be up to 2 gigabytes each on any plan. If you're a marketing agency working with video assets or large design files, Team or Business would be the right fit.
+[00:01:42] Camille Torres (Customer): We do work with video a lot. One more question — is there an offline mode? Sometimes our team works in locations without reliable internet.
+[00:01:52] Jason Park (Agent): There is a limited offline mode available. You can enable it from your profile settings, which lets you view and edit documents you've previously opened. Changes you make offline will sync automatically when you reconnect. However, real-time collaboration features and file uploads are not available offline — those require an active connection.
+[00:02:11] Camille Torres (Customer): That's good to know. Is offline mode available on all plans?
+[00:02:15] Jason Park (Agent): Offline mode is available on all plans, including Starter. It's enabled per device from the desktop app — the web browser version doesn't support offline access.
+[00:02:26] Camille Torres (Customer): Okay. Last question — do you have a free trial?
+[00:02:31] Jason Park (Agent): Yes, we offer a 14-day free trial on the Team plan. No credit card required to start. At the end of the trial you can choose to subscribe or your account will automatically revert to the free Starter tier, which lets you keep your data and continue using the core features at no charge.
+[00:02:48] Camille Torres (Customer): That's really helpful. I think I have what I need to make a decision. Is there anywhere I can read more about the specific plan differences?
+[00:02:57] Jason Park (Agent): Absolutely — horizon.cloud/plans has a full side-by-side comparison with feature details and pricing. You can also start your free trial directly from that page if you're ready.
+[00:03:07] Camille Torres (Customer): Great. Thanks so much, Jason. This was really helpful.
+[00:03:12] Jason Park (Agent): My pleasure! Is there anything else I can answer for you before we wrap up?
+[00:03:17] Camille Torres (Customer): No, that's everything. Thanks again.
+[00:03:20] Jason Park (Agent): Sounds good. Best of luck with your decision — hope to see you on Horizon Cloud soon. Have a great day!
+[00:03:26] Camille Torres (Customer): You too. Bye!
+[00:03:28] [CALL END]
+[00:04:07] [WRAP-UP COMPLETE — 39 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before evaluating any compliance check:
+      Determine ticket_type from call content. This controls which checks are applicable.
+      Make this determination BEFORE scoring any check.
+
+      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
+      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
+      - "account": customer issue involves profile settings, name/email changes, plan management
+      - "general": does not fit above categories
+
+      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
+      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
+
+      WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
+      RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
+    </gate_check>
+
+    <compliance_scoring>
+      - Y: Check was completed as required
+      - N: Check was required but not completed
+      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+    </compliance_scoring>
+
+    <grading_decision_tree priority="CRITICAL">
+      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+
+      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
+         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
+         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
+         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+
+      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+
+      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+
+      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+    </grading_decision_tree>
+
+    <escalation_rule priority="CRITICAL">
+      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
+      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
+      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+
+      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
+      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
+      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      RIGHT: escalation_required=false, escalation_reason=null.
+    </escalation_rule>
+
+    <evidence_purity priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
+      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
+      evidence min length = 10 characters. Empty string will fail schema validation.
+
+      WRONG: "Agent greeted customer professionally and identified themselves clearly"
+      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
+
+      WRONG: "N/A" (too short, 3 chars)
+      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+    </evidence_purity>
+
+    <compliance_checks>
+      C-01: Agent stated their name at the start of the call — ALWAYS applicable
+      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
+      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
+      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
+      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
+      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
+      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
+      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
+      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
+      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
+      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
+      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+    </compliance_checks>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
+      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
+      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
+      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+    </field_caps>
+
+    <quality_dimensions>
+      QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
+      - Professionalism: Tone, empathy, language quality throughout the call
+      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
+      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
+      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
+      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+    </quality_dimensions>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
+      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
+      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
+      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
+      5. escalation_required = true? → escalation_reason must not be null.
+      6. escalation_required = false? → escalation_reason must be null.
+      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
+      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
+
+      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
+      RIGHT: Two applicable N checks → overall_grade="FAIL".
+
+      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
+      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+    </pre_emit_check>
+
+    <output_schema>
+      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+    </output_schema>
+  </instructions>
+</prompt>

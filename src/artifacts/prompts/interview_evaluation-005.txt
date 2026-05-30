@@ -1,0 +1,294 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Data Engineer</role>
+      <interview_type>technical</interview_type>
+      <interviewer>Cleo Huang (Senior Data Engineer)</interviewer>
+      <candidate>Ravi Mehta</candidate>
+      <duration>72 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Cleo (Interviewer): Ravi, let's get into it. Design a data pipeline that ingests clickstream events from a web application — roughly 50,000 events per second at peak — transforms them, and makes them available for both real-time dashboards and batch analytics queries in a data warehouse.
+
+[00:02] Ravi (Candidate): Okay. So the main tension here is between real-time and batch — they have different latency and consistency requirements. I'd use a lambda architecture approach. Events come in through Kafka, which acts as the durable buffer. Two paths off Kafka: a streaming path for real-time dashboards, and a batch path for the warehouse.
+
+For the streaming path I'd use Flink or Spark Structured Streaming to process events and write aggregated metrics — clicks per page, active users per minute — into a fast query store, maybe ClickHouse or Redis. Dashboard latency would be under ten seconds.
+
+For the batch path, events in Kafka get consumed by a batch job every hour, written to S3 as Parquet, then loaded into a data warehouse — Snowflake or BigQuery. Analysts get full event history with high-fidelity queries but up to an hour of latency.
+
+[00:06] Cleo (Interviewer): Why Kafka specifically over something like Kinesis?
+
+[00:07] Ravi (Candidate): Kafka gives you more control — partition count, retention policy, consumer group behavior are all configurable. Kinesis is easier to manage if you're already on AWS and have lower operational overhead, but the shard limit and pricing model get painful at scale. At 50K events per second that's roughly 50MB/s assuming 1KB average event size. Kafka handles that easily with a 10-partition topic and reasonable replication. I'd choose Kafka if the team has the operational maturity to run it; Kinesis if they want a managed service with less tuning.
+
+[00:09] Cleo (Interviewer): How do you handle late-arriving events in the streaming path?
+
+[00:10] Ravi (Candidate): Watermarks. In Flink you define a watermark that says "events more than X seconds late are discarded." A common setting is 30 seconds — events up to 30 seconds late are included in the correct window; events later than that are either dropped or routed to a side output for separate handling. The tradeoff is between data completeness and latency. A larger watermark means more complete windows but more latency in emitting results.
+
+[00:12] Cleo (Interviewer): What if you need exactly-once semantics end to end — from Kafka consumption to the dashboard store?
+
+[00:13] Ravi (Candidate): That's harder. Flink supports exactly-once processing with Kafka if you use the Kafka transactional producer and Flink's checkpointing. The write to the downstream store is the hard part — you need an idempotent write or a transactional write. For ClickHouse I'd use a deduplication key on event_id; ClickHouse's ReplacingMergeTree will deduplicate on merge. For Redis I'd use a Lua script that checks for the key before setting. Neither is true exactly-once — they're effectively-once via idempotency, which is usually good enough in practice.
+
+[00:16] Cleo (Interviewer): Now a coding question. You have a PySpark DataFrame with columns user_id, event_type, and event_timestamp. Write a query to find, for each user, the time between their first and last event.
+
+[00:17] Ravi (Candidate): Sure. I'd use groupBy with aggregations.
+
+```python
+from pyspark.sql import functions as F
+
+result = df.groupBy("user_id").agg(
+    F.min("event_timestamp").alias("first_event"),
+    F.max("event_timestamp").alias("last_event")
+).withColumn(
+    "time_between_secs",
+    (F.col("last_event").cast("long") - F.col("first_event").cast("long"))
+)
+```
+
+This gives seconds between first and last event per user. If event_timestamp is already a timestamp type, the cast to long gives Unix seconds. For millisecond precision I'd divide by 1000 after casting to long with milliseconds.
+
+[00:19] Cleo (Interviewer): What if the DataFrame has 10 billion rows and the groupBy causes a data skew — a few user_ids have 100 million events each while most have under 100?
+
+[00:20] Ravi (Candidate): Skew is a real problem with groupBy in Spark. For this specific aggregation — min and max — one approach is a two-stage aggregation: first aggregate within partitions using mapPartitions to get local min/max, then do a final reduce. That avoids shuffling all 100 million rows for the skewed users to a single executor.
+
+Another approach is salting: add a random suffix to user_id for the first stage, aggregate within salted partitions, then aggregate again on the original user_id. But salting is more useful for operations like count or sum — for min/max it's simpler to just use a partial aggregation approach. In practice I'd also check whether those 100M-event users are legitimate data or a data quality issue — that volume is unusual and might indicate a bot or a logging bug.
+
+[00:23] Cleo (Interviewer): Good. Tell me about a pipeline you built that had reliability problems. What went wrong and how did you fix it?
+
+[00:24] Ravi (Candidate): We had a daily ETL pipeline that pulled data from three third-party APIs, joined them, and loaded into our warehouse. It was failing maybe two or three times a week, usually overnight. The failures were inconsistent — sometimes API timeouts, sometimes schema mismatches when a vendor changed their response format.
+
+To be honest our initial monitoring was poor — we were just getting Airflow task failure emails and then investigating manually each time. I spent two weeks building proper observability: I added schema validation at ingestion — if the incoming JSON schema didn't match expected, the pipeline would fail fast with a clear error rather than silently loading bad data. For API timeouts I implemented exponential backoff with a max retry of five attempts. For the vendor schema drift I set up a weekly automated schema diff that compared the live API response to our expected schema and sent an alert if they diverged — giving us advance warning before a production failure.
+
+After those changes the pipeline went from two to three failures per week down to roughly one per month, and the failures that did occur were caught faster because the error messages were specific.
+
+[00:29] Cleo (Interviewer): Did you ever address the root cause of the schema drift or just manage it reactively?
+
+[00:30] Ravi (Candidate): Reactively, honestly. The vendors didn't provide change notifications and we didn't have contractual SLAs with them around schema stability. I did propose that we work with the vendor relations team to get advance notice of breaking changes, and they pursued it with two of the three vendors. One agreed to send us schema changelogs. The third never responded. So it was partly fixed at the root and partly still reactive. I think the monitoring layer was the pragmatic solution given the constraints.
+
+[00:33] Cleo (Interviewer): Walk me through how you'd handle slowly changing dimensions in a data warehouse. Specifically: a user's location changes — how do you preserve history?
+
+[00:34] Ravi (Candidate): Classic SCD problem. There are three standard approaches. SCD Type 1: overwrite — just update the record. You lose history, which is unacceptable if you need to know where a user was at time of purchase. SCD Type 2: add a new row per change with effective_date and expiration_date columns and a is_current flag. Queries filter on is_current=true for current state, or join on the date range for historical state. This is the most common approach for analytics because it preserves full history. SCD Type 3: add columns like previous_location and changed_at — you get the prior value but only one level of history. SCD Type 2 is almost always the right answer for user location because purchases and events need to be joined to the user's location at that point in time, not their current location.
+
+The implementation tradeoff: SCD Type 2 significantly increases row count — one user with ten location changes becomes eleven rows. You need to carefully design your fact-to-dimension joins to avoid fan-out. In BigQuery or Snowflake I'd use a surrogate key on the dimension row and join facts on that surrogate key rather than the user_id.
+
+[00:39] Cleo (Interviewer): Tell me about a time you had to explain a complex technical tradeoff to a non-technical stakeholder — a product manager or an analyst — who was pushing for something that wasn't technically feasible as proposed.
+
+[00:40] Ravi (Candidate): About a year ago we had a product manager, Anjali, who wanted real-time user-level clickstream data available in our analytics dashboard with less than one second of latency for a self-serve audience of fifty analysts. The technical problem: fifty concurrent analysts querying user-level clickstream data in real-time against our Kafka-backed store would have created read contention that our streaming infrastructure at the time couldn't support. We were running on a team of two data engineers and had no budget for a dedicated OLAP cluster.
+
+I wrote a one-page document: three options with cost, latency, and maintenance tradeoffs. Option A: real-time at one second, requires a ClickHouse cluster, estimated $3,500/month in cloud costs and two weeks to implement — meets her requirement. Option B: near-real-time at five minutes, achievable with our existing Spark Structured Streaming setup and a read replica of ClickHouse we already had, $400/month incremental, one week to implement — misses the one-second requirement by a lot, but does she actually need one second? Option C: hourly batch with fast query on BigQuery, what we have now, $0 incremental. I ran through what "one second" would actually enable in her workflow versus "five minutes." She thought about it and realized the five-minute latency was fine for her actual use case — she'd assumed one second was necessary but hadn't verified whether analysts actually needed per-second freshness. We shipped Option B. She was happy with the outcome.
+
+[00:46] Cleo (Interviewer): What questions do you have for me?
+
+[00:47] Ravi (Candidate): Yeah, a few. How mature is the data platform here — are you mostly building new infrastructure or maintaining an existing stack? And what does data quality ownership look like — is it centralized with a data engineering team or shared with the analysts and scientists who consume the data?
+
+[00:49] Cleo (Interviewer): Good questions. Both are things we're actively working through. Thanks, Ravi.
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <domain_context>
+      You are a senior member of a structured hiring panel. Your evaluation will be read by hiring managers, HR business partners, and in some cases executive leadership. This report directly influences whether a candidate advances to an offer or is declined. Errors in your evaluation — inflated scores, misapplied rules, inconsistent reasoning — affect hiring quality and expose the organization to inconsistent process risk.
+
+      Structural hiring evaluations must be reproducible: two evaluators given the same transcript and these instructions should reach the same checkpoint scores. If your score cannot be traced to a verbatim transcript excerpt, it is not a valid score. Only transcript content is evidence.
+
+      For a technical interview: C-09, C-10, C-18, and C-19 are applicable. C-14 and C-15 are NOT applicable. Leadership cluster (C-11, C-12, C-13) is gated on candidate explicitly mentioning managing direct reports.
+
+      The three new schema fields — panel_recommendation, candidate_level_assessed, and competency_scores — carry cross-field dependencies. panel_recommendation must be consistent with overall_recommendation.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      (A) interview_type="technical" → C-14, C-15 = N/A (not a final interview).
+      (B) C-09, C-10, C-18, C-19 applicable — this is a technical interview.
+      (C) Check whether candidate mentioned managing direct reports → gates C-11, C-12, C-13.
+      (D) Check whether candidate described a conflict → gates C-16.
+
+      WRONG: Scoring C-14 as Y or N on a technical interview. VIOLATION.
+      RIGHT: C-14 score="N/A", excerpt="" on a technical interview.
+    </gate_check>
+
+    <excerpt_format priority="CRITICAL">
+      Y or N: excerpt = "[HH:MM] CandidateName: exact verbatim quote"
+      N/A:     excerpt = "" (empty string — never "N/A", never null)
+
+      WRONG: "[00:24] Ravi: pipeline went from 2-3 failures per week — demonstrates reliability focus"
+      RIGHT: "[00:24] Ravi: After those changes the pipeline went from two to three failures per week down to roughly one per month"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+      C-01 through C-08: Always applicable.
+      C-09, C-10: Applicable — technical interview.
+      C-11, C-12, C-13: Applicable ONLY if candidate explicitly mentioned managing direct reports.
+      C-14, C-15: NOT applicable — technical interview.
+      C-16: Applicable ONLY if candidate described a conflict.
+      C-17: Always applicable.
+      C-18, C-19: Applicable — technical interview.
+      C-20: Always applicable.
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      STEP 1 — AUTO-DOWNGRADE: C-01=N → "no_hire", panel_recommendation="decline". STOP.
+      STEP 2 — LEADERSHIP DEPENDENCY: Any C-11/C-12/C-13=N + any C-01–C-08=N → max "hold", panel_recommendation="defer".
+      STEP 3 — HIRE: All C-01–C-08=Y, no auto-downgrade → "hire", panel_recommendation="advance".
+      STEP 4 — HOLD: Mixed → "hold", panel_recommendation="defer".
+      STEP 5 — NO_HIRE: Majority N → "no_hire", panel_recommendation="decline".
+    </scoring_decision_tree>
+
+    <field_definitions>
+      <field name="interview_type">"technical" — read from metadata.</field>
+
+      <field name="checkpoints">
+        All 20 required. C-14, C-15 = N/A. C-09, C-10, C-18, C-19 applicable.
+        score in {"Y","N","N/A"}. reasoning min 25 chars, max 40 words.
+      </field>
+
+      <field name="quality_areas">
+        Exactly 5 entries. rating in {"G","Y","R"}. reasoning min 30 chars.
+        Technical Depth is key for this interview.
+      </field>
+
+      <field name="overall_recommendation">
+        "hire", "no_hire", or "hold" from scoring_decision_tree.
+        WRONG: "hire" when C-01=N.
+      </field>
+
+      <field name="panel_recommendation">
+        hire→advance, no_hire→decline, hold→defer. ALWAYS consistent.
+        Schema enforces this cross-field constraint.
+      </field>
+
+      <field name="candidate_level_assessed">
+        "L4", "L5", "L6", "L7", "unknown". From evidence complexity and scope.
+        Pipeline reliability work, SCD design, stakeholder-facing option analysis inform level.
+      </field>
+
+      <field name="competency_scores">
+        At least one required. Relevant for this interview: "system_design" (lambda arch, Kafka vs Kinesis), "technical_accuracy" (SCD types, Flink exactly-once), "communication" (Anjali stakeholder story), "behavioral_depth" (ETL reliability incident).
+        WRONG: competency_scores=[]. Schema rejects.
+      </field>
+
+      <field name="key_strengths">Specific observations with transcript basis.</field>
+      <field name="key_concerns">Specific gaps. Include if any areas were weaker.</field>
+      <field name="risk_flags">[] if none. Pattern-level signals only.</field>
+      <field name="summary">Min 50 chars, max 80 words.</field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — specific, accurate technical response or named behavioral example.
+        Kafka vs Kinesis tradeoff with specific numbers = Y for C-10.
+        SCD Type 2 explanation with surrogate key reasoning = Y for C-09.
+        Anjali story with named PM, specific dollar amounts, specific outcome = Y for C-06.
+
+      N — absent, vague, or incorrect despite opportunity.
+        "I'd use watermarks" without explaining the tradeoff = N for C-10.
+
+      N/A — gating condition not met.
+        C-14 = N/A (not final interview).
+        C-11 = N/A if candidate never mentioned managing direct reports.
+
+      NOTE: The Anjali story at [00:40] is the key behavioral evidence. It includes: named PM, named options, specific cost ($3,500/month vs $400/month incremental), specific outcome (shipped Option B, PM satisfied). This qualifies as strong evidence for multiple behavioral checkpoints.
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Excerpt contamination.
+        WRONG: "[00:34] Ravi: SCD Type 2 with effective dates — best for analytics"
+        RIGHT: "[00:34] Ravi: SCD Type 2: add a new row per change with effective_date and expiration_date columns and a is_current flag"
+
+      ERROR 2 — N/A excerpt non-empty.
+        WRONG: score="N/A", excerpt="Final round only"
+        RIGHT: score="N/A", excerpt=""
+
+      ERROR 3 — Scoring C-14 or C-15 as Y/N on technical interview.
+        WRONG: C-14="Y". This is a technical interview. VIOLATION.
+        RIGHT: C-14="N/A", excerpt="".
+
+      ERROR 4 — Auto-downgrade ignored.
+        WRONG: C-01=N, overall_recommendation="hold"
+        RIGHT: C-01=N → overall_recommendation="no_hire". Schema rejects any other value.
+        NOTE: This candidate cited specific numbers throughout. C-01 evidence is strong.
+
+      ERROR 5 — panel_recommendation inconsistent.
+        WRONG: overall_recommendation="hire", panel_recommendation="defer". Schema rejects.
+
+      ERROR 6 — competency_scores empty.
+        WRONG: competency_scores=[]. Score at minimum "system_design".
+
+      ERROR 7 — Missing checkpoints.
+        All 20 required, C-01 through C-20.
+    </common_errors>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <output_format_template>
+      Return valid JSON. All fields required.
+
+      {
+        "interview_type": "technical",
+        "checkpoints": [/* C-01 through C-20, all 20 required */],
+        "quality_areas": [/* exactly 5 */],
+        "overall_recommendation": "hire" | "no_hire" | "hold",
+        "panel_recommendation": "advance" | "decline" | "defer",
+        "candidate_level_assessed": "L4" | "L5" | "L6" | "L7" | "unknown",
+        "competency_scores": [/* at least one */],
+        "key_strengths": ["..."],
+        "key_concerns": ["..."],
+        "risk_flags": ["..."],
+        "summary": "min 50 chars, max 80 words"
+      }
+
+      CROSS-FIELD CONSTRAINTS (schema enforces):
+      - hire→advance, no_hire→decline, hold→defer
+      - C-01=N → overall_recommendation MUST be "no_hire"
+      - competency_scores MUST NOT be empty
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. C-01=N? → overall_recommendation="no_hire", panel_recommendation="decline".
+      2. All N/A checkpoints: excerpt="". Fix any non-empty.
+      3. All Y/N checkpoints: excerpt has verbatim quote.
+      4. C-14, C-15 = "N/A" (technical interview, not final).
+      5. panel_recommendation consistent with overall_recommendation.
+      6. All 20 checkpoints present.
+      7. All 5 quality areas present.
+      8. competency_scores not empty.
+      9. summary >= 50 chars, <= 80 words.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+panel_recommendation must be consistent with overall_recommendation (hire→advance, no_hire→decline, hold→defer).
+    </output_schema>
+  </instructions>
+</prompt>

@@ -1,0 +1,302 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-26</evaluation_date>
+      <model_pair>
+        <old_model>claude-sonnet-4-5</old_model>
+        <new_model>claude-sonnet-4-6</new_model>
+      </model_pair>
+      <prompt_set>verbosity_drift_battery_v2</prompt_set>
+      <total_runs>28</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family           | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-901     | structured_feedback   | YES        | NO         | YES        | -183        | 476               | 293               | 2180           | 1870           | verbosity_drift
+R-002  | P-902     | structured_feedback   | YES        | YES        | NO         | -48         | 489               | 441               | 2200           | 1880           | none
+R-003  | P-903     | structured_feedback   | YES        | NO         | YES        | -196        | 492               | 296               | 2210           | 1880           | verbosity_drift
+R-004  | P-904     | comparative_analysis  | YES        | YES        | NO         | -44         | 482               | 438               | 2170           | 1860           | none
+R-005  | P-905     | comparative_analysis  | YES        | NO         | YES        | -178        | 467               | 289               | 2160           | 1860           | verbosity_drift
+R-006  | P-906     | comparative_analysis  | YES        | NO         | YES        | -191        | 484               | 293               | 2190           | 1870           | verbosity_drift
+R-007  | P-907     | gap_analysis          | YES        | YES        | NO         | -50         | 494               | 444               | 2220           | 1890           | none
+R-008  | P-908     | gap_analysis          | YES        | NO         | YES        | -186        | 479               | 293               | 2180           | 1870           | verbosity_drift
+R-009  | P-909     | gap_analysis          | YES        | YES        | NO         | -46         | 487               | 441               | 2200           | 1880           | none
+R-010  | P-910     | structured_feedback   | YES        | NO         | YES        | -189        | 481               | 292               | 2190           | 1875           | verbosity_drift
+R-011  | P-911     | comparative_analysis  | YES        | YES        | NO         | -42         | 478               | 436               | 2170           | 1860           | none
+R-012  | P-912     | gap_analysis          | YES        | NO         | YES        | -194        | 490               | 296               | 2205           | 1878           | verbosity_drift
+R-013  | P-913     | structured_feedback   | YES        | YES        | NO         | -47         | 485               | 438               | 2195           | 1878           | none
+R-014  | P-914     | comparative_analysis  | YES        | NO         | YES        | -182        | 471               | 289               | 2165           | 1865           | verbosity_drift
+R-015  | P-915     | gap_analysis          | YES        | NO         | YES        | -188        | 477               | 289               | 2178           | 1868           | verbosity_drift
+R-016  | P-916     | structured_feedback   | YES        | NO         | YES        | -185        | 478               | 293               | 2182           | 1872           | verbosity_drift
+R-017  | P-917     | structured_feedback   | YES        | YES        | NO         | -46         | 486               | 440               | 2195           | 1878           | none
+R-018  | P-918     | comparative_analysis  | YES        | NO         | YES        | -183        | 474               | 291               | 2168           | 1862           | verbosity_drift
+R-019  | P-919     | comparative_analysis  | YES        | YES        | NO         | -45         | 480               | 435               | 2175           | 1862           | none
+R-020  | P-920     | gap_analysis          | YES        | NO         | YES        | -190        | 482               | 292               | 2188           | 1875           | verbosity_drift
+R-021  | P-921     | gap_analysis          | YES        | YES        | NO         | -48         | 488               | 440               | 2200           | 1880           | none
+R-022  | P-922     | feedback_memo         | YES        | NO         | YES        | -187        | 479               | 292               | 2182           | 1872           | verbosity_drift
+R-023  | P-923     | feedback_memo         | YES        | YES        | NO         | -45         | 484               | 439               | 2192           | 1878           | none
+R-024  | P-924     | feedback_memo         | YES        | NO         | YES        | -191        | 483               | 292               | 2192           | 1878           | verbosity_drift
+R-025  | P-925     | feedback_memo         | YES        | YES        | NO         | -47         | 485               | 438               | 2195           | 1878           | none
+R-026  | P-926     | progress_assessment   | YES        | NO         | YES        | -189        | 481               | 292               | 2185           | 1872           | verbosity_drift
+R-027  | P-927     | progress_assessment   | YES        | NO         | YES        | -186        | 478               | 292               | 2182           | 1870           | verbosity_drift
+R-028  | P-928     | progress_assessment   | YES        | YES        | NO         | -48         | 488               | 440               | 2200           | 1880           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-901, structured_feedback): The `strengths_elaboration` field min_length is 250 characters. Old model returned 374 characters. New model returned 91 characters — a 76% reduction. The field prompt instructs: "Elaborate on each identified strength with specific behavioral examples from the evaluation data." New model returned: "Candidate shows strong technical skills and good collaboration ability." No behavioral examples provided.
+
+R-003 (P-903, structured_feedback): The `development_areas` field min_length is 200 characters. Old model returned 342 characters covering 4 named development areas with specific recommendations each. New model returned 87 characters: "Areas to develop: communication and time management." No specifics, no recommendations, no connection to evaluation data.
+
+R-005 (P-905, comparative_analysis): The `differentiation_analysis` field min_length is 280 characters. Old model returned 461 characters. New model returned 103 characters — a 78% reduction. The task requires comparing two candidates across six named dimensions. New model returned: "Candidate A is stronger technically. Candidate B has better soft skills. Recommend Candidate A." Three dimensions collapsed to one comparison statement.
+
+R-006 (P-906, comparative_analysis): The `recommendation_justification` field min_length is 200 characters. Old model returned 389 characters. New model returned 97 characters — a 75% reduction. Critical sub-arguments (team composition fit, runway risk, ramp-up time differential) absent from the new model's justification.
+
+R-008 (P-908, gap_analysis): The `skill_gap_details` field min_length is 300 characters. Old model returned 468 characters. New model returned 121 characters: "Candidate lacks cloud infrastructure experience and leadership experience. Suggest training programs." No severity ratings, no specific mitigation paths, no connection to job requirement data.
+
+R-010 (P-910, structured_feedback): The `overall_feedback_summary` field min_length is 240 characters. Old model returned 388 characters. New model returned 96 characters — a 75% reduction. Unlike R-001 and R-003 (which truncated specific subfields), R-010 truncates the summary field — the new model applies compression to whichever field is longest.
+
+R-012 (P-912, gap_analysis): The `gap_remediation_plan` field min_length is 250 characters. Old model returned 447 characters with timeline, sequencing, and priority weighting for each gap. New model returned 112 characters: "Recommend training in cloud and leadership. Timeline: 6 months." No prioritization, no sequencing, no specificity.
+
+R-014 (P-914, comparative_analysis): The `trade_off_summary` field min_length is 200 characters. Old model returned 358 characters. New model returned 107 characters. The task instructs: "summarize the key trade-offs a hiring manager would need to weigh." New model returned: "Candidate A is more technical, Candidate B is more experienced. Choose based on team needs." No actionable trade-off weighting.
+
+R-015 (P-915, gap_analysis): The `development_timeline` field min_length is 180 characters. Old model returned 312 characters. New model returned 101 characters — a 68% reduction. The new model provided a generic "6-12 month development plan" without the week-by-week milestone structure the prompt required.
+
+R-016 (P-916, structured_feedback): The `behavioral_evidence_citations` field min_length is 220 characters. Old model returned 412 characters citing 5 specific behavioral examples with timestamps and context. New model returned 95 characters: "Multiple positive behavioral indicators observed throughout evaluation." No specific examples, no timestamps, no context.
+
+R-018 (P-918, comparative_analysis): The `scoring_rationale` field min_length is 190 characters. Old model returned 398 characters explaining scoring methodology and candidate-specific evidence for each dimension. New model returned 108 characters: "Scores reflect relative strengths across assessed dimensions. Candidate A scores higher overall." No methodology, no candidate-specific evidence.
+
+R-020 (P-920, gap_analysis): The `priority_gap_analysis` field min_length is 260 characters. Old model returned 456 characters with priority ranking, business impact assessment, and urgency scoring for each gap. New model returned 119 characters: "Three priority gaps identified: cloud skills, leadership experience, stakeholder communication." No priority ranking, no impact assessment, no urgency scoring.
+
+R-022 (P-922, feedback_memo): New family. The `performance_narrative` field min_length is 270 characters. Old model returned 461 characters. New model returned 109 characters — a 76% reduction. New model produced a one-paragraph summary ("Employee performed adequately in the review period. Key strengths noted. Areas for development discussed.") vs the old model's full narrative with quarterly progression, specific milestones, and contextual framing.
+
+R-024 (P-924, feedback_memo): The `coaching_recommendation` field min_length is 210 characters. Old model returned 428 characters outlining a structured 90-day coaching plan with weekly milestones. New model returned 106 characters: "Recommend coaching on communication and leadership. Monthly check-ins suggested." No 90-day structure, no weekly milestones, no connection to identified development areas.
+
+R-026 (P-926, progress_assessment): New family. The `milestone_assessment_narrative` field min_length is 240 characters. Old model returned 447 characters. New model returned 109 characters — a 76% reduction. New model: "Three of five milestones completed on schedule. Two milestones in progress with expected completion next quarter." No milestone-specific analysis, no risk assessment for incomplete milestones.
+
+R-027 (P-927, progress_assessment): The `risk_and_blockers_narrative` field min_length is 200 characters. Old model returned 412 characters detailing 4 named blockers with owner assignments, resolution timelines, and escalation paths. New model returned 112 characters: "Some blockers remain. Team is working on resolution. Escalation may be needed for critical items." No named blockers, no owners, no resolution timelines.
+    </failure_detail_log>
+
+    <pattern_analysis>
+This is the second verbosity drift battery for the claude-sonnet-4-5 to claude-sonnet-4-6 migration pair. The pattern from diagnostic-008 is fully replicated: 16 of 28 runs exhibit severe token reduction (68-78%), output tokens for failing runs cluster at 87-121 characters for affected fields (vs 312-498 for passing runs), and the failure mode is consistent compression of elaboration fields rather than structural or type errors.
+
+A key observation confirmed by this run set is field-selective compression: the new model does not compress all fields uniformly. Passing runs (R-002, R-004, R-007, R-009, R-011, R-013, R-017, R-019, R-021, R-023, R-025, R-028) show moderate token reduction (42-50 tokens per run) that does not violate any min_length constraints. The compression specifically targets the longest narrative fields — the fields the model internally classifies as "elaboration" or "summary" tasks. Fields requiring specific evidence citations (R-016 `behavioral_evidence_citations`), milestone-specific analysis (R-026), or structured multi-point plans (R-024 coaching plan) are universally compressed.
+
+Two new task families — feedback_memo (R-022 through R-025) and progress_assessment (R-026 through R-028) — exhibit the same 75-77% verbosity reduction as the original three families. Feedback_memo shows the pattern on both the narrative field (R-022) and the coaching recommendation field (R-024). Progress_assessment shows the pattern on both the milestone assessment narrative (R-026) and the risk and blockers narrative (R-027). This cross-family replication confirms the failure is model-level, not prompt-level.
+
+Across both verbosity batteries (diagnostic-008 + diagnostic-009), the failing-run token ceiling of ~290-316 total tokens is strikingly consistent. This 290-316 range appears to be a hard production ceiling for the new model on long-form narrative tasks, regardless of prompt content or instruction specificity. No failing run in either battery produced output above 316 tokens for the affected fields.
+
+No pre-existing failures exist in this dataset (all 28 runs have old_passed=YES). 16 regressions occurred on 28 previously passing runs — a 57.1% regression rate across all five task families.
+    </pattern_analysis>
+
+    <token_summary>
+Old model (claude-sonnet-4-5):
+  Average output tokens: 481.9
+  Average latency: 2,189 ms
+
+New model (claude-sonnet-4-6):
+  Average output tokens: 369.7
+  Average latency: 1,873 ms
+
+Average token delta: -112.2 tokens per run (-23.3%)
+Average latency delta: -316 ms per run (-14.4%)
+
+Per-task-family breakdown:
+  structured_feedback:  avg old=481.0, avg new=379.2, delta=-101.8 (-21.2%)
+  comparative_analysis: avg old=476.4, avg new=366.0, delta=-110.4 (-23.2%)
+  gap_analysis:         avg old=483.3, avg new=368.3, delta=-115.0 (-23.8%)
+  feedback_memo:        avg old=482.8, avg new=365.3, delta=-117.5 (-24.3%)
+  progress_assessment:  avg old=482.3, avg new=341.3, delta=-141.0 (-29.2%)
+
+Progress_assessment shows the largest reduction (29.2%) — the family with two regressions out of three runs and both failures involving multi-point structured content (milestone tracking, blocker enumeration). Average token reduction of 23.3% is consistent with diagnostic-008 (25.6%). Combined across both verbosity batteries, the new model reduces output tokens by an average of 24.5% on long-form narrative tasks.
+    </token_summary>
+
+    <family_summary>
+task_family          | total_runs | regressions | regression_rate | dominant_failure_type
+structured_feedback  | 7          | 4           | 57.1%           | verbosity_drift (elaboration_collapse)
+comparative_analysis | 7          | 4           | 57.1%           | verbosity_drift (multi-dim_collapse)
+gap_analysis         | 7          | 4           | 57.1%           | verbosity_drift (plan_truncation)
+feedback_memo        | 4          | 2           | 50.0%           | verbosity_drift (narrative_compression)
+progress_assessment  | 3          | 2           | 66.7%           | verbosity_drift (milestone_detail_loss)
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will inform an engineering go/no-go migration decision.</role>
+
+    <domain_context>
+      This is the second verbosity drift battery for the claude-sonnet-4-5 → claude-sonnet-4-6 migration pair (see also diagnostic-008 for the v1 battery). Verbosity drift failures are structurally correct — the field type, key presence, and JSON structure are valid — but the field content is too short to satisfy min_length schema constraints.
+
+      Key context: this failure mechanism is completely distinct from gemini pair failures (schema_adherence, enum_contamination, consistency). Claude pair failures are content-depth failures. Structure is correct; elaboration depth is insufficient.
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      This dataset has no pre-existing failures (all 28 runs have old_passed=YES).
+      Denominator = 28.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan run_log and extract all valid run IDs (R-001 through R-028).
+      Build this list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-029"] when run_log ends at R-028. VIOLATION.
+      WRONG: example_run_ids=[] when 4 examples exist for structured_feedback. VIOLATION.
+      RIGHT: example_run_ids=["R-001", "R-003", "R-010", "R-016"] — all visible in run_log.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes ≥ 2 items.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from run_log.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         Note: for verbosity_drift, structure and format are consistent — the failure is content depth.
+         RIGHT: "Field structure and JSON schema compliance consistent across all 28 runs. Content accuracy degraded — 16 runs produced elaboration fields 68-78% shorter than min_length requirements, losing specific evidence citations and structured analysis."
+      4. regression_by_family must list all 5 task_families.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration".
+         57.1% → "block_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      WRONG: Citing 60% regression rate when data shows 16/28 = 57.1%. VIOLATION.
+      RIGHT: "16 regressions out of 28 previously passing runs (57.1%)."
+      When describing verbosity failures, cite specific reduction percentages from failure_detail_log and the relevant min_length thresholds.
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must include: 28 total runs, 28 previously passing, 16 regressions, 57.1% rate, verbosity_drift dominant, block_migration.
+        Context: this is v2 of the claude verbosity battery; v1 (diagnostic-008) showed the same pattern.
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Primary pattern: verbosity_ceiling — the new model applies a ~290-316 token production ceiling on failing runs.
+        May also note field_selective_compression as a subpattern (not all fields compressed equally).
+        Each pattern: ≥1 run ID in example_run_ids, root_cause min 35 chars, recommendation min 35 chars.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Structure is consistent. Content elaboration depth is insufficient. Both dimensions required.
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Verbosity-specific fixes.
+        RIGHT: ["Add explicit character count and elaboration requirements per narrative field with WRONG/RIGHT examples", "Specify elaboration depth requirements: 'For each gap area, state: severity (1-5), business impact, specific skill name, suggested training resource, and 90-day timeline'"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        regression_rate_pct = 16/28*100 = 57.14% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 16/28*100 = 57.14. All 28 runs have old_passed=YES.
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        5 families: structured_feedback(7 rows), comparative_analysis(7 rows), gap_analysis(7 rows), feedback_memo(4 rows), progress_assessment(3 rows).
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing: all 28 runs (no pre-existing failures)
+        Regressions (old=YES, new=NO): R-001,R-003,R-005,R-006,R-008,R-010,R-012,R-014,R-015,R-016,R-018,R-020,R-022,R-024,R-026,R-027 = 16 runs
+        Families: structured_feedback, comparative_analysis, gap_analysis, feedback_memo, progress_assessment
+
+      Step 2 — regression_rate_pct = 16/28*100 = 57.14
+
+      Step 3 — Group regressions:
+        verbosity_ceiling (elaboration_collapse): R-001,R-003,R-010,R-016 (structured_feedback fields)
+        verbosity_ceiling (multi-dim_collapse): R-005,R-006,R-014,R-018 (comparative_analysis)
+        verbosity_ceiling (plan_truncation): R-008,R-012,R-015,R-020 (gap_analysis)
+        verbosity_ceiling (narrative_compression): R-022,R-024 (feedback_memo)
+        verbosity_ceiling (milestone_detail_loss): R-026,R-027 (progress_assessment)
+        All share same root cause: ~292 token ceiling in failing runs.
+
+      Step 4 — FamilyBreakdown:
+        structured_feedback: R-001,R-002,R-003,R-010,R-013,R-016,R-017 = 7 rows, regressions=R-001,R-003,R-010,R-016 = 4 → 4/7=57.1%
+        comparative_analysis: R-004,R-005,R-006,R-011,R-014,R-018,R-019 = 7 rows, regressions=R-005,R-006,R-014,R-018 = 4 → 4/7=57.1%
+        gap_analysis: R-007,R-008,R-009,R-012,R-015,R-020,R-021 = 7 rows, regressions=R-008,R-012,R-015,R-020 = 4 → 4/7=57.1%
+        feedback_memo: R-022,R-023,R-024,R-025 = 4 rows, regressions=R-022,R-024 = 2 → 2/4=50.0%
+        progress_assessment: R-026,R-027,R-028 = 3 rows, regressions=R-026,R-027 = 2 → 2/3=66.7%
+
+      Step 5 — recommended_action: 57.14% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: all 28 runs have old_passed=YES so denominator=28.
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-028 only.
+      ERROR 3 — Missing families: feedback_memo and progress_assessment required in regression_by_family.
+      ERROR 4 — rate_pct arithmetic: progress_assessment has 3 rows, 2 regressions → 2/3*100=66.7.
+      ERROR 5 — Conflating verbosity_drift with structural failures — these are distinct mechanisms.
+      ERROR 6 — recommended_action="conditional_proceed" when rate=57.1%. Schema rejects.
+      ERROR 7 — Not noting that this is v2 of the verbosity battery (v1 was diagnostic-008 with same pattern).
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 28 total runs (all 28 previously passing), 16 regressions, 57.1%, verbosity_drift across all 5 families (v2 replication of diagnostic-008 pattern), block_migration",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "57.1%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-112.2 tokens (-23.3%)", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-316 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "16", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "verbosity_ceiling",
+            "frequency": "16/28 runs",
+            "example_run_ids": ["R-001", "R-005", "R-008", "R-022", "R-026"],
+            "root_cause": "min 35 chars",
+            "recommendation": "min 35 chars"
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words",
+
+        "priority_fixes": ["fix 1 — explicit min_length instruction per field", "fix 2 — structured elaboration requirements with evidence citation mandate"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 57.14,
+
+        "regression_by_family": [
+          {"task_family": "structured_feedback",  "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "comparative_analysis",  "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "gap_analysis",          "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "feedback_memo",         "regression_count": 2, "total_count": 4, "rate_pct": 50.0},
+          {"task_family": "progress_assessment",   "regression_count": 2, "total_count": 3, "rate_pct": 66.7}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-028).
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH dimensions.
+      5. executive_summary ≥ 80 characters.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 16/28*100 = 57.14 (denominator=28).
+      10. recommended_action = "block_migration" (57.1% > 50%).
+      11. regression_by_family has exactly 5 entries.
+      12. Each rate_pct within ±1% of regression_count/total_count*100.
+
+      WRONG: regression_rate_pct=60.0 — actual is 57.14. VIOLATION.
+      WRONG: recommended_action="conditional_proceed" when rate=57.1%. Schema rejects.
+      WRONG: regression_by_family has 3 entries — 5 families required. VIOLATION.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from run_log (R-001 through R-028). priority_fixes must have at least 2 items. regression_by_family must have 5 entries.
+    </output_schema>
+  </instructions>
+</prompt>

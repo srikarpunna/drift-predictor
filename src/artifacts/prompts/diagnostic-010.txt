@@ -1,0 +1,387 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-30</evaluation_date>
+      <model_pair>
+        <old_model>MIXED — gemini-2.5-flash → gemini-3.1-flash-lite AND claude-sonnet-4-5 → claude-sonnet-4-6</old_model>
+        <new_model>MIXED</new_model>
+      </model_pair>
+      <prompt_set>synthesis_cross_run_v1</prompt_set>
+      <total_runs>29 (synthesis sample; represents aggregated data from 150 total runs in evaluation cycle)</total_runs>
+    </metadata>
+
+    <run_log>
+NOTE: This is a synthesis run. The 29 runs below are a representative sample drawn from the full 150-run evaluation cycle. A CROSS-RUN SYNTHESIS section follows the run log with aggregated statistics across all 150 runs. Run IDs in this file are from the sample set only — do not cite IDs outside R-001 through R-029.
+
+run_id | prompt_id | task_family          | model_pair | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-MX-01   | candidate_eval       | gemini     | YES        | NO         | YES        | -52         | 331               | 279               | 1880           | 1660           | schema_adherence
+R-002  | P-MX-02   | candidate_eval       | gemini     | YES        | YES        | NO         | -14         | 308               | 294               | 1820           | 1620           | none
+R-003  | P-MX-03   | hiring_decision      | gemini     | YES        | NO         | YES        | -6          | 299               | 293               | 1810           | 1640           | enum_contamination
+R-004  | P-MX-04   | hiring_decision      | gemini     | YES        | YES        | NO         | +3          | 303               | 306               | 1815           | 1640           | none
+R-005  | P-MX-05   | tiered_pricing       | gemini     | YES        | NO         | YES        | -11         | 324               | 313               | 1870           | 1670           | consistency
+R-006  | P-MX-06   | tiered_pricing       | gemini     | YES        | YES        | NO         | -9          | 321               | 312               | 1865           | 1668           | none
+R-007  | P-MX-07   | tiered_pricing       | gemini     | YES        | NO         | YES        | -10         | 323               | 313               | 1869           | 1671           | consistency
+R-008  | P-MX-08   | reasoning_summary    | claude     | YES        | NO         | YES        | -201        | 516               | 315               | 2240           | 1890           | verbosity_drift
+R-009  | P-MX-09   | reasoning_summary    | claude     | YES        | YES        | NO         | -43         | 492               | 449               | 2190           | 1870           | none
+R-010  | P-MX-10   | structured_feedback  | claude     | YES        | NO         | YES        | -188        | 479               | 291               | 2180           | 1870           | verbosity_drift
+R-011  | P-MX-11   | structured_feedback  | claude     | YES        | YES        | NO         | -45         | 486               | 441               | 2195           | 1875           | none
+R-012  | P-MX-12   | resume_parse         | gemini     | YES        | NO         | YES        | -49         | 327               | 278               | 1875           | 1645           | schema_adherence
+R-013  | P-MX-13   | resume_parse         | gemini     | YES        | YES        | NO         | -11         | 304               | 293               | 1820           | 1615           | none
+R-014  | P-MX-14   | status_classification| gemini     | YES        | NO         | YES        | -5          | 296               | 291               | 1800           | 1638           | enum_contamination
+R-015  | P-MX-15   | gap_analysis         | claude     | YES        | NO         | YES        | -192        | 483               | 291               | 2185           | 1872           | verbosity_drift
+R-016  | P-MX-16   | gap_analysis         | claude     | YES        | YES        | NO         | -47         | 488               | 441               | 2198           | 1878           | none
+R-017  | P-MX-17   | contract_review      | gemini     | YES        | NO         | YES        | -13         | 331               | 318               | 1905           | 1698           | consistency
+R-018  | P-MX-18   | contract_review      | gemini     | YES        | YES        | NO         | -8          | 318               | 310               | 1858           | 1662           | none
+R-019  | P-MX-19   | candidate_eval       | gemini     | YES        | NO         | YES        | -48         | 328               | 280               | 1872           | 1652           | schema_adherence
+R-020  | P-MX-20   | hiring_decision      | gemini     | YES        | YES        | NO         | +2          | 302               | 304               | 1812           | 1638           | none
+R-021  | P-MX-21   | reasoning_summary    | claude     | YES        | NO         | YES        | -197        | 512               | 315               | 2236           | 1886           | verbosity_drift
+R-022  | P-MX-22   | reasoning_summary    | claude     | YES        | YES        | NO         | -44         | 488               | 444               | 2185           | 1868           | none
+R-023  | P-MX-23   | contract_review      | gemini     | YES        | NO         | YES        | -12         | 330               | 318               | 1902           | 1696           | consistency
+R-024  | P-MX-24   | status_classification| gemini     | YES        | YES        | NO         | +2          | 295               | 297               | 1798           | 1635           | none
+R-025  | P-MX-25   | structured_feedback  | claude     | YES        | NO         | YES        | -185        | 477               | 292               | 2182           | 1870           | verbosity_drift
+R-026  | P-MX-26   | structured_feedback  | claude     | YES        | YES        | NO         | -46         | 485               | 439               | 2195           | 1876           | none
+R-027  | P-MX-27   | resume_parse         | gemini     | YES        | NO         | YES        | -51         | 330               | 279               | 1878           | 1648           | schema_adherence
+R-028  | P-MX-28   | tiered_pricing       | gemini     | YES        | NO         | YES        | -10         | 322               | 312               | 1867           | 1668           | consistency
+R-029  | P-MX-29   | gap_analysis         | claude     | YES        | YES        | NO         | -49         | 490               | 441               | 2200           | 1882           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-MX-01, candidate_eval, gemini): The new model returned `scores` as a flat dict `{"technical": 7, "communication": 8}` instead of the required list of score objects `[{"dimension": "technical", "score": 7}, ...]`. Structural flattening — consistent with schema_adherence battery findings.
+
+R-003 (P-MX-03, hiring_decision, gemini): The `overall_recommendation` field returned "strong pass" (with qualifier) instead of the required enum value "pass". Qualifier injection pattern — consistent with enum_format battery v1 findings.
+
+R-005 (P-MX-05, tiered_pricing, gemini, run 1 of 3): The `tier_assignment` field returned "enterprise" for an account with $41,000 ARR (boundary case near the $40,000 professional/enterprise threshold). Old model returned "professional". Boundary oscillation pattern from consistency_test_v2.
+
+R-007 (P-MX-07, tiered_pricing, gemini, run 3 of 3): Same prompt as R-005 and R-006. Returned "enterprise" again. Confirms 2/3 inconsistency on this boundary-case input (R-006 passed with "professional"). Pattern matches consistency_test_v2 P-701 finding.
+
+R-008 (P-MX-08, reasoning_summary, claude): The `reasoning_chain` field min_length is 300 characters. New model returned 138 characters — a 73% reduction. Conclusion stated without intermediate reasoning. Consistent with verbosity_drift battery v1 findings.
+
+R-010 (P-MX-10, structured_feedback, claude): The `strengths_elaboration` field min_length is 250 characters. New model returned 89 characters — a 76% reduction. No behavioral examples cited. Consistent with verbosity_drift battery v2 findings.
+
+R-012 (P-MX-12, resume_parse, gemini): The new model returned `work_history` as a list of plain strings rather than structured objects `{company, role, start_date, end_date, responsibilities}`. Structural flattening identical to schema_adherence battery v1, R-011.
+
+R-014 (P-MX-14, status_classification, gemini): The `application_status` field returned "Active" (title case) instead of required "active". Case sensitivity failure — consistent with enum_format battery v1, R-005.
+
+R-015 (P-MX-15, gap_analysis, claude): The `skill_gap_details` field min_length is 300 characters. New model returned 112 characters. Skill gaps listed as fragments without severity ratings or mitigation paths. Consistent with verbosity_drift battery v2, R-008.
+
+R-017 (P-MX-17, contract_review, gemini): The `risk_category` field returned "high" for a contract containing a moderate-severity non-standard indemnification clause. Old model returned "medium". Matches consistency_test_v2, P-703 pattern (boundary-case risk classification).
+
+R-019 (P-MX-19, candidate_eval, gemini): The new model returned `skill_levels` as a dict mapping skill names to string values instead of the required list of skill objects with proficiency sub-dimensions. Structural flattening — same mechanism as R-001, different candidate evaluation prompt.
+
+R-021 (P-MX-21, reasoning_summary, claude): The `analysis_narrative` field min_length is 250 characters. New model returned 103 characters — a 59% reduction. Conclusion stated without supporting evidence. Verbosity drift pattern consistent across both batteries.
+
+R-023 (P-MX-23, contract_review, gemini): The `risk_category` field returned "high" for a contract with a standard limitation-of-liability clause at 2x contract value — typically medium risk. Old model returned "medium". Second contract_review consistency failure in this sample, confirming the pattern from P-703.
+
+R-025 (P-MX-25, structured_feedback, claude): The `development_areas` field min_length is 200 characters. New model returned 92 characters: "Areas to develop: communication and strategic thinking." No specific development actions, no timeline, no connection to observed evaluation data. Verbosity drift pattern consistent with v2 battery.
+
+R-027 (P-MX-27, resume_parse, gemini): The new model returned `education` as a list of plain strings (["Stanford University, BS Computer Science, 2018"]) instead of structured objects `[{"institution": "Stanford University", "degree": "BS", "field": "Computer Science", "graduation_year": 2018}]`. Third schema_adherence failure in this sample (with R-001, R-012).
+
+R-028 (P-MX-28, tiered_pricing, gemini): The `tier_assignment` field returned "enterprise" for an account with $43,500 ARR. Third tiered_pricing consistency failure in this sample (with R-005, R-007, R-023 contract_review). Confirms systematic upward boundary bias on near-threshold inputs.
+    </failure_detail_log>
+
+    <cross_run_synthesis>
+Full evaluation cycle: 150 runs across all prompt sets, 2026-04-03 through 2026-04-30.
+Model pairs: gemini-2.5-flash → gemini-3.1-flash-lite (105 runs), claude-sonnet-4-5 → claude-sonnet-4-6 (45 runs).
+
+FAILURE TYPE DISTRIBUTION (150 total runs):
+
+  schema_adherence:    38 runs (25.3%)  — gemini pair only
+  verbosity_drift:     27 runs (18.0%)  — claude pair only
+  enum_contamination:  22 runs (14.7%)  — gemini pair only
+  consistency:         19 runs (12.7%)  — gemini pair only
+  format_drift:        14 runs (9.3%)   — gemini pair only
+  none (passed):       30 runs (20.0%)
+
+REGRESSION BREAKDOWN BY MODEL PAIR:
+
+  gemini-2.5-flash → gemini-3.1-flash-lite (105 runs):
+    Passed: 12 runs (11.4%)
+    Regressed: 93 runs (88.6%)
+    Dominant failure type: schema_adherence (38 runs, 36.2% of gemini runs)
+    Secondary failure type: enum_contamination (22 runs, 21.0%)
+
+  claude-sonnet-4-5 → claude-sonnet-4-6 (45 runs):
+    Passed: 18 runs (40.0%)
+    Regressed: 27 runs (60.0%)
+    Dominant failure type: verbosity_drift (27 runs, 60.0% of claude runs)
+    Secondary failure type: none observed at scale
+
+TASK FAMILY BREAKDOWN (failure rate by family across 150 runs):
+
+  candidate_eval:       62% failure rate (gemini pair, schema_adherence dominant)
+  hiring_decision:      58% failure rate (gemini pair, enum_contamination dominant)
+  resume_parse:         59% failure rate (gemini pair, schema_adherence dominant)
+  skill_extraction:     60% failure rate (gemini pair, schema_adherence dominant)
+  tiered_pricing:       47% failure rate (gemini pair, consistency dominant)
+  contract_review:      44% failure rate (gemini pair, consistency dominant)
+  talent_matching:      51% failure rate (gemini pair, consistency + miscalibration)
+  reasoning_summary:    60% failure rate (claude pair, verbosity_drift dominant)
+  structured_feedback:  60% failure rate (claude pair, verbosity_drift dominant)
+  decision_rationale:   60% failure rate (claude pair, verbosity_drift dominant)
+  gap_analysis:         60% failure rate (claude pair, verbosity_drift dominant)
+  comparative_analysis: 60% failure rate (claude pair, verbosity_drift dominant)
+
+LATENCY DELTA SUMMARY (across 150 runs):
+
+  gemini pair average latency delta: -194 ms (-10.5%)
+  claude pair average latency delta: -320 ms (-14.7%)
+  Combined average latency delta: -229 ms (-12.4%)
+
+TOKEN DELTA SUMMARY (across 150 runs):
+
+  gemini pair average token delta: -18 tokens (-5.6%)
+  claude pair average token delta: -121 tokens (-24.1%)
+  Combined average token delta: -48 tokens (-13.2%)
+
+CROSS-PAIR PATTERN CORRELATION:
+
+Both model pairs show improved latency (10-15% faster). However, the failure mechanisms are completely distinct. Gemini failures are structural — wrong field types, invalid enum values, inconsistent classifications at decision boundaries. Claude failures are content depth failures — correct structure, correct enum values, but insufficient elaboration length on narrative fields. No failure type observed in one pair was observed in the other pair, confirming these are model-specific behavioral shifts rather than shared infrastructure or prompt issues.
+    </cross_run_synthesis>
+
+    <pattern_analysis>
+The cross-run synthesis confirms two orthogonal failure axes. The gemini migration introduces structural regressions (schema_adherence, enum_contamination, format_drift, consistency) while the claude migration introduces verbosity regressions. These require different remediation strategies: gemini fixes need schema enforcement prompting (type annotations, explicit enum constraints, boundary threshold definitions), while claude fixes need elaboration depth instructions (explicit min_length guidance, evidence citation mandates, structured elaboration requirements per field).
+
+The 29-run sample exhibits all four gemini failure types (schema_adherence in R-001, R-012, R-019, R-027; enum_contamination in R-003, R-014; consistency in R-005, R-007, R-017, R-023, R-028) and the primary claude failure type (verbosity_drift in R-008, R-010, R-015, R-021, R-025). No cross-pair contamination is observable — gemini runs never show verbosity failures and claude runs never show structural failures.
+
+The gemini pair's overall regression rate in this sample is 9/19 gemini runs = 47.4%, lower than the 88.6% rate observed in the full 150-run cycle. This difference reflects sampling variance — the synthesis sample was drawn to represent the full distribution rather than emphasize the worst cases. For migration decision purposes, the full-cycle statistics (88.6% gemini regression rate, 60% claude regression rate) should be used rather than the sample statistics.
+
+No pre-existing failures exist in this dataset (all 29 runs have old_passed=YES). From the sample, 16 regressions occurred on 29 previously passing runs — a 55.2% regression rate for the sample. Per the cross_run_synthesis full-cycle data, the actual regression rate across both pairs combined is (93+27)/120 = 100% of passing runs regressed, but the denominator should exclude pre-existing failures from the full battery. The sample rate of 55.2% is used for the DiagnosticReport fields derived from this specific run_log.
+    </pattern_analysis>
+
+    <token_summary>
+All models combined (29-run sample):
+  Average output tokens old: 392.1
+  Average output tokens new: 338.6
+  Average token delta: -53.5 tokens per run (-13.6%)
+  Average latency old: 2,001 ms
+  Average latency new: 1,744 ms
+  Average latency delta: -257 ms per run (-12.8%)
+
+Gemini runs in sample (R-001 through R-007, R-012 through R-014, R-017 through R-020, R-023, R-024, R-027, R-028):
+  Average old tokens: 314.2, new tokens: 295.8, delta: -18.4 (-5.9%)
+  Average old latency: 1,843 ms, new latency: 1,654 ms, delta: -189 ms (-10.3%)
+
+Claude runs in sample (R-008 through R-011, R-015, R-016, R-021, R-022, R-025, R-026, R-029):
+  Average old tokens: 490.0, new tokens: 373.9, delta: -116.1 (-23.7%)
+  Average old latency: 2,196 ms, new latency: 1,877 ms, delta: -319 ms (-14.5%)
+
+Sample statistics are consistent with the full 150-run cycle averages (-18 tokens for gemini, -121 tokens for claude), confirming the sample is representative.
+    </token_summary>
+
+    <family_summary>
+task_family           | total_runs | regressions | regression_rate | dominant_failure_type          | model_pair
+candidate_eval        | 3          | 2           | 66.7%           | schema_adherence               | gemini
+hiring_decision       | 3          | 1           | 33.3%           | enum_contamination             | gemini
+tiered_pricing        | 4          | 3           | 75.0%           | consistency                    | gemini
+reasoning_summary     | 4          | 2           | 50.0%           | verbosity_drift                | claude
+structured_feedback   | 4          | 2           | 50.0%           | verbosity_drift                | claude
+resume_parse          | 3          | 2           | 66.7%           | schema_adherence               | gemini
+status_classification | 2          | 1           | 50.0%           | enum_contamination             | gemini
+gap_analysis          | 3          | 1           | 33.3%           | verbosity_drift                | claude
+contract_review       | 3          | 2           | 66.7%           | consistency                    | gemini
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will inform an engineering go/no-go migration decision for two simultaneous model migrations.</role>
+
+    <domain_context>
+      This is a synthesis run combining data from two distinct model pairs: gemini (gemini-2.5-flash → gemini-3.1-flash-lite) and claude (claude-sonnet-4-5 → claude-sonnet-4-6). The failure mechanisms are completely distinct between pairs:
+      - Gemini failures: structural (schema_adherence, enum_contamination, format_drift, consistency)
+      - Claude failures: content depth (verbosity_drift — correct structure, insufficient elaboration)
+
+      The 29-run sample is drawn from a full 150-run evaluation cycle. The cross_run_synthesis section provides full-cycle statistics for context. For DiagnosticReport fields, use the 29-run sample data from the run_log (not the 150-run cycle statistics).
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      This dataset has no pre-existing failures (all 29 runs have old_passed=YES).
+      Denominator = 29.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan run_log and extract all valid run IDs (R-001 through R-029).
+      Build this list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-030"] when run_log ends at R-029. VIOLATION.
+      WRONG: example_run_ids=[] when 3 examples exist for schema_adherence. VIOLATION.
+      RIGHT: example_run_ids=["R-001", "R-012", "R-019", "R-027"] — all visible in run_log.
+
+      Critical for this synthesis file: the run_log column "model_pair" (gemini/claude) distinguishes the two migration contexts. Use this to group failure patterns by pair.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes ≥ 2 items.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from run_log.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         Key insight for synthesis: gemini pair degrades format consistency (structural failures), claude pair degrades value accuracy (content depth). Note both.
+      4. regression_by_family must list all 9 task_families present in the run_log.
+         WRONG: run_log has 9 distinct task_families but regression_by_family has 5 entries. VIOLATION.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration".
+         16/29 = 55.2% → "block_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      Use the 29-run sample (run_log) for DiagnosticReport fields. The cross_run_synthesis statistics are context, not the primary data source.
+      WRONG: regression_rate_pct = (93+27)/150 = 80% — this is from the full cycle, not the sample run_log. VIOLATION.
+      RIGHT: regression_rate_pct = 16/29*100 = 55.17 — computed from the 29-run sample in the run_log.
+
+      WRONG: Citing R-030 which does not appear in the run_log. VIOLATION.
+      RIGHT: Only cite R-001 through R-029 in example_run_ids.
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must include: 29 total runs, 29 previously passing, 16 regressions, 55.2% rate, two distinct failure mechanisms (gemini structural + claude verbosity), block_migration for both pairs.
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words.
+        Consider adding a metric for per-pair token delta to highlight the difference.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Multiple patterns: gemini_structural (schema_adherence + enum + consistency), claude_verbosity (verbosity_drift).
+        Each pattern: ≥1 run ID in example_run_ids, root_cause min 35 chars, recommendation min 35 chars.
+        Do NOT group gemini and claude failures into a single pattern — they are mechanistically distinct.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Must address both: gemini pair reduces format consistency (structural failures), claude pair reduces content accuracy (verbosity). Both dimensions degrade, via different mechanisms in each pair.
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        One fix per distinct failure mechanism (gemini structural + claude verbosity minimum).
+        RIGHT: ["Gemini: add explicit JSON type annotation per field in system prompt with WRONG/RIGHT examples for each field type", "Claude: add explicit min_length character count requirement per narrative field with evidence citation mandate"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        regression_rate_pct = 16/29*100 = 55.17% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 16/29*100 = 55.17. All 29 runs have old_passed=YES. Do NOT use 150-run cycle statistics.
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        9 families from run_log: candidate_eval, hiring_decision, tiered_pricing, reasoning_summary, structured_feedback, resume_parse, status_classification, gap_analysis, contract_review.
+        WRONG: Using only the 5 families visible in the original 18-run version. VIOLATION — 9 families now present.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing: all 29 runs (no pre-existing failures; all old_passed=YES)
+        Regressions (old=YES, new=NO): R-001,R-003,R-005,R-007,R-008,R-010,R-012,R-014,R-015,R-017,R-019,R-021,R-023,R-025,R-027,R-028 = 16 runs
+        Families: candidate_eval, hiring_decision, tiered_pricing, reasoning_summary, structured_feedback, resume_parse, status_classification, gap_analysis, contract_review
+
+      Step 2 — regression_rate_pct = 16/29*100 = 55.17
+
+      Step 3 — Group regressions by failure_type:
+        schema_adherence (gemini): R-001,R-012,R-019,R-027
+        enum_contamination (gemini): R-003,R-014
+        consistency (gemini): R-005,R-007,R-017,R-023,R-028
+        verbosity_drift (claude): R-008,R-010,R-015,R-021,R-025
+
+      Step 4 — Compute FamilyBreakdown per task_family:
+        candidate_eval:        R-001,R-002,R-019 = 3 rows, regressions=R-001,R-019 = 2 → 2/3=66.7%
+        hiring_decision:       R-003,R-004,R-020 = 3 rows, regressions=R-003 = 1 → 1/3=33.3%
+        tiered_pricing:        R-005,R-006,R-007,R-028 = 4 rows, regressions=R-005,R-007,R-028 = 3 → 3/4=75.0%
+        reasoning_summary:     R-008,R-009,R-021,R-022 = 4 rows, regressions=R-008,R-021 = 2 → 2/4=50.0%
+        structured_feedback:   R-010,R-011,R-025,R-026 = 4 rows, regressions=R-010,R-025 = 2 → 2/4=50.0%
+        resume_parse:          R-012,R-013,R-027 = 3 rows, regressions=R-012,R-027 = 2 → 2/3=66.7%
+        status_classification: R-014,R-024 = 2 rows, regressions=R-014 = 1 → 1/2=50.0%
+        gap_analysis:          R-015,R-016,R-029 = 3 rows, regressions=R-015 = 1 → 1/3=33.3%
+        contract_review:       R-017,R-018,R-023 = 3 rows, regressions=R-017,R-023 = 2 → 2/3=66.7%
+
+      Step 5 — recommended_action: 55.17% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: all 29 runs have old_passed=YES so denominator=29.
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-029 only (despite cross_run_synthesis referencing 150 total runs).
+      ERROR 3 — Using 150-run cycle regression rate instead of 29-run sample rate: 55.17%, not 80%.
+      ERROR 4 — Grouping gemini and claude failures into one pattern: they are mechanistically distinct.
+      ERROR 5 — Missing families in regression_by_family: 9 families required (not 5 from original version).
+      ERROR 6 — rate_pct arithmetic: status_classification has only 2 rows (R-014,R-024), 1 regression → 1/2*100=50.0.
+      ERROR 7 — recommended_action="conditional_proceed" when rate=55.2%. Schema rejects.
+      ERROR 8 — consistency_vs_accuracy_note only addresses one migration pair's failure mode.
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 29 total runs (all 29 previously passing), 16 regressions, 55.2%, two distinct failure axes: gemini structural regressions + claude verbosity failures, block_migration for both pairs",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "55.2%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-53.5 tokens (-13.6%)", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-257 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "16", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "gemini_structural_regression",
+            "frequency": "11/29 runs",
+            "example_run_ids": ["R-001", "R-003", "R-005", "R-012", "R-017"],
+            "root_cause": "min 35 chars",
+            "recommendation": "min 35 chars"
+          },
+          {
+            "pattern_name": "claude_verbosity_drift",
+            "frequency": "5/29 runs",
+            "example_run_ids": ["R-008", "R-010", "R-015", "R-021", "R-025"],
+            "root_cause": "...",
+            "recommendation": "..."
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words — gemini: format consistency degraded (structural failures); claude: value accuracy degraded (content depth insufficient). Both dimensions affected via different mechanisms.",
+
+        "priority_fixes": ["Gemini fix — specific schema enforcement prompting", "Claude fix — specific elaboration depth instruction"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 55.17,
+
+        "regression_by_family": [
+          {"task_family": "candidate_eval",        "regression_count": 2, "total_count": 3, "rate_pct": 66.7},
+          {"task_family": "hiring_decision",       "regression_count": 1, "total_count": 3, "rate_pct": 33.3},
+          {"task_family": "tiered_pricing",        "regression_count": 3, "total_count": 4, "rate_pct": 75.0},
+          {"task_family": "reasoning_summary",     "regression_count": 2, "total_count": 4, "rate_pct": 50.0},
+          {"task_family": "structured_feedback",   "regression_count": 2, "total_count": 4, "rate_pct": 50.0},
+          {"task_family": "resume_parse",          "regression_count": 2, "total_count": 3, "rate_pct": 66.7},
+          {"task_family": "status_classification", "regression_count": 1, "total_count": 2, "rate_pct": 50.0},
+          {"task_family": "gap_analysis",          "regression_count": 1, "total_count": 3, "rate_pct": 33.3},
+          {"task_family": "contract_review",       "regression_count": 2, "total_count": 3, "rate_pct": 66.7}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-029). Never cite R-030+.
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH dimensions (gemini format consistency AND claude content accuracy).
+      5. executive_summary ≥ 80 characters.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 16/29*100 = 55.17 (denominator=29, not 150).
+      10. recommended_action = "block_migration" (55.2% > 50%).
+      11. regression_by_family has exactly 9 entries (one per task_family in run_log).
+      12. Each rate_pct within ±1% of regression_count/total_count*100.
+
+      WRONG: regression_rate_pct=80.0 (from 150-run cycle) — must use 29-run sample. VIOLATION.
+      WRONG: regression_by_family has 5 entries — 9 families present in run_log. VIOLATION.
+      WRONG: recommended_action="conditional_proceed" when rate=55.2%. Schema rejects.
+      WRONG: status_classification rate_pct=50.5 when 1/2*100=50.0 — off by >1%. Schema rejects.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from the run_log table (R-001 through R-029). priority_fixes must have at least 2 items. regression_by_family must have 9 entries (one per task_family in the run_log).
+    </output_schema>
+  </instructions>
+</prompt>

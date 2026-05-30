@@ -1,0 +1,433 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-03</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-flash</old_model>
+        <new_model>gemini-3.1-flash-lite</new_model>
+      </model_pair>
+      <prompt_set>schema_adherence_battery_v1</prompt_set>
+      <total_runs>30</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family      | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-101     | candidate_eval   | YES        | NO         | YES        | -44         | 312               | 268               | 1840           | 1620           | schema_adherence
+R-002  | P-102     | candidate_eval   | YES        | YES        | NO         | -18         | 305               | 287               | 1790           | 1590           | none
+R-003  | P-103     | candidate_eval   | YES        | NO         | YES        | -51         | 328               | 277               | 1870           | 1640           | schema_adherence
+R-004  | P-104     | resume_parse     | YES        | YES        | NO         | +12         | 290               | 302               | 1760           | 1710           | none
+R-005  | P-105     | resume_parse     | YES        | NO         | YES        | -38         | 318               | 280               | 1810           | 1590           | schema_adherence
+R-006  | P-106     | resume_parse     | NO         | NO         | NO         | -22         | 301               | 279               | 1830           | 1600           | schema_adherence
+R-007  | P-107     | skill_extraction | YES        | NO         | YES        | -60         | 334               | 274               | 1900           | 1650           | schema_adherence
+R-008  | P-108     | skill_extraction | YES        | YES        | NO         | -9          | 298               | 289               | 1760           | 1580           | none
+R-009  | P-109     | skill_extraction | YES        | NO         | YES        | -47         | 322               | 275               | 1850           | 1620           | schema_adherence
+R-010  | P-110     | candidate_eval   | YES        | YES        | NO         | +5          | 293               | 298               | 1770           | 1700           | none
+R-011  | P-111     | resume_parse     | YES        | NO         | YES        | -55         | 331               | 276               | 1890           | 1640           | schema_adherence
+R-012  | P-112     | skill_extraction | YES        | YES        | NO         | -14         | 308               | 294               | 1800           | 1590           | none
+R-013  | P-113     | candidate_eval   | YES        | NO         | YES        | -42         | 320               | 278               | 1860           | 1630           | schema_adherence
+R-014  | P-114     | resume_parse     | YES        | YES        | NO         | +8          | 296               | 304               | 1750           | 1720           | none
+R-015  | P-115     | skill_extraction | YES        | NO         | YES        | -49         | 325               | 276               | 1870           | 1640           | schema_adherence
+R-016  | P-116     | offer_gen        | YES        | NO         | YES        | -53         | 330               | 277               | 1880           | 1650           | schema_adherence
+R-017  | P-117     | offer_gen        | YES        | YES        | NO         | -11         | 309               | 298               | 1800           | 1610           | none
+R-018  | P-118     | offer_gen        | YES        | NO         | YES        | -48         | 326               | 278               | 1870           | 1645           | schema_adherence
+R-019  | P-119     | offer_gen        | YES        | YES        | NO         | +7          | 295               | 302               | 1760           | 1700           | none
+R-020  | P-120     | offer_gen        | YES        | NO         | YES        | -56         | 335               | 279               | 1895           | 1660           | schema_adherence
+R-021  | P-121     | doc_classification | YES      | YES        | NO         | -8          | 300               | 292               | 1780           | 1600           | none
+R-022  | P-122     | doc_classification | YES      | NO         | YES        | -44         | 319               | 275               | 1855           | 1630           | schema_adherence
+R-023  | P-123     | doc_classification | NO       | NO         | NO         | -20         | 297               | 277               | 1810           | 1595           | schema_adherence
+R-024  | P-124     | doc_classification | YES      | YES        | NO         | +4          | 292               | 296               | 1760           | 1710           | none
+R-025  | P-125     | doc_classification | YES      | NO         | YES        | -41         | 316               | 275               | 1840           | 1620           | field_omission
+R-026  | P-126     | candidate_eval   | YES        | YES        | NO         | -15         | 304               | 289               | 1785           | 1595           | none
+R-027  | P-127     | resume_parse     | YES        | NO         | YES        | -46         | 321               | 275               | 1850           | 1625           | schema_adherence
+R-028  | P-128     | resume_parse     | YES        | YES        | NO         | +9          | 291               | 300               | 1755           | 1705           | none
+R-029  | P-129     | skill_extraction | YES        | NO         | YES        | -52         | 329               | 277               | 1880           | 1650           | type_coercion
+R-030  | P-130     | skill_extraction | YES        | YES        | NO         | -12         | 303               | 291               | 1795           | 1600           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-101, candidate_eval): The new model returned the `skills` field as a plain comma-separated string ("Python, SQL, communication") instead of a JSON array (["Python", "SQL", "communication"]). Schema requires `skills: list[str]`. The old model correctly returned an array.
+
+R-003 (P-103, candidate_eval): The new model omitted the `experience_years` field entirely from the output JSON. The schema marks this field as required (non-nullable). Old model returned `"experience_years": 4`. New model output had no such key, causing a downstream validation KeyError.
+
+R-005 (P-105, resume_parse): The new model nested the `contact_info` object one level deeper than expected: `{"candidate": {"contact_info": {...}}}` instead of the flat top-level `{"contact_info": {...}}`. This extra nesting layer caused the downstream parser to fail field resolution.
+
+R-006 (P-106, resume_parse): Both models failed this run. The old model returned `education` as a list of strings rather than a list of structured objects with `{degree, institution, year}`. The new model replicated the same structural error and additionally dropped the `graduation_year` key entirely.
+
+R-007 (P-107, skill_extraction): The new model returned `proficiency_levels` as a dict mapping skill names to strings (`{"Python": "expert"}`), but the schema requires a list of objects: `[{"skill": "Python", "level": "expert"}]`. Type mismatch caused schema validation failure.
+
+R-009 (P-109, skill_extraction): The new model returned `null` for the `certifications` field rather than an empty list `[]`. The schema specifies `certifications: list[str]`, which does not permit null. The old model correctly returned `[]`.
+
+R-011 (P-111, resume_parse): The new model returned `work_history` as a flat list of strings (each entry a one-line summary) rather than a list of structured objects containing `{company, role, start_date, end_date, responsibilities}`. This is a structural regression matching the pattern in R-007.
+
+R-013 (P-113, candidate_eval): The new model returned the `scores` field as a flat object `{"technical": 7, "communication": 8}` when the schema requires a list of score objects `[{"dimension": "technical", "score": 7}, ...]`. Same structural flattening pattern as R-001 and R-007.
+
+R-015 (P-115, skill_extraction): The new model returned `years_of_experience` as a string ("5 years") rather than an integer (5). The schema specifies `years_of_experience: int`. This type coercion failure is consistent across skill_extraction runs for the new model.
+
+R-016 (P-116, offer_gen): The new model returned `salary_range` as a plain string ("$80,000-$100,000") instead of the required structured object `{"min": 80000, "max": 100000, "currency": "USD"}`. Schema requires an object. Old model returned the correct nested structure.
+
+R-018 (P-118, offer_gen): The new model returned `required_skills` as a nested dict `{"primary": ["Python"], "secondary": ["SQL"]}` instead of the flat list `["Python", "SQL"]` required by schema. Extra nesting layer caused field resolution failures downstream.
+
+R-020 (P-120, offer_gen): The new model returned `equity_details` missing the `cliff_months` subfield entirely. Schema requires `{shares, cliff_months, vesting_period}`. New model returned `{shares, vesting_period}` — a partial object with a required field omitted.
+
+R-022 (P-122, doc_classification): The new model returned `category_confidence` as a string ("0.87") rather than a float (0.87). Schema specifies `category_confidence: float`. Type coercion failure consistent with R-015.
+
+R-025 (P-125, doc_classification): The new model omitted the `subcategory` field entirely. Schema marks this as required. Old model returned `"subcategory": "technical_specification"`. New model returned no `subcategory` key — a field omission failure.
+
+R-027 (P-127, resume_parse): The new model returned `references` as a list of name strings rather than a list of reference objects `{name, title, company, relationship}`. Structural flattening consistent with R-011.
+
+R-029 (P-129, skill_extraction): The new model returned `skill_score` as a percentage string ("87%") rather than the required float (0.87). Type coercion failure — model retained source representation format rather than normalizing to schema-required type.
+    </failure_detail_log>
+
+    <pattern_analysis>
+The dominant failure pattern across this run set is field type regression: gemini-3.1-flash-lite consistently returns structured fields as simpler types than the schema requires. Arrays are collapsed to strings (R-001, R-015, R-029), lists of objects are collapsed to flat dicts or lists of strings (R-007, R-011, R-013, R-027), and nullable fields are incorrectly returned as null instead of empty collections (R-009). This pattern spans all five task families — candidate_eval, resume_parse, skill_extraction, offer_gen, and doc_classification — indicating a model-level behavioral shift rather than a prompt-specific issue.
+
+A secondary pattern is missing required fields and structural nesting errors. R-003, R-020, and R-025 show cases where the new model drops a required key entirely, while R-005 and R-018 add unexpected nesting layers or restructure the field hierarchy. R-006 demonstrates both models sharing a structural misunderstanding, which predates the migration. These structural failures are distinct from the type-collapse failures and suggest the new model has weaker adherence to field presence constraints than the old model.
+
+The new task families (offer_gen, doc_classification) added in the expanded battery show the same failure distribution as the original three families. Offer_gen exhibits both structural flattening (R-016, R-018) and field omission (R-020). Doc_classification shows type coercion (R-022) and field omission (R-025). This cross-family consistency confirms the failure mechanism is model-level, not prompt-level. Regressions are not concentrated in any single task family but distributed uniformly, ruling out prompt-specific causes as the root issue.
+
+Excluding R-006 and R-023 (pre-existing failures), the new model introduces 15 net regressions on prompts the old model handled correctly, out of 28 previously passing runs. Regression rate: 53.6%. This exceeds the 50% threshold for block_migration. The task families break down as: candidate_eval (4 regressions), resume_parse (4 regressions), skill_extraction (4 regressions), offer_gen (3 regressions), doc_classification (2 regressions). This uniform distribution across all five families rules out prompt-level causes.
+    </pattern_analysis>
+
+    <token_summary>
+Old model (gemini-2.5-flash):
+  Average output tokens: 312.2
+  Average latency: 1,827 ms
+
+New model (gemini-3.1-flash-lite):
+  Average output tokens: 283.1
+  Average latency: 1,636 ms
+
+Average token delta: -29.1 tokens per run (-9.3%)
+Average latency delta: -191 ms per run (-10.5%)
+
+Per-task-family breakdown:
+  candidate_eval:    avg old=308.0, avg new=280.0, delta=-28.0 (-9.1%)
+  resume_parse:      avg old=305.8, avg new=281.2, delta=-24.6 (-8.1%)
+  skill_extraction:  avg old=318.3, avg new=279.8, delta=-38.5 (-12.1%)
+  offer_gen:         avg old=319.0, avg new=286.8, delta=-32.2 (-10.1%)
+  doc_classification: avg old=304.8, avg new=283.0, delta=-21.8 (-7.2%)
+
+The new model is measurably faster and produces shorter output on average. However, the token reduction correlates directly with the field type failures — the model is emitting simpler and shorter representations where structured objects were expected. Speed gains do not offset schema compliance regressions.
+    </token_summary>
+
+    <family_summary>
+task_family      | total_runs | regressions | regression_rate | dominant_failure_type
+candidate_eval   | 6          | 4           | 66.7%           | schema_adherence
+resume_parse     | 6          | 4           | 66.7%           | schema_adherence
+skill_extraction | 6          | 4           | 66.7%           | schema_adherence / type_coercion
+offer_gen        | 5          | 3           | 60.0%           | schema_adherence
+doc_classification | 5        | 2           | 40.0%           | field_omission / type_coercion
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will be used by engineering leadership to make a go/no-go decision on a model migration. Inaccurate or unsupported claims create false confidence or block valid migrations — both outcomes harm the team.</role>
+
+    <domain_context>
+      This benchmark evaluates whether a replacement model (new_model) can maintain schema adherence and output quality on prompts that the current model (old_model) handles correctly. A "regression" is defined as: old_passed=YES, new_passed=NO. Runs where old_passed=NO are pre-existing failures — they do not count as regressions introduced by the migration.
+
+      Your job is to analyze the data objectively:
+      - Compute regression_rate_pct from the data, not from intuition.
+      - Identify failure patterns by grouping regressed runs by failure_type and task_family.
+      - Recommend an action based on the data, not on assumptions about model capability.
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      Do NOT divide by total_runs — pre-existing failures are excluded from denominator.
+
+      WRONG: Compute regression rate as 15/30 = 50% when 2 of those 30 are pre-existing failures (old_passed=NO). The denominator should be 28 (runs old passed), not 30.
+      RIGHT: Count rows where old_passed=YES. Count among those where new_passed=NO. Divide.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before populating example_run_ids in any FailurePattern:
+      Scan the run_log table above. Extract the complete list of valid run IDs.
+      Build this list BEFORE writing any FailurePattern.
+
+      Only run IDs that APPEAR IN THE RUN_LOG TABLE may appear in example_run_ids.
+      Do not use run IDs from failure_detail_log as substitutes — they must appear in the run_log header rows.
+
+      WRONG: example_run_ids=["R-031"] when run_log only goes to R-030. VIOLATION.
+      WRONG: example_run_ids=[] when the pattern has 4 example runs visible in the data. VIOLATION.
+      RIGHT: example_run_ids=["R-007", "R-011", "R-015", "R-029"] — all four visible in the run_log table.
+
+      For regression_by_family: count rows per task_family. Count regressions (old_passed=YES, new_passed=NO) per family. Compute rate. Do NOT estimate.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes must have ≥ 2 items.
+         WRONG: 3 failure patterns but priority_fixes=["Fix field types"]. VIOLATION — schema will reject.
+         RIGHT: Each distinct failure pattern generates at least one priority fix. Minimum 2 total.
+
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from the run_log.
+         Empty list = VIOLATION when the pattern has observable examples.
+
+      3. consistency_vs_accuracy_note must address BOTH dimensions:
+         - How did output FORMAT consistency change across the two models?
+         - How did output ACCURACY (correct values, not just correct structure) change?
+         WRONG: Note says "consistency dropped" without addressing accuracy. VIOLATION.
+         RIGHT: Note says "format consistency degraded (type collapses) while value accuracy for simple string fields remained stable."
+
+      4. regression_by_family must list every task_family present in the run_log.
+         WRONG: run_log has 5 families but regression_by_family has 3 entries. VIOLATION.
+         RIGHT: One FamilyBreakdown per distinct task_family in the data.
+
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+         WRONG: rate_pct=40.0 when regression_count=3, total_count=6 (correct=50.0). VIOLATION.
+         RIGHT: rate_pct=50.0 when regression_count=3, total_count=6.
+
+      6. recommended_action constraints:
+         - regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration". SCHEMA WILL REJECT.
+         - regression_rate_pct ≤ 20.0 → "proceed_migration" or "conditional_proceed".
+         - regression_rate_pct 20–50 → "conditional_proceed" is appropriate.
+         - regression_rate_pct > 50 → "block_migration" is expected.
+         WRONG: regression_rate_pct=53.6, recommended_action="proceed_migration". Schema rejects.
+         RIGHT: regression_rate_pct=53.6, recommended_action="block_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      EVIDENCE GROUNDING RULE: All claims must be verifiable from the data table.
+      - executive_summary must state the actual regression count and rate from this data.
+      - MetricSummary.value must match numbers from run_log or token_summary.
+      - FailurePattern.frequency must be expressed as "X/Y runs" where X and Y are counts from the actual table.
+      - regression_rate_pct must be computed from the data, not estimated.
+
+      WRONG: "The new model regressed on about half the prompts" — imprecise, ungrounded. VIOLATION.
+      WRONG: Citing regression rate of 57% when data shows 15 regressions out of 28 previously passing = 53.6%. VIOLATION.
+      RIGHT: "15 regressions out of 28 previously passing runs (53.6%)" — directly computable from the table.
+
+      WRONG: MetricSummary value="~310 tokens" when table shows exactly 312.2 avg. VIOLATION.
+      RIGHT: MetricSummary value="312.2 tokens (avg)" matching the token_summary exactly.
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        High-level finding: regression count, rate, primary failure type, and recommended action.
+        Must be self-contained — readable without the rest of the report.
+        Must state: (1) total runs, (2) regression count, (3) regression rate, (4) dominant failure type, (5) recommended action.
+
+        WRONG: "The new model performed worse than the old model on several runs." — no numbers, no recommendation. VIOLATION.
+        WRONG: "Regression rate was high and we should not migrate." — no specific numbers. VIOLATION.
+        RIGHT: "Benchmark ran 30 runs (28 previously passing). New model regressed on 15 (53.6%). Dominant failure: structural type collapse and field omission across all five task families. Recommendation: block_migration pending schema prompting improvements."
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        List of quantitative metrics from the run data. Include at minimum:
+        - regression_rate_pct: computed percentage
+        - avg_token_delta: average change in output tokens old→new
+        - avg_latency_delta_ms: average latency change old→new
+        - total_regressions: raw count
+
+        Each MetricSummary:
+          metric_name: short label (e.g., "regression_rate_pct")
+          value: exact numeric value from data (e.g., "53.6%")
+          interpretation: what this means for migration decision (min 20 chars, max 35 words)
+
+        WRONG: interpretation="High regression rate" — too short, no actionability. VIOLATION (min 20 chars).
+        RIGHT: interpretation="53.6% regression rate exceeds 50% threshold; migration blocked until schema compliance issues remediated."
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Group regressed runs by root cause into patterns. Each FailurePattern:
+          pattern_name: short label (e.g., "type_collapse", "field_omission")
+          frequency: "X/Y runs" — X regressed runs showing this pattern, Y total runs in data
+          example_run_ids: list of run IDs from run_log — NEVER empty
+          root_cause: mechanistic explanation (min 35 chars, max 60 words)
+          recommendation: one concrete fix (min 35 chars, max 60 words)
+
+        WRONG: example_run_ids=[] — always cite at least 1 run ID. VIOLATION.
+        WRONG: root_cause="Model returned wrong type" — no mechanism, too vague. VIOLATION.
+        RIGHT: root_cause="Model collapses list-of-objects to list-of-strings when schema nesting exceeds 2 levels, likely due to reduced parameter capacity for structure tracking in the lite variant."
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        MUST address both dimensions explicitly:
+        - Consistency: did the new model produce consistently-structured output across runs?
+        - Accuracy: did the new model produce correct field values (ignoring structure)?
+
+        WRONG: "Consistency decreased." — no accuracy dimension. VIOLATION.
+        RIGHT: "Output format consistency degraded significantly (type collapses in 11/15 regressions). Field-level accuracy for simple string and boolean fields remained stable — regressions are structural, not semantic."
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Ordered list of highest-impact remediations. Min 2 items when failure_patterns is non-empty.
+        Each item: one actionable instruction (not a vague goal).
+
+        WRONG: ["Fix schema", "Improve prompt"] — not actionable. VIOLATION.
+        RIGHT: ["Add explicit type annotation for each nested field in system prompt", "Add 3 WRONG/RIGHT examples demonstrating list-of-objects vs flat dict for structured fields"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        Permitted values (exact strings): "proceed_migration", "block_migration", "conditional_proceed"
+
+        - regression_rate_pct > 50.0 → MUST be "block_migration" (schema enforced)
+        - regression_rate_pct 20.0–50.0 → "conditional_proceed"
+        - regression_rate_pct ≤ 20.0 → "proceed_migration"
+
+        WRONG: "block migration" — not a permitted value. VIOLATION.
+        WRONG: recommended_action="proceed_migration" when regression_rate_pct=53.6 — schema will reject.
+        RIGHT: "block_migration" — exact string.
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true" range="0.0–100.0">
+        Computed from run_log: count rows where old_passed=YES AND new_passed=NO, divide by count of rows where old_passed=YES, multiply by 100.
+
+        Pre-existing failures (old_passed=NO) are EXCLUDED from both numerator and denominator.
+
+        WRONG: Use total_runs (30) as denominator. VIOLATION — inflates denominator.
+        RIGHT: Denominator = 28 (rows where old_passed=YES). Numerator = 15 (those where also new_passed=NO). regression_rate_pct = 15/28*100 = 53.57.
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        One entry per distinct task_family in the run_log. Must not be empty when failure_patterns is non-empty.
+
+        Each FamilyBreakdown:
+          task_family: exact string from run_log
+          regression_count: count of rows where old_passed=YES AND new_passed=NO in this family
+          total_count: count of ALL rows in this family
+          rate_pct: regression_count / total_count * 100, within ±1% tolerance
+
+        WRONG: Missing doc_classification when it appears in run_log. VIOLATION.
+        WRONG: rate_pct=66.7 when regression_count=4, total_count=5 (correct=80.0). VIOLATION — schema rejects if off >1%.
+        RIGHT: Compute each rate_pct explicitly from counts.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      HOW TO COMPUTE METRICS — step by step:
+
+      Step 1 — Inventory the run_log:
+        a. List all run_ids where old_passed=YES → "previously passing" set (denominator)
+        b. Among those, list run_ids where new_passed=NO → regression set (numerator)
+        c. List all unique task_family values: candidate_eval, resume_parse, skill_extraction, offer_gen, doc_classification
+
+      Step 2 — Compute regression_rate_pct:
+        Denominator = 28 (all runs except R-006 and R-023 which have old_passed=NO)
+        Numerator = count of those 28 where new_passed=NO
+        regression_rate_pct = numerator/28*100
+
+      Step 3 — Group regressions by failure_type:
+        schema_adherence: R-001,R-003,R-005,R-007,R-009,R-011,R-013,R-015,R-016,R-018,R-020,R-022,R-027
+        field_omission: R-025
+        type_coercion: R-029
+        Each group → one FailurePattern.
+
+      Step 4 — Compute FamilyBreakdown per task_family:
+        candidate_eval: total=6, regressions=4 (R-001,R-003,R-013,R-027... wait check run_log for R-027 family=resume_parse)
+        [Use run_log to count — do not use this rubric as ground truth]
+
+      Step 5 — recommended_action:
+        15/28 = 53.6% > 50% → "block_migration"
+
+      Step 6 — Write executive_summary last with all computed values.
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator for regression_rate_pct:
+        WRONG: 15 regressions / 30 total_runs = 50.0% when 2 runs have old_passed=NO
+        RIGHT: 15 regressions / 28 previously_passing = 53.6%
+        Fix: Count rows with old_passed=YES only.
+
+      ERROR 2 — Hallucinated run IDs in example_run_ids:
+        WRONG: example_run_ids=["R-031"] when run_log only goes to R-030
+        RIGHT: Only cite run IDs visible in run_log header rows (R-001 through R-030)
+        Fix: Build valid run ID list from run_log before writing any FailurePattern.
+
+      ERROR 3 — Empty example_run_ids:
+        WRONG: example_run_ids=[] for schema_adherence pattern with 13 examples
+        RIGHT: example_run_ids=["R-001", "R-003", "R-005", "R-007", "R-009"]
+        Fix: Every FailurePattern requires ≥ 1 run ID.
+
+      ERROR 4 — rate_pct arithmetic error in FamilyBreakdown:
+        WRONG: rate_pct=66.0 when regression_count=4, total_count=6
+        RIGHT: rate_pct=66.7 (4/6*100)
+        Fix: Compute explicitly, do not estimate.
+
+      ERROR 5 — consistency_vs_accuracy_note misses one dimension:
+        WRONG: "Output format became less consistent." (no accuracy mention)
+        RIGHT: "Format consistency degraded (structural collapses in 13/15 regressions). Value accuracy for atomic string/bool fields remained unchanged — failures are structural, not semantic."
+
+      ERROR 6 — recommended_action inconsistent with regression_rate_pct:
+        WRONG: regression_rate_pct=53.6, recommended_action="conditional_proceed" — schema rejects
+        RIGHT: regression_rate_pct=53.6, recommended_action="block_migration"
+
+      ERROR 7 — Only 1 priority_fix when multiple patterns exist:
+        WRONG: failure_patterns has 3 entries, priority_fixes=["Fix schema types"]
+        RIGHT: At minimum 2 priority_fixes. Schema will reject if fewer than 2.
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly. All fields required.
+
+      {
+        "executive_summary": "string, min 80 chars — state: 30 total runs, 28 previously passing, regression count, rate, dominant failure type, block_migration",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "53.6%", "interpretation": "min 20 chars, max 35 words"},
+          {"metric_name": "avg_token_delta", "value": "-29.1 tokens", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-191 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "15", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "structural_type_collapse",
+            "frequency": "13/30 runs",
+            "example_run_ids": ["R-001", "R-007", "R-011"],
+            "root_cause": "min 35 chars, max 60 words",
+            "recommendation": "min 35 chars, max 60 words"
+          },
+          {
+            "pattern_name": "field_omission",
+            "frequency": "2/30 runs",
+            "example_run_ids": ["R-025"],
+            "root_cause": "...",
+            "recommendation": "..."
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words — address BOTH consistency and accuracy",
+
+        "priority_fixes": ["actionable fix 1", "actionable fix 2"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 53.57,
+
+        "regression_by_family": [
+          {"task_family": "candidate_eval", "regression_count": 4, "total_count": 6, "rate_pct": 66.7},
+          {"task_family": "resume_parse", "regression_count": 4, "total_count": 6, "rate_pct": 66.7},
+          {"task_family": "skill_extraction", "regression_count": 4, "total_count": 6, "rate_pct": 66.7},
+          {"task_family": "offer_gen", "regression_count": 3, "total_count": 5, "rate_pct": 60.0},
+          {"task_family": "doc_classification", "regression_count": 2, "total_count": 5, "rate_pct": 40.0}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. All run IDs in any example_run_ids list appear in the run_log table (R-001 through R-030). No hallucinated IDs.
+      2. No example_run_ids list is empty when the pattern has observable runs in the data.
+      3. priority_fixes has ≥ 2 items (schema rejects if failure_patterns non-empty and fewer than 2).
+      4. consistency_vs_accuracy_note addresses BOTH consistency AND accuracy explicitly.
+      5. executive_summary is ≥ 80 characters and states: 30 total runs, previously-passing count, regression count, rate, dominant failure type, recommended_action.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct computed correctly (denominator = 28 previously-passing runs, not 30 total).
+      10. recommended_action is exactly one of: "proceed_migration", "block_migration", "conditional_proceed".
+      11. regression_rate_pct = 53.57 (or close) → recommended_action MUST be "block_migration". Schema rejects any other value.
+      12. regression_by_family has exactly 5 entries (one per task_family). No missing families.
+      13. Each FamilyBreakdown.rate_pct = regression_count/total_count*100 within ±1%. Fix arithmetic errors before submitting.
+
+      WRONG: example_run_ids=["R-031"] when run_log has R-001 through R-030. VIOLATION.
+      WRONG: priority_fixes=["Fix schema"] when 3 patterns identified — schema rejects <2 items.
+      WRONG: regression_rate_pct=50.0 (using 15/30) instead of 53.57 (using 15/28). VIOLATION.
+      WRONG: rate_pct=80.0 when regression_count=4, total_count=6 — schema rejects if off >1%. (correct: 66.7)
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from the run_log table (R-001 through R-030). priority_fixes must have at least 2 items. regression_by_family must have one entry per task_family in the run_log.
+    </output_schema>
+  </instructions>
+</prompt>

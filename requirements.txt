@@ -1,0 +1,4 @@
+# Install all providers, or just the one you use:
+openai>=1.0.0
+anthropic>=0.25.0
+google-generativeai>=0.5.0

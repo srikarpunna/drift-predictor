@@ -1,0 +1,23 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    claude_migration
+Old:     claude-sonnet-4-5-20250929
+New:     claude-sonnet-4-6
+============================================================
+Total prompts:   30
+Old model pass:  0/30  (0.0%)
+New model pass:  0/30  (0.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=0/10  new=0/10  reg=0
+  interview_evaluation       n=10  old=0/10  new=0/10  reg=0
+  support_audit              n=10  old=0/10  new=0/10  reg=0
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  0.0 tok/response
+  New avg:  0.0 tok/response
+  Delta:    +0.0 avg tok/response

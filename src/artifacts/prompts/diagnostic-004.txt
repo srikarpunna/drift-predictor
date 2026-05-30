@@ -1,0 +1,314 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-11</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-flash</old_model>
+        <new_model>gemini-3.1-flash-lite</new_model>
+      </model_pair>
+      <prompt_set>enum_format_battery_v1</prompt_set>
+      <total_runs>28</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family                   | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-401     | hiring_decision               | YES        | NO         | YES        | -6          | 298               | 292               | 1820           | 1640           | enum_contamination
+R-002  | P-402     | hiring_decision               | YES        | YES        | NO         | +3          | 304               | 307               | 1800           | 1630           | none
+R-003  | P-403     | hiring_decision               | YES        | NO         | YES        | -8          | 302               | 294               | 1830           | 1650           | enum_contamination
+R-004  | P-404     | status_classification         | YES        | YES        | NO         | +2          | 296               | 298               | 1790           | 1640           | none
+R-005  | P-405     | status_classification         | YES        | NO         | YES        | -5          | 299               | 294               | 1810           | 1650           | enum_contamination
+R-006  | P-406     | status_classification         | YES        | NO         | YES        | -4          | 297               | 293               | 1800           | 1640           | enum_contamination
+R-007  | P-407     | priority_ranking              | YES        | YES        | NO         | +1          | 301               | 302               | 1810           | 1640           | none
+R-008  | P-408     | priority_ranking              | YES        | NO         | YES        | -7          | 303               | 296               | 1820           | 1650           | enum_contamination
+R-009  | P-409     | priority_ranking              | YES        | NO         | YES        | -9          | 306               | 297               | 1840           | 1660           | enum_contamination
+R-010  | P-410     | hiring_decision               | YES        | YES        | NO         | +4          | 295               | 299               | 1790           | 1630           | none
+R-011  | P-411     | status_classification         | YES        | NO         | YES        | -6          | 300               | 294               | 1810           | 1650           | enum_contamination
+R-012  | P-412     | priority_ranking              | NO         | NO         | NO         | -3          | 297               | 294               | 1800           | 1640           | enum_contamination
+R-013  | P-413     | hiring_decision               | YES        | NO         | YES        | -8          | 304               | 296               | 1830           | 1660           | enum_contamination
+R-014  | P-414     | status_classification         | YES        | YES        | NO         | +2          | 295               | 297               | 1790           | 1630           | none
+R-015  | P-415     | priority_ranking              | YES        | NO         | YES        | -5          | 299               | 294               | 1810           | 1650           | enum_contamination
+R-016  | P-416     | hiring_decision               | YES        | NO         | YES        | -7          | 302               | 295               | 1822           | 1648           | enum_contamination
+R-017  | P-417     | hiring_decision               | YES        | YES        | NO         | +3          | 296               | 299               | 1792           | 1632           | none
+R-018  | P-418     | status_classification         | YES        | NO         | YES        | -5          | 299               | 294               | 1812           | 1652           | enum_contamination
+R-019  | P-419     | status_classification         | YES        | YES        | NO         | +2          | 295               | 297               | 1789           | 1629           | none
+R-020  | P-420     | priority_ranking              | YES        | NO         | YES        | -8          | 304               | 296               | 1828           | 1658           | enum_contamination
+R-021  | P-421     | priority_ranking              | YES        | YES        | NO         | +1          | 300               | 301               | 1808           | 1638           | none
+R-022  | P-422     | offer_status_parse            | YES        | NO         | YES        | -6          | 298               | 292               | 1818           | 1642           | enum_contamination
+R-023  | P-423     | offer_status_parse            | YES        | YES        | NO         | +2          | 294               | 296               | 1788           | 1628           | none
+R-024  | P-424     | offer_status_parse            | YES        | NO         | YES        | -7          | 301               | 294               | 1825           | 1652           | format_drift
+R-025  | P-425     | offer_status_parse            | YES        | YES        | NO         | +3          | 296               | 299               | 1792           | 1632           | none
+R-026  | P-426     | interview_stage_classification| YES        | NO         | YES        | -5          | 298               | 293               | 1815           | 1648           | enum_contamination
+R-027  | P-427     | interview_stage_classification| YES        | NO         | YES        | -8          | 303               | 295               | 1828           | 1658           | enum_contamination
+R-028  | P-428     | interview_stage_classification| YES        | YES        | NO         | +2          | 295               | 297               | 1791           | 1631           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-401, hiring_decision): The `overall_recommendation` field returned "PASS - with reservations" instead of the required enum value "pass". Schema defines valid values as: ["pass", "fail", "hold"]. The old model returned lowercase "pass". The new model added a qualifier phrase, violating exact-match enum constraint.
+
+R-003 (P-403, hiring_decision): The `overall_recommendation` field returned "no hire" (with space) instead of the schema-required "fail". The prompt uses "no hire" terminology internally as a business concept, and the new model conflated the business term with the output enum. The schema requires the technical enum "fail" regardless of internal terminology.
+
+R-005 (P-405, status_classification): The `application_status` field returned "Active" (title case) instead of the required "active" (all lowercase). Schema specifies `application_status: Literal["active", "inactive", "pending", "archived"]`. This is a case sensitivity regression.
+
+R-006 (P-406, status_classification): The `application_status` field returned "IN_PROGRESS" (underscore-separated uppercase) instead of the required enum value "pending". The new model generated a status label from a different taxonomy, suggesting it is drawing on training data conventions rather than the provided enum constraint.
+
+R-008 (P-408, priority_ranking): The `priority_level` field returned "High" (title case) instead of the required lowercase "high". Schema defines `priority_level: Literal["low", "medium", "high", "critical"]`.
+
+R-009 (P-409, priority_ranking): The `priority_level` field returned "URGENT" instead of the schema-required "critical". Both convey high urgency semantically, but "URGENT" is not a valid enum member. The new model substitutes a semantically equivalent but schema-invalid term.
+
+R-011 (P-411, status_classification): The `application_status` field returned "Archived - flagged for review" instead of the schema-required "archived". Like R-001, the new model adds qualifier text to a valid enum base value.
+
+R-012 (P-412, priority_ranking): Both models failed. Old model returned "MEDIUM" (uppercase), new model returned "Medium" (title case). Neither matches the required lowercase "medium". Pre-existing failure; not counted as regression.
+
+R-013 (P-413, hiring_decision): The `overall_recommendation` field returned "strong pass" (with modifier) instead of the required "pass". New model again appends modifier language to a valid enum base value.
+
+R-015 (P-415, priority_ranking): The `priority_level` field returned "P1" instead of the required "critical". The new model is using a numeric priority notation system that does not match the schema's string enum.
+
+R-016 (P-416, hiring_decision): The `overall_recommendation` field returned "conditional pass" instead of the required "pass". New modifier-injection pattern: the model adds a qualifier phrase ("conditional") that makes it non-enum-compliant.
+
+R-018 (P-418, status_classification): The `application_status` field returned "pending_review" (with underscore) instead of the required "pending". The model added a qualifier suffix in snake_case format rather than returning the exact enum value.
+
+R-020 (P-420, priority_ranking): The `priority_level` field returned "medium-high" (hyphenated) instead of the required "high". The model invented a non-existent intermediate enum value to represent a score it assessed as between medium and high.
+
+R-022 (P-422, offer_status_parse): New family. The `offer_status` field returned "extended pending response" instead of the required enum value "extended". New model added descriptive text to a valid base enum value, matching the qualifier-injection pattern.
+
+R-024 (P-424, offer_status_parse): The `expiration_date_format` field returned "ISO 8601" (a description of the format) instead of the required date string in YYYY-MM-DD format ("2026-05-15"). The model confused the format name for the formatted value itself.
+
+R-026 (P-426, interview_stage_classification): New family. The `current_stage` field returned "Technical Interview" (title case with space) instead of the required enum value "technical_screen". Vocabulary mismatch — model used natural language interview stage label rather than the system enum.
+
+R-027 (P-427, interview_stage_classification): The `outcome` field returned "moved to next round" (free text) instead of the required enum value "advance". The schema specifies `outcome: Literal["advance", "hold", "reject"]`. New model produced a natural-language description of the action rather than the enum token.
+    </failure_detail_log>
+
+    <pattern_analysis>
+This run set reveals three distinct enum failure subtypes. The first and most frequent is qualifier injection: the new model returns a valid enum base value plus additional qualifying text (R-001 "PASS - with reservations", R-011 "Archived - flagged for review", R-013 "strong pass", R-016 "conditional pass", R-018 "pending_review", R-022 "extended pending response"). In each case the correct enum value is embedded in the string but fails exact-match validation. This pattern accounts for 9 of the 16 regressions.
+
+The second subtype is vocabulary substitution: the new model returns a semantically equivalent term from a different taxonomy (R-003 "no hire" vs "fail", R-006 "IN_PROGRESS" vs "pending", R-009 "URGENT" vs "critical", R-015 "P1" vs "critical", R-020 "medium-high" vs "high", R-026 "Technical Interview" vs "technical_screen", R-027 "moved to next round" vs "advance"). The model accesses an alternative vocabulary — business terminology, status codes, priority notation schemes — that is semantically aligned but schema-incompatible.
+
+Case sensitivity failures (R-005, R-008) form a third minor pattern — the new model returns the correct enum value but in wrong case. Two new task families — offer_status_parse (R-022 through R-025) and interview_stage_classification (R-026 through R-028) — exhibit the same enum failure distribution, confirming the failure mechanism is model-level rather than prompt-specific.
+
+Excluding R-012 (pre-existing failure, old_passed=NO), the regression count is 16 out of 27 previously-passing runs — a 59.3% regression rate. Hiring_decision shows 4 regressions (57.1%), status_classification shows 4 regressions (57.1%), priority_ranking shows 4 regressions (57.1%), offer_status_parse shows 2 regressions (50.0%), and interview_stage_classification shows 2 regressions (66.7%).
+    </pattern_analysis>
+
+    <token_summary>
+Old model (gemini-2.5-flash):
+  Average output tokens: 299.9
+  Average latency: 1,812 ms
+
+New model (gemini-3.1-flash-lite):
+  Average output tokens: 296.4
+  Average latency: 1,645 ms
+
+Average token delta: -3.5 tokens per run (-1.2%)
+Average latency delta: -167 ms per run (-9.2%)
+
+Per-task-family breakdown:
+  hiring_decision:                avg old=299.5, avg new=297.0, delta=-2.5 (-0.8%)
+  status_classification:          avg old=297.3, avg new=295.2, delta=-2.1 (-0.7%)
+  priority_ranking:               avg old=301.4, avg new=297.0, delta=-4.4 (-1.5%)
+  offer_status_parse:             avg old=297.3, avg new=295.3, delta=-2.0 (-0.7%)
+  interview_stage_classification: avg old=298.7, avg new=295.0, delta=-3.7 (-1.2%)
+
+Token delta is nearly zero for this run set — enum failures involve correct-length content with wrong values, not structural changes. The near-zero token delta confirms that enum contamination is a value accuracy problem, not a verbosity or structure problem.
+    </token_summary>
+
+    <family_summary>
+task_family                    | total_runs | regressions | regression_rate | dominant_failure_type
+hiring_decision                | 7          | 4           | 57.1%           | enum_contamination (qualifier_injection)
+status_classification          | 7          | 4           | 57.1%           | enum_contamination (case_sensitivity / vocab_substitution)
+priority_ranking               | 7          | 4           | 57.1%           | enum_contamination (vocab_substitution)
+offer_status_parse             | 4          | 2           | 50.0%           | enum_contamination / format_drift
+interview_stage_classification | 3          | 2           | 66.7%           | enum_contamination (vocab_substitution)
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will be used by engineering leadership to make a go/no-go migration decision.</role>
+
+    <domain_context>
+      This benchmark evaluates whether a replacement model (new_model) can maintain enum format compliance on prompts the current model (old_model) handles correctly. A "regression" is defined as: old_passed=YES, new_passed=NO. Runs where old_passed=NO are pre-existing failures excluded from the regression count.
+
+      Enum failures are distinct from schema_adherence failures: the field type and structure are correct, but the value does not match the permitted enum set. Enum failures require different remediation (explicit constraint reinforcement) than structural failures (type annotation).
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      WRONG: Compute rate as 16/28 = 57.1% when 1 run has old_passed=NO. Denominator must be 27.
+      RIGHT: 16/27 = 59.3%
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan the run_log and extract all valid run IDs (R-001 through R-028).
+      Only these IDs may appear in example_run_ids. Build the list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-029"] when run_log ends at R-028. VIOLATION.
+      WRONG: example_run_ids=[] when the pattern has observable examples. VIOLATION.
+      RIGHT: example_run_ids=["R-001", "R-003", "R-013", "R-016"] — all visible in run_log.
+
+      For regression_by_family: count ALL rows per task_family (including pre-existing). Count regressions (old=YES, new=NO) per family. Do not estimate.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes must have ≥ 2 items. Schema rejects if fewer.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID. Empty = VIOLATION.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         RIGHT: "Format consistency stable (enum field structure correct in all runs). Value accuracy degraded — 16 runs returned wrong enum values due to qualifier injection and vocabulary substitution."
+      4. regression_by_family must list all 5 task_families from the run_log.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+         Example: hiring_decision has 7 rows, 4 regressions → rate = 4/7*100 = 57.1
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration". Schema rejects.
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      All claims must be verifiable from the run_log or failure_detail_log.
+      WRONG: Citing 60% regression rate when data shows 16/27 = 59.3%. VIOLATION.
+      RIGHT: "16 regressions out of 27 previously passing runs (59.3%)."
+      MetricSummary.value must match numbers from run_log or token_summary exactly.
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must state: total runs, previously passing count, regression count, rate, dominant failure type, recommended action.
+        RIGHT: "Benchmark ran 28 runs (27 previously passing). New model regressed on 16 (59.3%). Dominant failure: enum contamination via qualifier injection and vocabulary substitution across all five task families. Recommendation: block_migration."
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words per entry.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Group by failure subtype. For this dataset: qualifier_injection, vocabulary_substitution, case_sensitivity.
+        Each pattern: example_run_ids (≥1 from run_log), root_cause (min 35 chars), recommendation (min 35 chars).
+        WRONG: grouping all enum failures into one pattern when 3 subtypes are identifiable.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Note: for enum failures, field STRUCTURE is consistent — failures are value accuracy failures.
+        Must address both dimensions: "Structure consistent (correct field types). Value accuracy degraded..."
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Enum-specific fixes: explicit permitted-values list in system prompt, WRONG/RIGHT examples for qualifier injection.
+        WRONG: ["Fix enum values"] — too vague. RIGHT: ["Add explicit permitted values list: 'output ONLY one of: pass, fail, hold — no qualifiers, no modifiers'", "Add WRONG/RIGHT example demonstrating qualifier injection: WRONG: 'strong pass', RIGHT: 'pass'"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        Permitted: "proceed_migration", "block_migration", "conditional_proceed"
+        regression_rate_pct = 59.3% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 16/27*100 = 59.26. Denominator = 27 (excludes R-012 which has old_passed=NO).
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        5 families: hiring_decision, status_classification, priority_ranking, offer_status_parse, interview_stage_classification.
+        total_count includes ALL rows in that family (including pre-existing failures).
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing (old=YES): all rows except R-012 = 27 runs
+        Regressions (old=YES, new=NO): R-001,R-003,R-005,R-006,R-008,R-009,R-011,R-013,R-015,R-016,R-018,R-020,R-022,R-024,R-026,R-027 = 16 runs
+        Families: hiring_decision, status_classification, priority_ranking, offer_status_parse, interview_stage_classification
+
+      Step 2 — regression_rate_pct = 16/27*100 = 59.26
+
+      Step 3 — Group regressions by subtype:
+        qualifier_injection: R-001,R-011,R-013,R-016,R-018,R-022 (6 runs — qualifier added to valid base)
+        vocabulary_substitution: R-003,R-006,R-009,R-015,R-020,R-026,R-027 (7 runs — different taxonomy)
+        case_sensitivity: R-005,R-008 (2 runs — correct value, wrong case)
+        format_drift: R-024 (1 run — format name instead of formatted value)
+
+      Step 4 — FamilyBreakdown counts from run_log:
+        [Compute directly from table]
+
+      Step 5 — recommended_action: 59.3% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: use 27 (old=YES), not 28 (total). R-012 excluded.
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-028 only.
+      ERROR 3 — Grouping all enum failures into one pattern when 3 subtypes exist (qualifier_injection, vocabulary_substitution, case_sensitivity).
+      ERROR 4 — consistency_vs_accuracy_note focuses only on accuracy, ignores format consistency dimension.
+      ERROR 5 — recommended_action="conditional_proceed" when rate=59.3%. Schema rejects.
+      ERROR 6 — Missing offer_status_parse or interview_stage_classification in regression_by_family.
+      ERROR 7 — rate_pct arithmetic: priority_ranking has 7 rows (R-007,R-008,R-009,R-012,R-015,R-020,R-021), 4 regressions → 4/7*100=57.1.
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 28 total runs, 27 previously passing, 16 regressions, 59.3%, block_migration",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "59.3%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-3.5 tokens", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-167 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "16", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "qualifier_injection",
+            "frequency": "6/28 runs",
+            "example_run_ids": ["R-001", "R-011", "R-013", "R-016"],
+            "root_cause": "min 35 chars",
+            "recommendation": "min 35 chars"
+          },
+          {
+            "pattern_name": "vocabulary_substitution",
+            "frequency": "7/28 runs",
+            "example_run_ids": ["R-003", "R-006", "R-009", "R-015", "R-026"],
+            "root_cause": "...",
+            "recommendation": "..."
+          },
+          {
+            "pattern_name": "case_sensitivity",
+            "frequency": "2/28 runs",
+            "example_run_ids": ["R-005", "R-008"],
+            "root_cause": "...",
+            "recommendation": "..."
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words — address BOTH consistency (structure) and accuracy (values)",
+
+        "priority_fixes": ["fix 1 — specific", "fix 2 — specific"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 59.26,
+
+        "regression_by_family": [
+          {"task_family": "hiring_decision",                "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "status_classification",          "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "priority_ranking",               "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "offer_status_parse",             "regression_count": 2, "total_count": 4, "rate_pct": 50.0},
+          {"task_family": "interview_stage_classification", "regression_count": 2, "total_count": 3, "rate_pct": 66.7}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-028).
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH consistency AND accuracy.
+      5. executive_summary ≥ 80 characters with all key stats.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 16/27*100 = 59.26 (denominator=27, not 28).
+      10. recommended_action = "block_migration" (rate > 50%).
+      11. regression_by_family has exactly 5 entries.
+      12. Each rate_pct = regression_count/total_count*100 within ±1%.
+
+      WRONG: regression_rate_pct=57.1 (16/28) — wrong denominator. VIOLATION.
+      WRONG: recommended_action="conditional_proceed" when rate=59.3%. Schema rejects.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from run_log (R-001 through R-028). priority_fixes must have at least 2 items. regression_by_family must have 5 entries (one per task_family).
+    </output_schema>
+  </instructions>
+</prompt>

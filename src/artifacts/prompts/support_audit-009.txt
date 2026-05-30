@@ -1,0 +1,173 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20240426-134809</call_id>
+      <agent>Fatima Al-Hassan</agent>
+      <queue>Technical Support</queue>
+      <duration>14:37</duration>
+      <date>2024-04-26</date>
+    </metadata>
+    <dialogue>
+[00:00:05] Fatima Al-Hassan (Agent): Horizon Cloud Technical Support, this is Fatima Al-Hassan. How can I help you today?
+[00:00:11] Devon Castillo (Customer): Hi Fatima. I'm having trouble with the Horizon Cloud API. I'm trying to pull project data into our internal dashboard but the requests keep returning a 403 Forbidden error even though I'm using my API key.
+[00:00:25] Fatima Al-Hassan (Agent): I can definitely help with that. Before I access your account, can you verify the email address associated with it?
+[00:00:32] Devon Castillo (Customer): It's d.castillo at brightpath.co.
+[00:00:37] Fatima Al-Hassan (Agent): And to confirm identity, can you give me the name of your organization and the last four digits of your account phone number?
+[00:00:44] Devon Castillo (Customer): Brightpath Consulting. Phone ends in 3391.
+[00:00:49] Fatima Al-Hassan (Agent): Perfect, verified. I'm in your account now. A 403 on the API usually points to one of three things: the API key is scoped incorrectly, the endpoint you're hitting requires a permission level your plan doesn't include, or the key itself has been deactivated. Can you tell me which endpoint you're calling?
+[00:01:04] Devon Castillo (Customer): I'm calling /v2/projects — trying to get a list of all projects under our workspace.
+[00:01:11] Fatima Al-Hassan (Agent): Got it. And is this a newly generated API key or one that's been in use for a while?
+[00:01:17] Devon Castillo (Customer): I generated it about a week ago specifically for this integration. It's never successfully returned data.
+[00:01:24] Fatima Al-Hassan (Agent): Okay. First thing I want to check is the key's scope in your account. When you generated it, did you select the Projects read permission in the scope settings?
+[00:01:34] Devon Castillo (Customer): I think I selected everything — but I'm not completely sure. I may have just taken the defaults.
+[00:01:41] Fatima Al-Hassan (Agent): That's a common one. The default scope when generating a key only grants account-level read access — it doesn't include Projects by default. You'd need to explicitly enable the Projects:Read scope. Let me confirm what's on your current key.
+[00:01:55] [SYSTEM LOOKUP — API key scope review]
+[00:02:08] Fatima Al-Hassan (Agent): Confirmed — your key is missing the Projects:Read scope. That's the cause of the 403. You have two options: I can walk you through regenerating the key with the correct scope, or if you need to preserve the existing key for other integrations, I can walk you through adding the scope to the existing key.
+[00:02:25] Devon Castillo (Customer): Let's add it to the existing key — I don't want to break anything else.
+[00:02:30] Fatima Al-Hassan (Agent): Good call. Go to your API Settings — you should be at Settings, then Developer, then API Keys. Do you see the key listed there?
+[00:02:39] Devon Castillo (Customer): Yes, I see it. It's called "BI Integration Key."
+[00:02:43] Fatima Al-Hassan (Agent): Perfect. Click the pencil icon to edit it. On the edit screen you'll see a Scopes section. You'll want to check Projects:Read. There are also sub-scopes — if you need to pull archived projects in addition to active ones, you'd also check Projects:Read:Archived. Do you need archived projects?
+[00:02:59] Devon Castillo (Customer): Probably not right now, but maybe in the future.
+[00:03:03] Fatima Al-Hassan (Agent): Then start with just Projects:Read for now. You can always edit the key again later if your use case expands. Go ahead and check that box. Let me know when you've saved it.
+[00:03:13] Devon Castillo (Customer): Saving now...
+[00:03:16] Fatima Al-Hassan (Agent): While that saves — I need to pull a backend reference for the /v2/projects endpoint parameters. Let me put you on hold for a moment while I check that.
+[00:03:24] Devon Castillo (Customer): Sure, no problem.
+[00:03:26] [HOLD — Fatima places Devon on hold without stating expected duration or thanking for holding in advance]
+[00:07:29] [HOLD END — 4 minutes 3 seconds elapsed]
+[00:07:31] Fatima Al-Hassan (Agent): Okay, I'm back. Sorry about the wait — the documentation system was slow today. So the /v2/projects endpoint accepts optional query parameters for filtering: status can be "active", "archived", or "all"; page and per_page control pagination with a max of 100 records per page; and you can filter by owner_id if you want to scope results to a specific user's projects.
+[00:07:52] Devon Castillo (Customer): That's helpful, thanks. Should I try the API call now?
+[00:07:56] Fatima Al-Hassan (Agent): Yes — try the GET /v2/projects call with your updated key and let me know what you get.
+[00:08:02] Devon Castillo (Customer): Okay, running it now... I'm getting a 200 response. And I can see project data coming back. It's working!
+[00:08:12] Fatima Al-Hassan (Agent): Excellent! So the scope update resolved the 403. The fix was adding Projects:Read to your API key scope. Going forward, when generating new API keys, always review the Scopes section during creation rather than accepting defaults — the defaults are intentionally minimal for security reasons.
+[00:08:28] Devon Castillo (Customer): That makes total sense. I'll keep that in mind. Is there documentation I can reference for all the available scopes?
+[00:08:35] Fatima Al-Hassan (Agent): Yes — it's at developer.horizon.cloud/docs/api-scopes. It lists every scope, what endpoints it unlocks, and the minimum plan required. Bookmark that if you're doing API work.
+[00:08:46] Devon Castillo (Customer): Will do. Thanks, Fatima. This was really helpful.
+[00:08:51] Fatima Al-Hassan (Agent): Happy to help! Is there anything else I can help you with today?
+[00:08:56] Devon Castillo (Customer): No, that's everything.
+[00:08:59] Fatima Al-Hassan (Agent): Great. Have a good one, Devon. Goodbye.
+[00:09:02] Devon Castillo (Customer): Thanks. Bye!
+[00:09:04] [CALL END]
+[00:09:48] [WRAP-UP COMPLETE — 44 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before evaluating any compliance check:
+      Determine ticket_type from call content. This controls which checks are applicable.
+      Make this determination BEFORE scoring any check.
+
+      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
+      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
+      - "account": customer issue involves profile settings, name/email changes, plan management
+      - "general": does not fit above categories
+
+      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
+      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
+
+      WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
+      RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
+    </gate_check>
+
+    <compliance_scoring>
+      - Y: Check was completed as required
+      - N: Check was required but not completed
+      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+    </compliance_scoring>
+
+    <grading_decision_tree priority="CRITICAL">
+      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+
+      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
+         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
+         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
+         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+
+      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+
+      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+
+      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+    </grading_decision_tree>
+
+    <escalation_rule priority="CRITICAL">
+      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
+      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
+      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+
+      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
+      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
+      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      RIGHT: escalation_required=false, escalation_reason=null.
+    </escalation_rule>
+
+    <evidence_purity priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
+      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
+      evidence min length = 10 characters. Empty string will fail schema validation.
+
+      WRONG: "Agent greeted customer professionally and identified themselves clearly"
+      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
+
+      WRONG: "N/A" (too short, 3 chars)
+      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+    </evidence_purity>
+
+    <compliance_checks>
+      C-01: Agent stated their name at the start of the call — ALWAYS applicable
+      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
+      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
+      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
+      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
+      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
+      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
+      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
+      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
+      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
+      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
+      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+    </compliance_checks>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
+      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
+      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
+      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+    </field_caps>
+
+    <quality_dimensions>
+      QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
+      - Professionalism: Tone, empathy, language quality throughout the call
+      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
+      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
+      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
+      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+    </quality_dimensions>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
+      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
+      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
+      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
+      5. escalation_required = true? → escalation_reason must not be null.
+      6. escalation_required = false? → escalation_reason must be null.
+      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
+      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
+
+      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
+      RIGHT: Two applicable N checks → overall_grade="FAIL".
+
+      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
+      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+    </pre_emit_check>
+
+    <output_schema>
+      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+    </output_schema>
+  </instructions>
+</prompt>

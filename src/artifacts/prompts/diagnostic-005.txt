@@ -1,0 +1,304 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-14</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-flash</old_model>
+        <new_model>gemini-3.1-flash-lite</new_model>
+      </model_pair>
+      <prompt_set>enum_format_battery_v2</prompt_set>
+      <total_runs>29</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family          | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-501     | date_extraction      | YES        | NO         | YES        | -4          | 295               | 291               | 1810           | 1640           | format_drift
+R-002  | P-502     | date_extraction      | YES        | YES        | NO         | +1          | 299               | 300               | 1800           | 1630           | none
+R-003  | P-503     | date_extraction      | YES        | NO         | YES        | -5          | 297               | 292               | 1820           | 1650           | format_drift
+R-004  | P-504     | date_extraction      | YES        | NO         | YES        | -3          | 293               | 290               | 1800           | 1640           | format_drift
+R-005  | P-505     | score_normalization  | YES        | YES        | NO         | +2          | 301               | 303               | 1810           | 1640           | none
+R-006  | P-506     | score_normalization  | YES        | NO         | YES        | -6          | 303               | 297               | 1830           | 1660           | format_drift
+R-007  | P-507     | score_normalization  | YES        | NO         | YES        | -8          | 305               | 297               | 1840           | 1670           | format_drift
+R-008  | P-508     | score_normalization  | YES        | YES        | NO         | +3          | 298               | 301               | 1800           | 1630           | none
+R-009  | P-509     | currency_formatting  | YES        | NO         | YES        | -5          | 300               | 295               | 1820           | 1650           | format_drift
+R-010  | P-510     | currency_formatting  | YES        | YES        | NO         | +2          | 296               | 298               | 1790           | 1630           | none
+R-011  | P-511     | currency_formatting  | YES        | NO         | YES        | -7          | 304               | 297               | 1840           | 1660           | format_drift
+R-012  | P-512     | date_extraction      | NO         | NO         | NO         | -4          | 294               | 290               | 1800           | 1640           | format_drift
+R-013  | P-513     | score_normalization  | YES        | NO         | YES        | -6          | 302               | 296               | 1830           | 1660           | format_drift
+R-014  | P-514     | currency_formatting  | YES        | YES        | NO         | +1          | 297               | 298               | 1800           | 1630           | none
+R-015  | P-515     | currency_formatting  | YES        | NO         | YES        | -5          | 300               | 295               | 1820           | 1650           | format_drift
+R-016  | P-516     | score_normalization  | YES        | YES        | NO         | +2          | 295               | 297               | 1790           | 1630           | none
+R-017  | P-517     | date_extraction      | YES        | NO         | YES        | -4          | 294               | 290               | 1805           | 1638           | format_drift
+R-018  | P-518     | date_extraction      | YES        | YES        | NO         | +1          | 298               | 299               | 1798           | 1628           | none
+R-019  | P-519     | score_normalization  | YES        | NO         | YES        | -7          | 304               | 297               | 1832           | 1662           | format_drift
+R-020  | P-520     | score_normalization  | YES        | YES        | NO         | +2          | 296               | 298               | 1792           | 1632           | none
+R-021  | P-521     | currency_formatting  | YES        | NO         | YES        | -5          | 300               | 295               | 1820           | 1652           | format_drift
+R-022  | P-522     | currency_formatting  | YES        | YES        | NO         | +2          | 296               | 298               | 1790           | 1630           | none
+R-023  | P-523     | geo_classification   | YES        | NO         | YES        | -4          | 295               | 291               | 1812           | 1642           | format_drift
+R-024  | P-524     | geo_classification   | YES        | NO         | YES        | -6          | 298               | 292               | 1822           | 1652           | enum_contamination
+R-025  | P-525     | geo_classification   | YES        | YES        | NO         | +1          | 294               | 295               | 1789           | 1629           | none
+R-026  | P-526     | skill_level_tagging  | YES        | NO         | YES        | -5          | 299               | 294               | 1818           | 1648           | format_drift
+R-027  | P-527     | skill_level_tagging  | YES        | YES        | NO         | +2          | 295               | 297               | 1789           | 1629           | none
+R-028  | P-528     | skill_level_tagging  | YES        | NO         | YES        | -6          | 301               | 295               | 1825           | 1655           | enum_contamination
+R-029  | P-529     | skill_level_tagging  | YES        | YES        | NO         | +2          | 295               | 297               | 1789           | 1629           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-501, date_extraction): The `start_date` field returned "April 3, 2026" (natural language format) instead of the required ISO 8601 format "2026-04-03". The prompt explicitly instructs "format all dates as YYYY-MM-DD". Old model returned "2026-04-03". New model returned the human-readable form.
+
+R-003 (P-503, date_extraction): The `end_date` field returned "03/28/26" (MM/DD/YY format with two-digit year) instead of the required "2026-03-28". A different format drift than R-001 — the new model is not consistently choosing one wrong format; it varies between natural language and slash-delimited formats across runs.
+
+R-004 (P-504, date_extraction): The `interview_date` field returned "28th March 2026" (ordinal day + month name format) instead of "2026-03-28". A third distinct wrong format. The new model appears to lack a stable internal format mapping for date output when the prompt's ISO instruction is present.
+
+R-006 (P-506, score_normalization): The `composite_score` field returned "82%" (with percent sign appended) instead of the required decimal float 0.82. Schema specifies `composite_score: float` in the range [0.0, 1.0]. The prompt instructs: "normalize all scores to decimal between 0 and 1." The new model returns the pre-normalization percentage form.
+
+R-007 (P-507, score_normalization): The `technical_score` field returned "7.5/10" (fraction notation) instead of the required 0.75. Schema requires float. The new model uses the source fraction form rather than normalizing to the required [0, 1] range.
+
+R-009 (P-509, currency_formatting): The `annual_salary` field returned "$95,000" (with dollar sign and comma separator) instead of the required integer 95000. Schema specifies `annual_salary: int`. The prompt instructs: "return all monetary amounts as integers in base currency units."
+
+R-011 (P-511, currency_formatting): The `signing_bonus` field returned "15k" (abbreviated notation) instead of the required integer 15000. A different format drift than R-009 — abbreviated thousands notation rather than display-formatted currency.
+
+R-012 (P-512, date_extraction): Both models failed. Old model returned "2026/04/01" (slash delimiter instead of hyphen), new model returned "April 1, 2026" (natural language). Neither matches the required "2026-04-01". Pre-existing failure on this specific prompt; not counted as regression.
+
+R-013 (P-513, score_normalization): The `weighted_score` field returned "88 out of 100" (prose fraction) instead of the required 0.88. A third distinct wrong format for score normalization runs.
+
+R-015 (P-515, currency_formatting): The `relocation_allowance` field returned "USD 8,500.00" (currency code prefix with decimal cents) instead of the required integer 8500. A third distinct wrong format for currency runs.
+
+R-017 (P-517, date_extraction): The `effective_date` field returned "05/01/2026" (MM/DD/YYYY US format) instead of the required "2026-05-01". A fourth distinct date format failure across the battery — the new model is drawing on different locale-specific date conventions in each run.
+
+R-019 (P-519, score_normalization): The `calibration_score` field returned "71/100" (numeric fraction with /100 denominator) instead of the required float 0.71. A fourth distinct score_normalization format drift — each failing run uses a different non-normalized representation.
+
+R-021 (P-521, currency_formatting): The `annual_bonus` field returned "EUR 12,500" (ISO currency code prefix, comma-separated) instead of the required integer 12500. A fourth distinct currency format failure. Combined across R-009, R-011, R-015, R-021, the new model produces a different currency representation format in every failing run.
+
+R-023 (P-523, geo_classification): New family. The `region_code` field returned "North America" (natural language region name) instead of the required ISO region code "NA". Schema specifies `region_code: str` matching ISO 3166-1 regional codes.
+
+R-024 (P-524, geo_classification): The `country_tier` field returned "tier 1 — premium market" (free text with qualifier) instead of the required enum value "tier_1". Enum contamination pattern — valid base value plus qualifier text.
+
+R-026 (P-526, skill_level_tagging): New family. The `proficiency_level` field returned "advanced+" (with plus modifier) instead of the required enum value "expert". Schema specifies `proficiency_level: Literal["novice", "intermediate", "advanced", "expert"]`. Qualifier injection pattern.
+
+R-028 (P-528, skill_level_tagging): The `years_experience_band` field returned "5-8 years" (range string) instead of the required enum value "mid" (representing 5-8 year experience band). The model returned the raw range rather than the mapped enum token.
+    </failure_detail_log>
+
+    <pattern_analysis>
+The distinctive characteristic of this run set is intra-category format inconsistency. For date extraction, failing runs produced four different wrong formats across R-001 (natural language), R-003 (MM/DD/YY), R-004 (ordinal day format), and R-017 (US locale MM/DD/YYYY). For score normalization, failing runs produced percentage with symbol (R-006), fraction notation (R-007), prose fraction (R-013), and numeric fraction with /100 denominator (R-019). For currency, failing runs produced display-formatted with dollar sign (R-009), abbreviated thousands (R-011), currency code prefix with cents (R-015), and ISO currency code (R-021). No two failing runs in any category used the same wrong format.
+
+This intra-category variation indicates the new model is not applying a consistent alternative format — it is simply failing to apply the required format transformation and falling back to whichever format appears locally salient for that specific input. The old model reliably applied format instructions as hard constraints; the new model treats format instructions as suggestions.
+
+Two new task families — geo_classification (R-023 through R-025) and skill_level_tagging (R-026 through R-029) — exhibit a mix of format_drift (R-023, R-026) and enum_contamination (R-024, R-028). The geo_classification failure R-023 is a format failure (region name instead of region code), while R-024 is an enum failure (qualifier injection). This indicates the format_drift and enum_contamination failure mechanisms co-occur at the task level but are triggered by different field types within the same prompt.
+
+Excluding R-012 (pre-existing failure, old_passed=NO), 16 regressions occurred on 28 previously passing runs — a 57.1% regression rate. Regressions span all five task families with no family showing a zero regression rate.
+    </pattern_analysis>
+
+    <token_summary>
+Old model (gemini-2.5-flash):
+  Average output tokens: 298.5
+  Average latency: 1,812 ms
+
+New model (gemini-3.1-flash-lite):
+  Average output tokens: 295.3
+  Average latency: 1,644 ms
+
+Average token delta: -3.2 tokens per run (-1.1%)
+Average latency delta: -168 ms per run (-9.3%)
+
+Per-task-family breakdown:
+  date_extraction:      avg old=295.3, avg new=291.7, delta=-3.6 (-1.2%)
+  score_normalization:  avg old=299.6, avg new=297.9, delta=-1.7 (-0.6%)
+  currency_formatting:  avg old=298.6, avg new=296.5, delta=-2.1 (-0.7%)
+  geo_classification:   avg old=295.7, avg new=292.7, delta=-3.0 (-1.0%)
+  skill_level_tagging:  avg old=297.5, avg new=295.8, delta=-1.7 (-0.6%)
+
+Token delta is minimal and uniform across families — format_drift produces content of similar length as the correct output. Enum failures involve correct-length strings with wrong values. Neither pattern affects output verbosity.
+    </token_summary>
+
+    <family_summary>
+task_family          | total_runs | regressions | regression_rate | dominant_failure_type
+date_extraction      | 7          | 4           | 57.1%           | format_drift (inconsistent date representation)
+score_normalization  | 8          | 4           | 50.0%           | format_drift (non-normalized numeric formats)
+currency_formatting  | 7          | 4           | 57.1%           | format_drift (display-formatted monetary values)
+geo_classification   | 3          | 2           | 66.7%           | format_drift / enum_contamination
+skill_level_tagging  | 4          | 2           | 50.0%           | enum_contamination (qualifier_injection / vocab_substitution)
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will inform an engineering go/no-go migration decision.</role>
+
+    <domain_context>
+      This benchmark evaluates format compliance: whether the new model applies required format transformations (ISO dates, normalized scores, integer currencies) as strictly as the old model. Format failures differ from structural failures — the field type may be correct (string, float, int) while the value representation violates the format constraint.
+
+      A "regression" is: old_passed=YES, new_passed=NO. Pre-existing failures (old_passed=NO) excluded.
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+
+      WRONG: 16/29 = 55.2% when 1 run has old_passed=NO. Denominator must be 28.
+      RIGHT: 16/28 = 57.1%
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan run_log, extract all valid run IDs (R-001 through R-029).
+      Build this list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-030"] when run_log ends at R-029. VIOLATION.
+      WRONG: example_run_ids=[] when 4 examples exist for date_extraction. VIOLATION.
+      RIGHT: example_run_ids=["R-001", "R-003", "R-004", "R-017"] — all visible in run_log.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes ≥ 2 items. Schema rejects if fewer.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from run_log.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         Note: for format_drift failures, the field type is correct — the failure is representation.
+         RIGHT: "Field structure consistent (correct types returned). Value accuracy degraded — format instructions not applied consistently across 16 runs; each failing run used a different non-compliant representation."
+      4. regression_by_family must list all 5 task_families.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      WRONG: Citing 55.2% rate when data shows 16/28 = 57.1%. VIOLATION.
+      RIGHT: "16 regressions out of 28 previously passing runs (57.1%)."
+      MetricSummary.value must match run_log or token_summary numbers exactly.
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must include: 29 total runs, 28 previously passing, 16 regressions, 57.1% rate, format_drift dominant, block_migration.
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Three format-drift subtypes identifiable: date_format_drift, numeric_format_drift (scores+currency), enum_contamination (geo+skill families).
+        Each pattern: ≥1 run ID in example_run_ids, root_cause min 35 chars, recommendation min 35 chars.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Key insight: format consistency WITHIN each family degrades further than between families — each failing run uses a different wrong format for the same transformation task. Address both consistency and accuracy.
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Format-specific fixes: explicit format constraints with WRONG/RIGHT examples.
+        RIGHT: ["Prepend to date fields: 'ALWAYS return dates as YYYY-MM-DD (ISO 8601). WRONG: April 3, 2026. RIGHT: 2026-04-03'", "For numeric score fields: 'Return normalized float in [0.0, 1.0]. WRONG: 82%. WRONG: 8.2/10. RIGHT: 0.82'"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        regression_rate_pct = 57.1% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 16/28*100 = 57.14. Denominator = 28 (excludes R-012 which has old_passed=NO).
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        5 families: date_extraction(7 rows), score_normalization(8 rows), currency_formatting(7 rows), geo_classification(3 rows), skill_level_tagging(4 rows).
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing (old=YES): 28 runs (excludes R-012 which has old_passed=NO)
+        Regressions (old=YES, new=NO): R-001,R-003,R-004,R-006,R-007,R-009,R-011,R-013,R-015,R-017,R-019,R-021,R-023,R-024,R-026,R-028 = 16 runs
+        Families: date_extraction, score_normalization, currency_formatting, geo_classification, skill_level_tagging
+
+      Step 2 — regression_rate_pct = 16/28*100 = 57.14
+
+      Step 3 — Group regressions by failure subtype:
+        date_format_drift: R-001,R-003,R-004,R-017 (wrong date representation)
+        numeric_format_drift: R-006,R-007,R-009,R-011,R-013,R-015,R-019,R-021 (scores + currency)
+        enum_contamination: R-023,R-024,R-026,R-028 (geo + skill families)
+
+      Step 4 — FamilyBreakdown: count from run_log table.
+
+      Step 5 — recommended_action: 57.1% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: use 28 (old=YES), not 29 (total). R-012 excluded.
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-029 only.
+      ERROR 3 — Missing families: geo_classification and skill_level_tagging required in regression_by_family.
+      ERROR 4 — rate_pct arithmetic: score_normalization has 8 rows, 4 regressions → 4/8*100=50.0 (not 50.1 or 49.9).
+      ERROR 5 — consistency_vs_accuracy_note ignores accuracy dimension.
+      ERROR 6 — recommended_action="conditional_proceed" when rate=57.1%. Schema rejects.
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 29 total runs, 28 previously passing, 16 regressions, 57.1%, block_migration",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "57.1%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-3.2 tokens", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-168 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "16", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "date_format_drift",
+            "frequency": "4/29 runs",
+            "example_run_ids": ["R-001", "R-003", "R-004", "R-017"],
+            "root_cause": "min 35 chars",
+            "recommendation": "min 35 chars"
+          },
+          {
+            "pattern_name": "numeric_format_drift",
+            "frequency": "8/29 runs",
+            "example_run_ids": ["R-006", "R-007", "R-009", "R-011"],
+            "root_cause": "...",
+            "recommendation": "..."
+          },
+          {
+            "pattern_name": "enum_contamination",
+            "frequency": "4/29 runs",
+            "example_run_ids": ["R-023", "R-024", "R-026", "R-028"],
+            "root_cause": "...",
+            "recommendation": "..."
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words",
+
+        "priority_fixes": ["fix 1 — specific", "fix 2 — specific"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 57.14,
+
+        "regression_by_family": [
+          {"task_family": "date_extraction",     "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "score_normalization",  "regression_count": 4, "total_count": 8, "rate_pct": 50.0},
+          {"task_family": "currency_formatting",  "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "geo_classification",   "regression_count": 2, "total_count": 3, "rate_pct": 66.7},
+          {"task_family": "skill_level_tagging",  "regression_count": 2, "total_count": 4, "rate_pct": 50.0}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-029).
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH dimensions.
+      5. executive_summary ≥ 80 characters.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 16/28*100 = 57.14 (denominator=28, not 29).
+      10. recommended_action = "block_migration".
+      11. regression_by_family has exactly 5 entries.
+      12. Each rate_pct within ±1% of regression_count/total_count*100.
+
+      WRONG: regression_rate_pct=55.2 (16/29) — wrong denominator. VIOLATION.
+      WRONG: score_normalization rate_pct=50.1 when 4/8=50.0. Schema rejects if off >1%.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from run_log (R-001 through R-029). priority_fixes must have at least 2 items. regression_by_family must have 5 entries.
+    </output_schema>
+  </instructions>
+</prompt>

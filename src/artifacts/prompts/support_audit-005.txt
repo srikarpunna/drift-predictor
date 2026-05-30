@@ -1,0 +1,163 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20240329-024418</call_id>
+      <agent>Sophie Kim</agent>
+      <queue>Account Management</queue>
+      <duration>6:28</duration>
+      <date>2024-03-29</date>
+    </metadata>
+    <dialogue>
+[00:00:03] Sophie Kim (Agent): Horizon Cloud Support, this is Sophie Kim. How can I help you today?
+[00:00:08] Trevor Nguyen (Customer): Hi Sophie. I need to change the username on my account. I've been going by my nickname but I want to update it to my actual name.
+[00:00:16] Sophie Kim (Agent): Sure, I can help with that. Let me bring up your account. Can I get the email address on the account?
+[00:00:22] Trevor Nguyen (Customer): It's trev.nguyen at personalmail.com.
+[00:00:28] Sophie Kim (Agent): Thank you. And to verify your identity, could you confirm the current username on the account and your account's registered phone number?
+[00:00:36] Trevor Nguyen (Customer): Current username is TrevN2019. And the phone on the account is 415-882-5560.
+[00:00:44] Sophie Kim (Agent): Perfect, that matches. I've verified your identity. I'm in your account now. What would you like to change the username to?
+[00:00:51] Trevor Nguyen (Customer): I'd like to change it to TrevorNguyen — T-R-E-V-O-R-N-G-U-Y-E-N, all one word.
+[00:00:59] Sophie Kim (Agent): Let me check availability for that username... TrevorNguyen is available. I'll go ahead and update it now.
+[00:01:07] [SYSTEM UPDATE — 0:22]
+[00:01:29] Sophie Kim (Agent): Done — your username has been updated from TrevN2019 to TrevorNguyen, effective immediately.
+[00:01:35] Trevor Nguyen (Customer): Great. Will this change anything else on my account? Like will my login still work the same way?
+[00:01:41] Sophie Kim (Agent): Good question. Your login email and password remain exactly the same — you only use the username for display purposes in the Horizon Cloud community and team collaboration features. Your login credentials are not affected.
+[00:01:53] Trevor Nguyen (Customer): Perfect. And will any existing mentions of my old username in shared documents or comments update automatically?
+[00:01:59] Sophie Kim (Agent): They won't update retroactively — any previous mentions will still show TrevN2019 — but all new mentions and tags going forward will reflect TrevorNguyen.
+[00:02:08] Trevor Nguyen (Customer): That makes sense. Is there anything else I should know about the change?
+[00:02:13] Sophie Kim (Agent): That's about it. The change is live on your account right now.
+[00:02:17] Trevor Nguyen (Customer): One more thing — is there a limit to how often I can change my username?
+[00:02:22] Sophie Kim (Agent): Yes, usernames can be changed once every 90 days per our account policy.
+[00:02:27] Trevor Nguyen (Customer): Good to know. And just to double-check — my account email is still trev.nguyen at personalmail.com, right? I want to make sure none of that changed.
+[00:02:35] Sophie Kim (Agent): Yes, your login email hasn't changed. It's still the same address. Only the display username was updated.
+[00:02:41] Trevor Nguyen (Customer): Okay perfect. I do have one more question — I share some dashboards with colleagues on Horizon Cloud. Will they see the name change immediately, or do they need to refresh something?
+[00:02:51] Sophie Kim (Agent): They'll see the updated username the next time a page that displays your name is loaded or refreshed. In most cases it will show up immediately on their next visit. Shared dashboards don't require them to do anything special.
+[00:03:02] Trevor Nguyen (Customer): Great. That's all I needed. It was a pretty simple change but I'm glad I could get it handled quickly.
+[00:03:08] Sophie Kim (Agent): Happy to help. That's all set on our end.
+[00:03:12] Trevor Nguyen (Customer): Okay. Thanks Sophie. Have a good one.
+[00:03:15] Sophie Kim (Agent): Glad I could help. Take care.
+[00:03:18] Trevor Nguyen (Customer): Thanks. Bye.
+[00:03:20] [CALL END]
+[00:04:03] [WRAP-UP COMPLETE — 43 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before evaluating any compliance check:
+      Determine ticket_type from call content. This controls which checks are applicable.
+      Make this determination BEFORE scoring any check.
+
+      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
+      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
+      - "account": customer issue involves profile settings, name/email changes, plan management
+      - "general": does not fit above categories
+
+      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
+      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
+
+      WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
+      RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
+    </gate_check>
+
+    <compliance_scoring>
+      - Y: Check was completed as required
+      - N: Check was required but not completed
+      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+    </compliance_scoring>
+
+    <grading_decision_tree priority="CRITICAL">
+      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+
+      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
+         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
+         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
+         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+
+      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+
+      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+
+      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+    </grading_decision_tree>
+
+    <escalation_rule priority="CRITICAL">
+      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
+      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
+      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+
+      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
+      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
+      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      RIGHT: escalation_required=false, escalation_reason=null.
+    </escalation_rule>
+
+    <evidence_purity priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
+      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
+      evidence min length = 10 characters. Empty string will fail schema validation.
+
+      WRONG: "Agent greeted customer professionally and identified themselves clearly"
+      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
+
+      WRONG: "N/A" (too short, 3 chars)
+      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+    </evidence_purity>
+
+    <compliance_checks>
+      C-01: Agent stated their name at the start of the call — ALWAYS applicable
+      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
+      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
+      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
+      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
+      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
+      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
+      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
+      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
+      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
+      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
+      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+    </compliance_checks>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
+      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
+      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
+      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+    </field_caps>
+
+    <quality_dimensions>
+      QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
+      - Professionalism: Tone, empathy, language quality throughout the call
+      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
+      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
+      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
+      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+    </quality_dimensions>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
+      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
+      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
+      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
+      5. escalation_required = true? → escalation_reason must not be null.
+      6. escalation_required = false? → escalation_reason must be null.
+      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
+      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
+
+      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
+      RIGHT: Two applicable N checks → overall_grade="FAIL".
+
+      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
+      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+    </pre_emit_check>
+
+    <output_schema>
+      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+    </output_schema>
+  </instructions>
+</prompt>

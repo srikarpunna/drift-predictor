@@ -1,0 +1,199 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>Staff Engineer</role>
+      <interview_type>technical</interview_type>
+      <interviewer>Farida Okonkwo (Principal Engineer), Leo Hartmann (Engineering Manager)</interviewer>
+      <candidate>Yuki Tanaka</candidate>
+      <duration>70 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Farida (Interviewer): Yuki, we're doing a mix today — technical depth and some behavioral questions. Let's start technical. Design a distributed rate limiter that supports 500,000 requests per second, multi-region, with sub-5ms p99 latency at the rate check.
+
+[00:02] Yuki (Candidate): Good problem. The core challenge is: you can't do a synchronous distributed consensus check at 500k RPS without blowing your latency budget, so you need to accept some eventual consistency in your counting. Here's how I'd approach it. I'd use a sliding window counter implemented in Redis Cluster — Redis single-node can handle about 100k ops/second on commodity hardware, so for 500k RPS I'd shard by user or entity ID across five nodes minimum with consistent hashing. Each rate check is a Lua script — atomically execute INCR, check against limit, and set TTL in one round-trip. Lua runs server-side in Redis, so you avoid a network roundtrip between increment and check. That keeps you well within 5ms at the rate check layer if your application servers are co-located regionally with Redis.
+
+[00:06] Farida (Interviewer): What happens during a Redis failover in that architecture? What's the failure mode?
+
+[00:07] Yuki (Candidate): During failover in Redis Sentinel or Redis Cluster, you have a leader election window — typically two to ten seconds depending on your heartbeat configuration. During that window, rate checks either fail open or fail closed depending on your policy. Failing open means requests pass through unchecked — you accept some abuse risk for those seconds. Failing closed means you drop legitimate traffic. For most rate-limiting use cases, fail-open is the better default: the cost of a few seconds of unthrottled traffic is lower than dropping legitimate customer requests. What you want to avoid is indefinite fail-open, so you'd want a maximum circuit-breaker timeout — if the Redis cluster is unreachable for more than 30 seconds, you'd route to a degraded mode that uses in-process rate limiting with a tighter limit as a safety backstop.
+
+[00:11] Farida (Interviewer): How would you handle multi-region? You have users hitting different regions but their rate limit is global.
+
+[00:12] Yuki (Candidate): Cross-region rate limiting is a hard problem because cross-region latency — say 80ms for US-East to EU-West — immediately blows your 5ms budget if you do a synchronous cross-region check. There are a few approaches. Option one: regional rate limits with a global envelope. Each region enforces a per-region limit — say 60% of the global limit — and a background sync job reconciles total usage across regions every few seconds. This is eventually consistent but keeps per-check latency local. Option two: token bucket with async replenishment. Each region has a local token bucket. A global coordinator periodically redistributes tokens based on observed usage patterns. This works well when traffic distribution across regions is predictable. Option three: approximate counting with CRDTs — conflict-free replicated data types that allow concurrent increments across regions and converge without coordination. Redis doesn't natively support CRDTs but you can implement a G-counter on top of it. The tradeoff is that you'll over-allow briefly during the convergence window. I'd use option one for most cases — it's predictable, debuggable, and the math is clear.
+
+[00:18] Farida (Interviewer): You mentioned Lua scripts for atomicity. What happens to your throughput if the Lua script execution time grows because someone adds logic to it?
+
+[00:19] Yuki (Candidate): This is a real footgun in Redis. Lua scripts block the entire Redis event loop while they execute — Redis is single-threaded for command processing. A slow Lua script doesn't just slow down that one client; it creates a head-of-line blocking problem across every client hitting that Redis instance. I've seen this in production: someone added a debug logging call inside a rate-limit Lua script that did a string concatenation in a hot path, and p99 latency on that Redis instance jumped from 1ms to 40ms under load. The mitigation is: Lua scripts for rate limiting must be kept minimal — INCR and comparison only, nothing else — and you should have a latency SLO on Lua script execution itself, monitored separately from overall Redis latency. If script execution crosses 2ms, you investigate before it cascades.
+
+[00:23] Leo (Interviewer): Let me shift gears. Tell me about a time a system you owned had a significant failure in production. What happened?
+
+[00:24] Yuki (Candidate): At my previous company, the rate-limiting service I maintained had an outage during a traffic spike from a marketing campaign. The Redis Cluster lost a primary shard and the failover took longer than expected — about 45 seconds. During that window the application fell back to in-process counting per node, but with twelve app servers, each with its own counter, the effective rate limit was twelve times the intended limit. A customer segment that was supposed to be limited to 1,000 requests per minute got through about 11,000. It didn't cause data corruption — the downstream systems were idempotent — but it created database connection pool exhaustion on two read replicas. I had to do an emergency increase in the read replica connection pool limit to stabilize. The technical cause was clear.
+
+[00:28] Leo (Interviewer): What did you personally change afterward?
+
+[00:29] Yuki (Candidate): We added the circuit-breaker fallback I described earlier — a tighter in-process limit during Redis unavailability rather than sum-across-nodes. We also changed the alerting: previously we only alerted on Redis being down, not on the rate limit effective multiplier jumping. After that incident we added a metric — aggregate allowed requests per second across all nodes — and alerted if it exceeded 130% of expected. The infrastructure team handled most of the Redis Cluster tuning. I focused on the application-side changes.
+
+[00:31] Leo (Interviewer): How did you communicate during that incident? Did you write the postmortem?
+
+[00:32] Yuki (Candidate): I sent status updates to the internal channel every ten minutes during the incident. The postmortem was a team effort — I wrote the technical sections on root cause and remediation. The section on customer impact and timeline was written by our incident commander. It was collaborative. The technical constraints were the main challenge — it wasn't really about communication or process, those were fine.
+
+[00:34] Farida (Interviewer): How do you approach debugging a latency regression in a system like this — one where the p99 has degraded but you don't have an obvious error signal?
+
+[00:35] Yuki (Candidate): I approach it in layers. First, narrow the scope: is the latency regression at the client, the network, the rate-limit service itself, or a downstream dependency? I'd use distributed tracing — Jaeger or a similar tool — to identify which span is contributing the extra latency. If the regression is in the rate-limit service, I'd look at Redis latency directly: is it the Lua script execution time, the network round-trip from app server to Redis, or something in the connection pool? I'd pull the Redis SLOWLOG and check for commands taking longer than 10ms. I'd also check whether the regression correlates with traffic volume — if it only appears above a certain RPS threshold, it's likely a resource saturation issue: connection pool exhaustion, CPU saturation on Redis, or memory pressure triggering swapping. I'd add temporary high-frequency metrics at each layer and bisect until the regression is isolated.
+
+[00:40] Farida (Interviewer): What's one architectural decision in this kind of system that looks correct but commonly introduces subtle bugs at scale?
+
+[00:41] Yuki (Candidate): Using wall clock time for sliding window boundaries without accounting for clock skew across nodes. If your rate limit window is "the last 60 seconds" and you're computing that from each app server's local clock, clock skew of even 200 milliseconds can cause windows to open slightly early or close slightly late on different nodes. Under normal conditions it doesn't matter. At high RPS with a tight limit, 200ms of window drift means a user can sneak in extra requests between nodes that disagree on where the window boundary is. The fix is to compute window boundaries from a single time source — Redis server time via the TIME command — rather than app server clocks. It adds one extra Redis call but eliminates the skew. I've seen this bite a team in a fraud prevention context where they needed tight per-second limits and kept seeing limit violations they couldn't explain.
+
+[00:46] Leo (Interviewer): One more behavioral question. Tell me about a time you worked closely with a non-technical stakeholder — someone from product, finance, sales — on a technical problem. How did you bridge that gap?
+
+[00:47] Yuki (Candidate): I've had those situations. When there are performance constraints or architectural limitations that affect what the product can do, I make sure to explain them clearly without jargon. I try to translate technical tradeoffs into something a product manager can reason about — usually in terms of cost, latency, or risk. I think having those conversations is important even if they're not always comfortable.
+
+[00:49] Leo (Interviewer): Can you give me a specific example — a project, a person, what you specifically communicated?
+
+[00:50] Yuki (Candidate): In the rate-limiting work, I did talk to the product side about why certain feature requests were technically constrained. I explained why a fully real-time global count was not achievable at our latency budget and what the alternatives were. They understood the tradeoff once it was framed clearly. I focused on explaining the technical constraints as clearly as possible. The product team made the call on which tradeoff to accept, which is how it should work.
+
+[00:53] Leo (Interviewer): Who specifically did you talk to and what was the outcome?
+
+[00:54] Yuki (Candidate): I don't remember the specific name — it was a PM on the platform team. The outcome was that we went with the regional rate limit approach rather than global. The conversation went well. I tend to stay focused on the technical side and let the business stakeholders drive the decision once they have the information.
+
+[00:57] Farida (Interviewer): Do you have questions for us?
+
+[00:58] Yuki (Candidate): Yes. What does the current Redis infrastructure look like here — is it Redis Cluster or Sentinel, and what version? And how does the team handle capacity planning for traffic spikes — is there a formal process or is it more reactive?
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a senior hiring panel evaluator. Your role is to produce an objective, evidence-based evaluation of the interview transcript above. All scores must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      Determine interview_type from the transcript metadata. This controls applicability of entire checkpoint clusters.
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview.
+      RIGHT: C-09 score="N/A" on a behavioral interview, excerpt="" (empty string).
+
+      WRONG: Scoring C-14 as Y or N when interview_type is not "final".
+      RIGHT: C-14 score="N/A" on a technical interview, excerpt="".
+    </gate_check>
+
+    <scoring_guide>
+- Y (Yes): Clearly and specifically observed in the transcript
+- N (No): Expected behavior was not observed or was explicitly absent
+- N/A (Not Applicable): Checkpoint does not apply — state reason in reasoning field, set excerpt to ""
+    </scoring_guide>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      For Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+      For N/A score: excerpt = "" (empty string — not "N/A", not null, not omitted)
+
+      WRONG: "[00:24] Sarah: We reduced defects — this shows ownership and accountability"
+      RIGHT: "[00:24] Sarah: We brought defect count from 140 to 22 in one quarter"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+- C-01 through C-08: Always applicable for all interview types
+- C-09, C-10: Applicable only if interview_type is "technical" — mark N/A with explanation for behavioral interviews
+- C-11, C-12, C-13 (Leadership cluster): Applicable only if candidate explicitly mentioned managing direct reports or leading a team of 2+ people
+- C-14, C-15: Applicable only if interview_type is "final"
+- C-16: Applicable only if candidate described a situation involving conflict with a peer, stakeholder, or manager
+- C-17: Always applicable
+- C-18, C-19: Applicable only if interview_type is "technical"
+- C-20: Always applicable
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins — do not skip to a later step if an earlier one applies.
+
+      1. AUTO-DOWNGRADE — NO_HIRE:
+         If C-01 is scored N (no concrete examples provided) → overall_recommendation = "no_hire"
+         regardless of all other scores. STOP. Do not evaluate further steps.
+         WRONG: C-01=N but overall_recommendation="hold". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_recommendation="no_hire". STOP.
+
+      2. LEADERSHIP DEPENDENCY — HOLD CEILING:
+         If ANY checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N →
+         overall_recommendation cannot be "hire" unless ALL of C-01 through C-08 are scored Y.
+         If that condition is not met → maximum recommendation is "hold".
+         WRONG: C-12=N, C-03=N, overall_recommendation="hire". VIOLATION.
+         RIGHT: C-12=N, C-03=N → overall_recommendation="hold".
+
+      3. HIRE: All C-01 through C-08 scored Y, no Leadership cluster failures.
+
+      4. HOLD: Mixed evidence — some Y, some N, no auto-downgrade triggered, leadership dependency not violated.
+
+      5. NO_HIRE: Majority of core checkpoints (C-01–C-08) scored N, or auto-downgrade from step 1.
+    </scoring_decision_tree>
+
+    <dependency_rules>
+CROSS-FIELD DEPENDENCY RULE:
+If any checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N, overall_recommendation cannot be "hire" unless ALL checkpoints in C-01 through C-08 are scored Y. If this condition is not met, maximum recommendation is "hold".
+
+AUTO-DOWNGRADE RULE:
+If C-01 is scored N (no concrete examples provided), overall_recommendation must be "no_hire" regardless of all other scores. This is enforced by schema validation — any other value will be rejected.
+    </dependency_rules>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If your draft exceeds the cap, shorten the observation. Do NOT go over.
+      - reasoning (CheckpointResult): state observation + evidence, then STOP. ≤ 40 words. HARD CAP.
+      - reasoning (QualityArea): ≤ 45 words. HARD CAP.
+      - summary: covers overall impression, key strengths, key concerns. ≤ 80 words. HARD CAP.
+    </field_caps>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. Did C-01 score N? If yes, overall_recommendation MUST be "no_hire". Fix if not — schema will reject any other value.
+      2. Did any Leadership cluster checkpoint (C-11, C-12, C-13) score N AND any C-01–C-08 score N?
+         If yes, overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
+      3. All N/A checkpoints have excerpt = "" (empty string — not "N/A", not null, not omitted).
+      4. All Y/N checkpoints have excerpt = "[HH:MM] CandidateName: exact quote" (not empty).
+      5. overall_recommendation is exactly one of: "hire", "no_hire", "hold".
+      6. summary is at least 50 characters.
+
+      WRONG: overall_recommendation="hire" but C-01=N. SELF-CONTRADICTION. Schema will reject.
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only". VIOLATION. Set to "".
+      WRONG: Y checkpoint with excerpt="". VIOLATION. Must include verbatim quote.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+    </output_schema>
+  </instructions>
+</prompt>

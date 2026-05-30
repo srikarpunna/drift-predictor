@@ -1,0 +1,300 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-04-23</evaluation_date>
+      <model_pair>
+        <old_model>claude-sonnet-4-5</old_model>
+        <new_model>claude-sonnet-4-6</new_model>
+      </model_pair>
+      <prompt_set>verbosity_drift_battery_v1</prompt_set>
+      <total_runs>28</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family          | old_passed | new_passed | regression | token_delta | output_tokens_old | output_tokens_new | latency_old_ms | latency_new_ms | failure_type
+R-001  | P-801     | reasoning_summary    | YES        | NO         | YES        | -198        | 512               | 314               | 2240           | 1890           | verbosity_drift
+R-002  | P-802     | reasoning_summary    | YES        | YES        | NO         | -41         | 498               | 457               | 2190           | 1860           | none
+R-003  | P-803     | reasoning_summary    | YES        | NO         | YES        | -211        | 524               | 313               | 2260           | 1900           | verbosity_drift
+R-004  | P-804     | decision_rationale   | YES        | YES        | NO         | -38         | 487               | 449               | 2160           | 1840           | none
+R-005  | P-805     | decision_rationale   | YES        | NO         | YES        | -189        | 503               | 314               | 2200           | 1880           | verbosity_drift
+R-006  | P-806     | decision_rationale   | YES        | NO         | YES        | -204        | 519               | 315               | 2230           | 1890           | verbosity_drift
+R-007  | P-807     | evaluation_narrative | YES        | YES        | NO         | -45         | 491               | 446               | 2170           | 1850           | none
+R-008  | P-808     | evaluation_narrative | YES        | NO         | YES        | -196        | 508               | 312               | 2220           | 1885           | verbosity_drift
+R-009  | P-809     | evaluation_narrative | YES        | YES        | NO         | -39         | 484               | 445               | 2150           | 1840           | none
+R-010  | P-810     | reasoning_summary    | YES        | NO         | YES        | -207        | 521               | 314               | 2250           | 1895           | verbosity_drift
+R-011  | P-811     | decision_rationale   | YES        | YES        | NO         | -44         | 493               | 449               | 2180           | 1855           | none
+R-012  | P-812     | evaluation_narrative | YES        | NO         | YES        | -193        | 505               | 312               | 2210           | 1880           | verbosity_drift
+R-013  | P-813     | reasoning_summary    | YES        | YES        | NO         | -37         | 481               | 444               | 2150           | 1840           | none
+R-014  | P-814     | decision_rationale   | YES        | NO         | YES        | -202        | 518               | 316               | 2240           | 1890           | verbosity_drift
+R-015  | P-815     | evaluation_narrative | YES        | NO         | YES        | -195        | 507               | 312               | 2215           | 1882           | verbosity_drift
+R-016  | P-816     | reasoning_summary    | YES        | NO         | YES        | -205        | 520               | 315               | 2248           | 1893           | verbosity_drift
+R-017  | P-817     | reasoning_summary    | YES        | YES        | NO         | -38         | 482               | 444               | 2152           | 1840           | none
+R-018  | P-818     | decision_rationale   | YES        | NO         | YES        | -200        | 516               | 316               | 2238           | 1888           | verbosity_drift
+R-019  | P-819     | decision_rationale   | YES        | YES        | NO         | -41         | 488               | 447               | 2162           | 1842           | none
+R-020  | P-820     | evaluation_narrative | YES        | NO         | YES        | -198        | 512               | 314               | 2242           | 1888           | verbosity_drift
+R-021  | P-821     | evaluation_narrative | YES        | YES        | NO         | -42         | 486               | 444               | 2155           | 1840           | none
+R-022  | P-822     | case_narrative       | YES        | NO         | YES        | -195        | 510               | 315               | 2235           | 1885           | verbosity_drift
+R-023  | P-823     | case_narrative       | YES        | YES        | NO         | -40         | 484               | 444               | 2152           | 1838           | none
+R-024  | P-824     | case_narrative       | YES        | NO         | YES        | -203        | 518               | 315               | 2245           | 1892           | verbosity_drift
+R-025  | P-825     | case_narrative       | YES        | YES        | NO         | -41         | 485               | 444               | 2155           | 1840           | none
+R-026  | P-826     | decision_memo        | YES        | NO         | YES        | -199        | 514               | 315               | 2240           | 1888           | verbosity_drift
+R-027  | P-827     | decision_memo        | YES        | NO         | YES        | -196        | 510               | 314               | 2235           | 1884           | verbosity_drift
+R-028  | P-828     | decision_memo        | YES        | YES        | NO         | -40         | 484               | 444               | 2152           | 1840           | none
+    </run_log>
+
+    <failure_detail_log>
+R-001 (P-801, reasoning_summary): The `reasoning_chain` field min_length is 300 characters. Old model returned 487 characters. New model returned 142 characters — a 71% reduction. The new model omitted the intermediate reasoning steps and jumped directly to the conclusion. The field reads: "Candidate meets technical bar. Recommend pass." vs the old model's multi-step analysis covering skill gaps, team fit context, and risk factors.
+
+R-003 (P-803, reasoning_summary): The `analysis_narrative` field min_length is 250 characters. Old model returned 398 characters. New model returned 109 characters — a 73% reduction. The new model's output is syntactically valid but semantically sparse: it states the conclusion without supporting evidence. Downstream audit systems that check min_length fail at the schema validation layer.
+
+R-005 (P-805, decision_rationale): The `rationale` field min_length is 200 characters. Old model returned 371 characters. New model returned 118 characters — a 68% reduction. The new model summarized three distinct decision factors into a single sentence rather than elaborating each factor separately as the prompt instructed ("provide separate rationale for each decision factor").
+
+R-006 (P-806, decision_rationale): The `supporting_evidence` field min_length is 180 characters. Old model returned 352 characters. New model returned 97 characters — a 72% reduction. The new model listed evidence items as bullet fragments ("strong Python background; communication concerns; 4 years relevant exp") rather than the full descriptive sentences required.
+
+R-008 (P-808, evaluation_narrative): The `overall_evaluation` field min_length is 220 characters. Old model returned 421 characters. New model returned 128 characters — a 70% reduction. The new model collapsed a multi-paragraph evaluation into a two-sentence summary. Key evaluation dimensions (cultural fit, growth potential, risk factors) were absent from the new model's output.
+
+R-010 (P-810, reasoning_summary): The `reasoning_chain` field min_length is 300 characters. Old model returned 494 characters. New model returned 131 characters — a 73% reduction. Pattern identical to R-001 and R-003: conclusion stated without intermediate reasoning steps.
+
+R-012 (P-812, evaluation_narrative): The `overall_evaluation` field min_length is 220 characters. Old model returned 412 characters. New model returned 117 characters — a 72% reduction. Pattern matches R-008. The tight clustering of output token counts (312-316 tokens for all failing runs) is the clearest signal of a systematic verbosity ceiling.
+
+R-014 (P-814, decision_rationale): The `rationale` field min_length is 200 characters. Old model returned 366 characters. New model returned 121 characters — a 67% reduction. Pattern matches R-005 and R-006. Decision factors listed as comma-separated fragments rather than full explanatory sentences.
+
+R-015 (P-815, evaluation_narrative): The `overall_evaluation` field min_length is 220 characters. Old model returned 419 characters. New model returned 108 characters — a 74% reduction. Most severe verbosity reduction in original battery. New model output: "Candidate demonstrates adequate qualifications. Recommend proceeding." Old model output covered six named evaluation dimensions.
+
+R-016 (P-816, reasoning_summary): The `reasoning_chain` field min_length is 300 characters. Old model returned 516 characters. New model returned 113 characters — a 78% reduction. This is the most severe reduction in the entire battery. New model output contained only the final recommendation: "Evidence supports hiring decision. Technical bar met, culture fit assessed positively." No intermediate reasoning steps present.
+
+R-018 (P-818, decision_rationale): The `supporting_evidence` field min_length is 180 characters. Old model returned 498 characters. New model returned 104 characters — a 79% reduction. New model returned three bullet fragments without the full contextual analysis the prompt required. Pattern matches R-006.
+
+R-020 (P-820, evaluation_narrative): The `overall_evaluation` field min_length is 220 characters. Old model returned 491 characters. New model returned 122 characters — a 75% reduction. New model collapsed five-dimension evaluation to a two-sentence summary. Key dimensions (technical depth, leadership signals, risk assessment) absent from new model's response.
+
+R-022 (P-822, case_narrative): New family. The `case_summary_narrative` field min_length is 280 characters. Old model returned 486 characters. New model returned 118 characters — a 76% reduction. New model stated the case outcome without the background context, contributing factors, or decision rationale the prompt required. Output: "Claim resolved in claimant's favor based on evidence review." No case facts, no analysis chain.
+
+R-024 (P-824, case_narrative): The `risk_analysis_narrative` field min_length is 240 characters. Old model returned 474 characters. New model returned 113 characters — a 76% reduction. New model: "Risk factors assessed. Low exposure given mitigating circumstances." No enumeration of risk factors, no assessment of mitigating circumstances, no connection to case facts.
+
+R-026 (P-826, decision_memo): New family. The `memo_body` field min_length is 350 characters. Old model returned 489 characters. New model returned 122 characters — a 75% reduction. New model produced a one-paragraph memo ("Decision: approved. Rationale: meets criteria. Next steps: proceed with implementation.") vs the old model's full structured memo with background, analysis, recommendations, and implementation timeline.
+
+R-027 (P-827, decision_memo): The `risk_considerations` field min_length is 200 characters. Old model returned 468 characters. New model returned 108 characters — a 77% reduction. New model: "Standard implementation risks apply. Mitigation plan in place." No enumeration of risks, no specifics on mitigation approach. Field requires detailed risk elaboration.
+    </failure_detail_log>
+
+    <pattern_analysis>
+The verbosity drift pattern in this run set is highly systematic and consistent with the original 15-run battery. Failing runs (R-001,R-003,R-005,R-006,R-008,R-010,R-012,R-014,R-015,R-016,R-018,R-020,R-022,R-024,R-026,R-027) share three characteristics: output token count clusters at 97-131 characters for affected fields (vs 350-524 for old model), reduction percentage ranges from 67-79%, and the failure mode is consistent truncation of intermediate reasoning and contextual elaboration rather than any structural change.
+
+The bimodal distribution of output tokens confirms two discrete behavior modes: passing runs output 444-457 tokens, failing runs output 312-316 tokens. There is no middle ground. This tight clustering in the 312-316 range across all failing runs, regardless of prompt content or task family, suggests the new model has a hard token production ceiling for long-form narrative tasks in this context window configuration.
+
+Two new task families — case_narrative (R-022 through R-025) and decision_memo (R-026 through R-028) — exhibit the same 75-77% verbosity reduction as the original three families. Case_narrative shows the pattern on both the primary narrative field (R-022) and a secondary analysis field (R-024). Decision_memo shows the pattern on both the memo body (R-026) and a separate risk considerations field (R-027). This cross-family replication confirms the failure mechanism is a model-level verbosity preference shift, not prompt-specific compression.
+
+No pre-existing failures exist in this dataset (all 28 runs have old_passed=YES). 16 regressions occurred on 28 previously passing runs — a 57.1% regression rate. Regressions span all five task families: reasoning_summary (4), decision_rationale (4), evaluation_narrative (4), case_narrative (2), decision_memo (2).
+    </pattern_analysis>
+
+    <token_summary>
+Old model (claude-sonnet-4-5):
+  Average output tokens: 500.7
+  Average latency: 2,196 ms
+
+New model (claude-sonnet-4-6):
+  Average output tokens: 372.4
+  Average latency: 1,870 ms
+
+Average token delta: -128.3 tokens per run (-25.6%)
+Average latency delta: -326 ms per run (-14.8%)
+
+Per-task-family breakdown:
+  reasoning_summary:    avg old=506.8, avg new=375.0, delta=-131.8 (-26.0%)
+  decision_rationale:   avg old=503.4, avg new=382.8, delta=-120.6 (-24.0%)
+  evaluation_narrative: avg old=501.2, avg new=378.0, delta=-123.2 (-24.6%)
+  case_narrative:       avg old=495.8, avg new=379.5, delta=-116.3 (-23.5%)
+  decision_memo:        avg old=497.7, avg new=357.7, delta=-140.0 (-28.1%)
+
+Decision_memo shows the largest reduction (28.1%) — the family with both the longest min_length requirements and the most severe failing-run truncation. The 25.6% average reduction across all families is driven entirely by the 16 failing runs producing ~313 tokens vs the old model's ~503 tokens. Passing runs show a moderate 40-45 token reduction that does not violate any min_length constraints.
+    </token_summary>
+
+    <family_summary>
+task_family          | total_runs | regressions | regression_rate | dominant_failure_type
+reasoning_summary    | 7          | 4           | 57.1%           | verbosity_drift (conclusion_without_reasoning)
+decision_rationale   | 7          | 4           | 57.1%           | verbosity_drift (fragment_lists_replace_prose)
+evaluation_narrative | 7          | 4           | 57.1%           | verbosity_drift (multi-dim_collapse_to_summary)
+case_narrative       | 4          | 2           | 50.0%           | verbosity_drift (outcome_without_context)
+decision_memo        | 3          | 2           | 66.7%           | verbosity_drift (memo_body_truncation)
+    </family_summary>
+  </run_data>
+
+  <instructions>
+    <role>You are a senior QA engineer analyzing benchmark run data to produce an objective diagnostic report on model migration quality. All findings must be grounded in the specific run data provided above. Your report will inform an engineering go/no-go migration decision.</role>
+
+    <domain_context>
+      This benchmark evaluates verbosity compliance: whether the new model meets minimum length requirements on narrative and reasoning fields. Verbosity drift failures are structurally correct — the field type, key presence, and JSON structure are valid — but the field content is too short to satisfy min_length schema constraints.
+
+      This is a claude pair migration (claude-sonnet-4-5 → claude-sonnet-4-6), distinct from gemini pair runs. The failure mechanism is completely different: instead of structural type collapses or enum violations, the new claude model compresses long-form narrative fields by 67-79%, falling below min_length constraints.
+
+      Regression rate formula: regressions / (runs where old_passed=YES) * 100
+      This dataset has no pre-existing failures (all 28 runs have old_passed=YES).
+      Denominator = 28.
+    </domain_context>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — scan run_log and extract all valid run IDs (R-001 through R-028).
+      Build this list BEFORE writing any FailurePattern.
+
+      WRONG: example_run_ids=["R-029"] when run_log ends at R-028. VIOLATION.
+      WRONG: example_run_ids=[] when 4 examples exist for reasoning_summary. VIOLATION.
+      RIGHT: example_run_ids=["R-001", "R-003", "R-010", "R-016"] — all visible in run_log.
+    </gate_check>
+
+    <cross_field_rules priority="CRITICAL">
+      1. failure_patterns non-empty → priority_fixes ≥ 2 items.
+      2. Every FailurePattern.example_run_ids must have ≥ 1 run ID from run_log.
+      3. consistency_vs_accuracy_note must address BOTH format consistency AND value accuracy.
+         Note: for verbosity_drift failures, field structure is consistent — the failure is content depth.
+         RIGHT: "Output format and structure consistent (correct keys, valid JSON, correct field types). Content accuracy degraded — 16 runs produced narrative fields 67-79% shorter than required, failing min_length constraints."
+      4. regression_by_family must list all 5 task_families.
+      5. FamilyBreakdown.rate_pct = regression_count / total_count * 100, within ±1%.
+      6. regression_rate_pct > 50.0 → recommended_action CANNOT be "proceed_migration".
+         57.1% → "block_migration".
+    </cross_field_rules>
+
+    <evidence_rule priority="CRITICAL">
+      WRONG: Citing 60% regression rate when data shows 16/28 = 57.1%. VIOLATION.
+      RIGHT: "16 regressions out of 28 previously passing runs (57.1%)."
+      When describing verbosity failures, cite the specific reduction percentage and min_length threshold from failure_detail_log (e.g., "67-79% reduction, violating min_length constraints of 180-350 characters").
+    </evidence_rule>
+
+    <field_definitions>
+      <field name="executive_summary" type="string" required="true" min_length="80" max_words="100">
+        Must include: 28 total runs, 28 previously passing, 16 regressions, 57.1% rate, verbosity_drift dominant, block_migration.
+        Context: claude-sonnet-4-5 → claude-sonnet-4-6 migration; failure is content compression, not structural.
+      </field>
+
+      <field name="metrics" type="list[MetricSummary]" required="true">
+        Include: regression_rate_pct, avg_token_delta, avg_latency_delta_ms, total_regressions.
+        interpretation: min 20 chars, max 35 words.
+        Key metric: avg_token_delta of -128.3 tokens (-25.6%) is highest in the entire benchmark battery.
+      </field>
+
+      <field name="failure_patterns" type="list[FailurePattern]" required="true">
+        Primary pattern: verbosity_ceiling — the new model produces 312-316 tokens for failing runs regardless of prompt content, suggesting a hard token budget limit.
+        Each pattern: ≥1 run ID in example_run_ids, root_cause min 35 chars, recommendation min 35 chars.
+      </field>
+
+      <field name="consistency_vs_accuracy_note" type="string" required="true" min_length="50" max_words="70">
+        Key insight: structure and format consistent, content depth insufficient. Both dimensions required.
+      </field>
+
+      <field name="priority_fixes" type="list[str]" required="true" min_items="2">
+        Verbosity-specific fixes: explicit minimum length instructions per field.
+        RIGHT: ["Add explicit character count requirement per narrative field: 'reasoning_chain must be at least 300 characters — include each intermediate step separately'", "Add WRONG/RIGHT example showing truncated vs full reasoning chain for each affected field type"]
+      </field>
+
+      <field name="recommended_action" type="string" required="true">
+        regression_rate_pct = 16/28*100 = 57.14% > 50% → MUST be "block_migration".
+      </field>
+
+      <field name="regression_rate_pct" type="float" required="true">
+        = 16/28*100 = 57.14. All 28 runs have old_passed=YES.
+      </field>
+
+      <field name="regression_by_family" type="list[FamilyBreakdown]" required="true">
+        5 families: reasoning_summary(7 rows), decision_rationale(7 rows), evaluation_narrative(7 rows), case_narrative(4 rows), decision_memo(3 rows).
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Step 1 — Inventory run_log:
+        Previously passing: all 28 runs (no pre-existing failures)
+        Regressions (old=YES, new=NO): R-001,R-003,R-005,R-006,R-008,R-010,R-012,R-014,R-015,R-016,R-018,R-020,R-022,R-024,R-026,R-027 = 16 runs
+        Families: reasoning_summary, decision_rationale, evaluation_narrative, case_narrative, decision_memo
+
+      Step 2 — regression_rate_pct = 16/28*100 = 57.14
+
+      Step 3 — Group regressions by failure mechanism:
+        verbosity_ceiling (conclusion_only): R-001,R-003,R-010,R-016 (reasoning_summary — steps omitted)
+        verbosity_ceiling (fragment_lists): R-005,R-006,R-014,R-018 (decision_rationale — fragments replace prose)
+        verbosity_ceiling (multi-dim_collapse): R-008,R-012,R-015,R-020 (evaluation_narrative — summary replaces dimensions)
+        verbosity_ceiling (new families): R-022,R-024 (case_narrative), R-026,R-027 (decision_memo)
+        All share same root cause: model produces 312-316 tokens max for these task types.
+
+      Step 4 — FamilyBreakdown:
+        reasoning_summary: R-001,R-002,R-003,R-010,R-013,R-016,R-017 = 7 rows, regressions=R-001,R-003,R-010,R-016 = 4 → 4/7=57.1%
+        decision_rationale: R-004,R-005,R-006,R-011,R-014,R-018,R-019 = 7 rows, regressions=R-005,R-006,R-014,R-018 = 4 → 4/7=57.1%
+        evaluation_narrative: R-007,R-008,R-009,R-012,R-015,R-020,R-021 = 7 rows, regressions=R-008,R-012,R-015,R-020 = 4 → 4/7=57.1%
+        case_narrative: R-022,R-023,R-024,R-025 = 4 rows, regressions=R-022,R-024 = 2 → 2/4=50.0%
+        decision_memo: R-026,R-027,R-028 = 3 rows, regressions=R-026,R-027 = 2 → 2/3=66.7%
+
+      Step 5 — recommended_action: 57.14% > 50% → "block_migration"
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Wrong denominator: all 28 runs have old_passed=YES so denominator=28.
+      ERROR 2 — Hallucinated run IDs: run_log is R-001 through R-028 only.
+      ERROR 3 — Missing families: case_narrative and decision_memo required in regression_by_family.
+      ERROR 4 — rate_pct arithmetic: decision_memo has 3 rows (R-026,R-027,R-028), 2 regressions → 2/3*100=66.7.
+      ERROR 5 — Describing verbosity_drift as a structural failure — it is a content depth failure; structure is correct.
+      ERROR 6 — consistency_vs_accuracy_note ignores format consistency (format is actually fine in this dataset).
+      ERROR 7 — recommended_action="conditional_proceed" when rate=57.1%. Schema rejects.
+      ERROR 8 — Not distinguishing between passing runs (444-457 tokens, moderate reduction) and failing runs (312-316 tokens, severe reduction) — bimodal distribution is a key diagnostic signal.
+    </common_errors>
+
+    <output_format_template>
+      Return valid JSON matching DiagnosticReport schema exactly.
+
+      {
+        "executive_summary": "min 80 chars — 28 total runs (all 28 previously passing), 16 regressions, 57.1%, verbosity_drift (content compression to 312-316 tokens per run), block_migration. claude pair migration.",
+
+        "metrics": [
+          {"metric_name": "regression_rate_pct", "value": "57.1%", "interpretation": "min 20 chars"},
+          {"metric_name": "avg_token_delta", "value": "-128.3 tokens (-25.6%)", "interpretation": "..."},
+          {"metric_name": "avg_latency_delta_ms", "value": "-326 ms", "interpretation": "..."},
+          {"metric_name": "total_regressions", "value": "16", "interpretation": "..."}
+        ],
+
+        "failure_patterns": [
+          {
+            "pattern_name": "verbosity_ceiling",
+            "frequency": "16/28 runs",
+            "example_run_ids": ["R-001", "R-005", "R-008", "R-016", "R-022"],
+            "root_cause": "min 35 chars — new model applies a ~313 token ceiling on long-form narrative fields...",
+            "recommendation": "min 35 chars"
+          }
+        ],
+
+        "consistency_vs_accuracy_note": "min 50 chars, max 70 words — BOTH structure consistency (fine) and content accuracy (degraded)",
+
+        "priority_fixes": ["fix 1 — explicit min_length instruction per field", "fix 2 — WRONG/RIGHT examples for each narrative field type"],
+
+        "recommended_action": "block_migration",
+
+        "regression_rate_pct": 57.14,
+
+        "regression_by_family": [
+          {"task_family": "reasoning_summary",    "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "decision_rationale",   "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "evaluation_narrative",  "regression_count": 4, "total_count": 7, "rate_pct": 57.1},
+          {"task_family": "case_narrative",        "regression_count": 2, "total_count": 4, "rate_pct": 50.0},
+          {"task_family": "decision_memo",         "regression_count": 2, "total_count": 3, "rate_pct": 66.7}
+        ]
+      }
+    </output_format_template>
+
+    <pre_emit_check priority="CRITICAL">
+      1. All run IDs in example_run_ids exist in run_log (R-001 through R-028).
+      2. No example_run_ids list is empty.
+      3. priority_fixes has ≥ 2 items.
+      4. consistency_vs_accuracy_note addresses BOTH dimensions.
+      5. executive_summary ≥ 80 characters.
+      6. Each FailurePattern.root_cause ≥ 35 characters.
+      7. Each FailurePattern.recommendation ≥ 35 characters.
+      8. All MetricSummary.interpretation ≥ 20 characters.
+      9. regression_rate_pct = 16/28*100 = 57.14 (denominator=28).
+      10. recommended_action = "block_migration" (57.1% > 50%).
+      11. regression_by_family has exactly 5 entries.
+      12. Each rate_pct within ±1% of regression_count/total_count*100.
+
+      WRONG: regression_rate_pct=60.0 (16/28 is not 60%) — actual is 57.14. VIOLATION.
+      WRONG: describing verbosity_drift as "schema_adherence" — these are distinct failure types.
+      WRONG: recommended_action="conditional_proceed" when rate=57.1%. Schema rejects.
+    </pre_emit_check>
+
+    <output_schema>
+      Return DiagnosticReport JSON. All fields required. example_run_ids must contain only IDs from run_log (R-001 through R-028). priority_fixes must have at least 2 items. regression_by_family must have 5 entries.
+    </output_schema>
+  </instructions>
+</prompt>

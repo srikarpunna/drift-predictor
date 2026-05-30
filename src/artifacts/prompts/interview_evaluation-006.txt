@@ -1,0 +1,243 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <role>ML Engineer (Senior)</role>
+      <interview_type>technical</interview_type>
+      <interviewer>Priya Nair (Principal ML Engineer)</interviewer>
+      <candidate>Lisa Park</candidate>
+      <duration>62 minutes</duration>
+    </metadata>
+    <dialogue>
+[00:01] Priya (Interviewer): Lisa, welcome. Let's get into it. Walk me through a production ML system you built end-to-end — something non-trivial.
+
+[00:02] Lisa (Candidate): Sure, yes. At my last company — Axon Analytics — I built our recommendation engine. It used collaborative filtering and we deployed it to production. It handled a lot of traffic and the business loved it. I was the main person driving it.
+
+[00:03] Priya (Interviewer): Can you be more specific? What was the data scale, latency budget, how did you handle cold start?
+
+[00:04] Lisa (Candidate): The data was pretty large — millions of rows. Latency was fine, we kept it under our SLA. For cold start we used content-based fallback, which is a standard approach. I designed that part myself.
+
+[00:05] Priya (Interviewer): What was the actual latency SLA? And how large is "millions of rows"?
+
+[00:06] Lisa (Candidate): I don't remember the exact number off the top of my head. It was in the range the product team was happy with. The dataset was somewhere around, I'd say, fifty to a hundred million rows? I'd need to check the exact figure.
+
+[00:07] Priya (Interviewer): Okay. Let's talk about model serving. How did you handle versioning and rollback in that system?
+
+[00:08] Lisa (Candidate): We had a versioning system. When a new model was ready we'd deploy it and if something went wrong we could roll back. We used a blue-green deployment style, I believe. I was involved in the deployment process though the DevOps team handled most of that infrastructure.
+
+[00:10] Priya (Interviewer): Tell me about a time a model you shipped degraded in production. What happened?
+
+[00:11] Lisa (Candidate): Yes, we had an issue once where the model performance went down. The metrics dropped and we had to investigate. We found it was a data drift issue — the input distribution shifted. It was a pretty classic scenario. We retrained and it was resolved.
+
+[00:12] Priya (Interviewer): What metrics dropped? By how much? How long did it take you to detect and resolve?
+
+[00:13] Lisa (Candidate): I think precision dropped — or maybe recall, I'd have to look back at the dashboards. It was noticeable enough that the business raised a flag. We resolved it within a couple of weeks. I was part of the team that fixed it.
+
+[00:15] Priya (Interviewer): Let's go to fundamentals. Explain gradient boosting to me — how does it differ from bagging?
+
+[00:16] Lisa (Candidate): Gradient boosting builds trees sequentially where each tree corrects the errors of the previous one. Bagging, like random forests, builds trees in parallel and aggregates them. Gradient boosting is generally more accurate but prone to overfitting if you're not careful with hyperparameters.
+
+[00:17] Priya (Interviewer): Good. What loss function does gradient boosting minimize and how does the gradient connect to that?
+
+[00:18] Lisa (Candidate): It minimizes a loss function — typically mean squared error for regression or log loss for classification. The gradient tells you the direction to move. Each new tree fits the residuals of the previous prediction, which is related to the negative gradient. The math gets fairly involved.
+
+[00:20] Priya (Interviewer): "Related to" — can you be more precise? What exactly does the tree in each boosting round fit?
+
+[00:21] Lisa (Candidate): It fits the residuals, essentially the errors. The gradient gives you those residuals in the general case. I know the theory well but I'm more of a practitioner — I work with the frameworks and know when to apply what.
+
+[00:22] Priya (Interviewer): Understood. Let's go to feature engineering. You mentioned collaborative filtering. Walk me through how you handled sparse user-item matrices at scale.
+
+[00:23] Lisa (Candidate): Sparse matrices are a challenge. We used sparse matrix representations — CSR format I believe — and did matrix factorization using ALS, Alternating Least Squares. That's a standard approach. We had good results with it.
+
+[00:25] Priya (Interviewer): What were the embedding dimensions you chose and why? What was the tradeoff?
+
+[00:26] Lisa (Candidate): We experimented with different values — I think we landed somewhere around 50 to 100 dimensions. Larger embeddings capture more but are computationally heavier. We did some grid search to find a good balance.
+
+[00:27] Priya (Interviewer): Did you run any ablation studies? What did the results show?
+
+[00:28] Lisa (Candidate): We ran experiments. I was not personally running all of the ablations — we had a data scientist on the team who owned that part. The results showed the configuration we chose performed best on our validation set.
+
+[00:30] Priya (Interviewer): Let's shift to a practical problem. You have a binary classifier that scores 98% accuracy on the test set. Stakeholders are excited. What are your concerns?
+
+[00:31] Lisa (Candidate): I'd check for class imbalance first. If 98% of your labels are one class then 98% accuracy is trivial. I'd also look at precision and recall separately, and check if the test set is representative.
+
+[00:32] Priya (Interviewer): Good. What specifically would you do to evaluate whether the test set is representative?
+
+[00:33] Lisa (Candidate): I'd look at the distribution of features and compare to production data. If there's drift between training data and what the model sees in production, the metric won't hold up. I'd do exploratory analysis and some statistical tests.
+
+[00:34] Priya (Interviewer): Which statistical tests?
+
+[00:35] Lisa (Candidate): KS test is a common one. PSI — Population Stability Index. These are standard drift detection approaches. I've used them in monitoring pipelines.
+
+[00:37] Priya (Interviewer): Tell me about a specific time you found a flaw in your own approach — something you got wrong technically and had to unlearn.
+
+[00:38] Lisa (Candidate): Early in my career I over-relied on accuracy as the main metric for classification problems. It took a project where we had very imbalanced classes — fraud detection — for me to realize that accuracy is misleading. After that I always start with precision, recall, and AUC-ROC. That was an important mindset shift.
+
+[00:40] Priya (Interviewer): What model were you using in that fraud detection work and what changes did you specifically make?
+
+[00:41] Lisa (Candidate): I was using a random forest. We resampled the training data using SMOTE and switched to evaluating on F1 and AUC. That improved our ability to catch fraud cases. The exact lift I don't remember precisely.
+
+[00:43] Priya (Interviewer): Let's talk about transformers. You listed them on your resume under "deep learning." Describe how self-attention works.
+
+[00:44] Lisa (Candidate): Self-attention allows each token to attend to every other token in the sequence. You compute query, key, and value vectors from the input and do a scaled dot product to get attention weights. Those weights are applied to the values to produce the output. It captures long-range dependencies better than RNNs.
+
+[00:46] Priya (Interviewer): Why do we scale the dot product?
+
+[00:47] Lisa (Candidate): To prevent the dot products from getting too large in high-dimensional space, which would push the softmax into regions with very small gradients. Dividing by the square root of the key dimension stabilizes training.
+
+[00:48] Priya (Interviewer): Correct. Have you fine-tuned a transformer in production?
+
+[00:49] Lisa (Candidate): I've worked with pre-trained models and applied them. Fine-tuning at scale is something I've done in a research context. In production at Axon we used embeddings from a pre-trained BERT model as features for a downstream classifier, which worked well.
+
+[00:51] Priya (Interviewer): What did you fine-tune it on and what did the training loop look like?
+
+[00:52] Lisa (Candidate): I'd have to look back at that work. It was more of a side exploration. The embeddings extraction pipeline was the main production artifact I owned on that project.
+
+[00:54] Priya (Interviewer): How do you think about monitoring a model post-deployment beyond accuracy metrics?
+
+[00:55] Lisa (Candidate): You want to monitor for data drift on inputs, track prediction distribution over time, and have alerting on key business metrics that the model affects. Feature-level drift signals degradation before it shows up downstream. We had dashboards for this at Axon.
+
+[00:57] Priya (Interviewer): What triggered the alert in your drift incident earlier? Was it a statistical monitor or a business KPI flag?
+
+[00:58] Lisa (Candidate): It was a business KPI flag that the product team noticed. We didn't have a fully automated statistical monitor in place at that point. After the incident we improved our monitoring setup, though I moved to another team before seeing the full implementation through.
+
+[01:00] Priya (Interviewer): Do you have questions for me?
+
+[01:01] Lisa (Candidate): Yes — what does the team's tech stack look like and what ML frameworks do you use most? And what's the biggest challenge the team is facing right now?
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    <role>You are a senior hiring panel evaluator. Your role is to produce an objective, evidence-based evaluation of the interview transcript above. All scores must be grounded in direct transcript evidence.</role>
+
+    <gate_check priority="CRITICAL">
+      MANDATORY FIRST STEP — before scoring any checkpoint:
+      Determine interview_type from the transcript metadata. This controls applicability of entire checkpoint clusters.
+
+      WRONG: Scoring C-09 as Y or N on a behavioral interview.
+      RIGHT: C-09 score="N/A" on a behavioral interview, excerpt="" (empty string).
+
+      WRONG: Scoring C-14 as Y or N when interview_type is not "final".
+      RIGHT: C-14 score="N/A" on a technical interview, excerpt="".
+    </gate_check>
+
+    <scoring_guide>
+- Y (Yes): Clearly and specifically observed in the transcript
+- N (No): Expected behavior was not observed or was explicitly absent
+- N/A (Not Applicable): Checkpoint does not apply — state reason in reasoning field, set excerpt to ""
+    </scoring_guide>
+
+    <excerpt_format priority="CRITICAL">
+      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+
+      For Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
+      For N/A score: excerpt = "" (empty string — not "N/A", not null, not omitted)
+
+      WRONG: "[00:24] Sarah: We reduced defects — this shows ownership and accountability"
+      RIGHT: "[00:24] Sarah: We brought defect count from 140 to 22 in one quarter"
+
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
+      RIGHT: N/A checkpoint with excerpt=""
+    </excerpt_format>
+
+    <applicability_rules>
+- C-01 through C-08: Always applicable for all interview types
+- C-09, C-10: Applicable only if interview_type is "technical" — mark N/A with explanation for behavioral interviews
+- C-11, C-12, C-13 (Leadership cluster): Applicable only if candidate explicitly mentioned managing direct reports or leading a team of 2+ people
+- C-14, C-15: Applicable only if interview_type is "final"
+- C-16: Applicable only if candidate described a situation involving conflict with a peer, stakeholder, or manager
+- C-17: Always applicable
+- C-18, C-19: Applicable only if interview_type is "technical"
+- C-20: Always applicable
+    </applicability_rules>
+
+    <scoring_decision_tree priority="CRITICAL">
+      Before writing overall_recommendation, evaluate IN ORDER. First match wins — do not skip to a later step if an earlier one applies.
+
+      1. AUTO-DOWNGRADE — NO_HIRE:
+         If C-01 is scored N (no concrete examples provided) → overall_recommendation = "no_hire"
+         regardless of all other scores. STOP. Do not evaluate further steps.
+         WRONG: C-01=N but overall_recommendation="hold". VIOLATION — schema will reject this.
+         RIGHT: C-01=N → overall_recommendation="no_hire". STOP.
+
+      2. LEADERSHIP DEPENDENCY — HOLD CEILING:
+         If ANY checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N →
+         overall_recommendation cannot be "hire" unless ALL of C-01 through C-08 are scored Y.
+         If that condition is not met → maximum recommendation is "hold".
+         WRONG: C-12=N, C-03=N, overall_recommendation="hire". VIOLATION.
+         RIGHT: C-12=N, C-03=N → overall_recommendation="hold".
+
+      3. HIRE: All C-01 through C-08 scored Y, no Leadership cluster failures.
+
+      4. HOLD: Mixed evidence — some Y, some N, no auto-downgrade triggered, leadership dependency not violated.
+
+      5. NO_HIRE: Majority of core checkpoints (C-01–C-08) scored N, or auto-downgrade from step 1.
+    </scoring_decision_tree>
+
+    <dependency_rules>
+CROSS-FIELD DEPENDENCY RULE:
+If any checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N, overall_recommendation cannot be "hire" unless ALL checkpoints in C-01 through C-08 are scored Y. If this condition is not met, maximum recommendation is "hold".
+
+AUTO-DOWNGRADE RULE:
+If C-01 is scored N (no concrete examples provided), overall_recommendation must be "no_hire" regardless of all other scores. This is enforced by schema validation — any other value will be rejected.
+    </dependency_rules>
+
+    <field_caps priority="HIGH">
+      HARD WORD CAPS — plan each field before writing. If your draft exceeds the cap, shorten the observation. Do NOT go over.
+      - reasoning (CheckpointResult): state observation + evidence, then STOP. ≤ 40 words. HARD CAP.
+      - reasoning (QualityArea): ≤ 45 words. HARD CAP.
+      - summary: covers overall impression, key strengths, key concerns. ≤ 80 words. HARD CAP.
+    </field_caps>
+
+    <checkpoints>
+C-01: Did candidate provide specific, concrete examples with named details (project names, metrics, timelines, dollar amounts)?
+C-02: Did candidate demonstrate clear personal ownership and accountability for outcomes, including negative ones?
+C-03: Did candidate articulate measurable business impact tied to their specific actions?
+C-04: Did candidate show genuine self-awareness about failures and articulate what they specifically changed afterward?
+C-05: Did candidate communicate clearly, structuring answers logically without excessive jargon?
+C-06: Did candidate demonstrate ability to work effectively across functions or with stakeholders outside their team?
+C-07: Did candidate show evidence of independent judgment or decision-making under ambiguity?
+C-08: Did candidate demonstrate awareness of how their work connects to broader business goals?
+C-09: [Technical only] Did candidate accurately explain technical concepts and demonstrate appropriate depth for the role level?
+C-10: [Technical only] Did candidate identify tradeoffs and constraints in their technical approach?
+C-11: [Leadership, if applicable] Did candidate describe a specific situation where they developed or coached a team member?
+C-12: [Leadership, if applicable] Did candidate demonstrate ability to set direction and hold a team accountable?
+C-13: [Leadership, if applicable] Did candidate show awareness of team dynamics, motivation, or engagement challenges?
+C-14: [Final round only] Did candidate demonstrate strategic thinking beyond their immediate team or function?
+C-15: [Final round only] Did candidate show alignment with long-term organizational direction or values?
+C-16: [If conflict described] Did candidate navigate the conflict constructively without blaming others?
+C-17: Did candidate ask at least one substantive, role-specific question at the end of the interview?
+C-18: [Technical only] Did candidate demonstrate debugging or problem-solving methodology, not just solutions?
+C-19: [Technical only] Did candidate show awareness of system-level implications of their technical decisions?
+C-20: Did candidate show genuine, specific interest in this role beyond generic interest in the company?
+    </checkpoints>
+
+    <quality_areas>
+QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
+- Opening: How the candidate established presence and context in early responses
+- Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
+- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Closing: Quality of questions asked and engagement level at end of interview
+    </quality_areas>
+
+    <pre_emit_check priority="CRITICAL">
+      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+
+      1. Did C-01 score N? If yes, overall_recommendation MUST be "no_hire". Fix if not — schema will reject any other value.
+      2. Did any Leadership cluster checkpoint (C-11, C-12, C-13) score N AND any C-01–C-08 score N?
+         If yes, overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
+      3. All N/A checkpoints have excerpt = "" (empty string — not "N/A", not null, not omitted).
+      4. All Y/N checkpoints have excerpt = "[HH:MM] CandidateName: exact quote" (not empty).
+      5. overall_recommendation is exactly one of: "hire", "no_hire", "hold".
+      6. summary is at least 50 characters.
+
+      WRONG: overall_recommendation="hire" but C-01=N. SELF-CONTRADICTION. Schema will reject.
+      WRONG: N/A checkpoint with excerpt="Not applicable — final round only". VIOLATION. Set to "".
+      WRONG: Y checkpoint with excerpt="". VIOLATION. Must include verbatim quote.
+    </pre_emit_check>
+
+    <output_schema>
+Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+    </output_schema>
+  </instructions>
+</prompt>

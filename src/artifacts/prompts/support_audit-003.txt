@@ -33,133 +33,179 @@
 [00:04:15] Priya Shah (Agent): Your bypass code is DELTA-7-7-4-SIERRA-2. I'll say that again: DELTA-7-7-4-SIERRA-2. Once you're logged in, go to Account Settings, then Security, then Two-Factor Authentication. You can set up an authenticator app from there.
 [00:04:32] Marcus Lee (Customer): Got it, let me try it... okay, I'm in. That worked perfectly.
 [00:04:39] Priya Shah (Agent): Excellent. While you're still on the line, do you want me to stay with you while you set up the authenticator app, or are you comfortable doing that on your own?
-[00:04:47] Marcus Lee (Customer): I should be fine — I've used Google Authenticator before. This is really helpful.
-[00:04:52] Priya Shah (Agent): Great. Just to summarize: you were locked out due to carrier-side SMS blocking on short codes. We resolved it with a one-time bypass and you'll be switching to an authenticator app for 2FA going forward, which will prevent this from happening again. Is there anything else I can help you with today?
-[00:05:06] Marcus Lee (Customer): No, that's everything. Thanks for being so thorough, Priya.
-[00:05:10] Priya Shah (Agent): My pleasure, Marcus. Thank you for calling Horizon Cloud — have a wonderful day. Goodbye.
-[00:05:15] Marcus Lee (Customer): Thanks. Bye.
-[00:05:17] [CALL END]
-[00:05:52] [WRAP-UP COMPLETE — 35 seconds post-call]
+[00:04:47] Marcus Lee (Customer): I should be fine — I've used Google Authenticator before. Actually, can you quickly walk me through the setup in case I forget a step?
+[00:04:54] Priya Shah (Agent): Of course. Go to Account Settings — you should see a gear icon at the top right. Then click Security in the left sidebar. You'll see a section called Two-Factor Authentication — click Edit. On the method selection screen, choose Authenticator App. A QR code will appear. Open Google Authenticator on your phone, tap the plus icon at the bottom right, then select Scan a QR Code. Point your camera at the code on screen. It'll add a Horizon Cloud entry showing a six-digit rotating code. Enter that code on the website to confirm setup and you're done.
+[00:05:26] Marcus Lee (Customer): Got it. And what happens to my old SMS setup — does it just disappear?
+[00:05:31] Priya Shah (Agent): Once you save the authenticator app as your method, the SMS option will be deactivated automatically. The phone number stays on your account for other purposes but won't be used for 2FA. You can always re-enable SMS later from the same Security settings page if you need to.
+[00:05:46] Marcus Lee (Customer): Okay. One more question — I noticed the bypass code was only good for 15 minutes. What if I had taken longer to log in?
+[00:05:54] Priya Shah (Agent): The 15-minute window is a security precaution — if the code expires before you use it, I can generate another one for you. There's no limit on how many times we can do that during a support call. The window is intentionally short to prevent someone intercepting it.
+[00:06:07] Marcus Lee (Customer): Makes sense. Thanks for being so thorough, Priya. This is really helpful.
+[00:06:12] Priya Shah (Agent): My pleasure. Just to summarize before we wrap up: you were locked out due to carrier-side SMS blocking on short codes. We resolved it with a one-time bypass code. You'll be switching to Google Authenticator for 2FA, which will prevent this from happening again. Is there anything else I can help you with today?
+[00:06:28] Marcus Lee (Customer): No, that's everything.
+[00:06:31] Priya Shah (Agent): Great. Thank you for calling Horizon Cloud, Marcus — have a wonderful day. Goodbye.
+[00:06:36] Marcus Lee (Customer): Thanks. Bye.
+[00:06:38] [CALL END]
+[00:07:11] [WRAP-UP COMPLETE — 33 seconds post-call]
     </dialogue>
   </transcript>
 
   <instructions>
     <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
 
+    <domain_context>
+      You are auditing a customer support agent for a SaaS company. Two auditors reviewing the same call must reach identical compliance scores.
+
+      The ticket_type determination controls which checks apply. Determine it before scoring anything.
+
+      This is a technical support call (2FA SMS lockout → bypass code + authenticator app guidance). C-08 (troubleshooting sequence) is applicable. C-11 (retention disclosure) is N/A — no billing topic, no cancellation mentioned.
+    </domain_context>
+
     <gate_check priority="CRITICAL">
-      MANDATORY FIRST STEP — before evaluating any compliance check:
-      Determine ticket_type from call content. This controls which checks are applicable.
-      Make this determination BEFORE scoring any check.
+      MANDATORY FIRST STEP — determine ticket_type before scoring any check.
 
-      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
-      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
-      - "account": customer issue involves profile settings, name/email changes, plan management
-      - "general": does not fit above categories
-
-      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
-      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
+      - "billing": charges, invoices, refunds, fees, subscription changes
+      - "technical": product errors, features not working, login failures, API issues
+      - "account": profile settings, name/email changes, plan management
+      - "general": product inquiries, no account access required
 
       WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
       RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
     </gate_check>
 
     <compliance_scoring>
-      - Y: Check was completed as required
-      - N: Check was required but not completed
-      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+      Y: Check completed as required. N: Required but not completed. N/A: Not applicable — evidence explains why (min 10 chars).
     </compliance_scoring>
 
     <grading_decision_tree priority="CRITICAL">
-      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+      Evaluate IN ORDER. First match wins.
 
-      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
-         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
-         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
-         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
-         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+      1. AUTO-DOWNGRADE FAIL:
+         C-01=N → overall_grade="FAIL". STOP.
+         C-02=N AND ticket_type="billing" → overall_grade="FAIL". STOP.
 
-      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+      2. FAIL: Auto-downgrade, OR two+ applicable checks scored N.
 
-      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+      3. COACH: Exactly one applicable N, or one QualityDimension rated R.
 
-      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+      4. PASS: All applicable checks Y, no R quality dimension.
     </grading_decision_tree>
 
     <escalation_rule priority="CRITICAL">
-      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
-      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
-      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+      escalation_required=true ONLY if: C-01=N, C-02=N, or customer explicitly requested a supervisor.
+      If false → escalation_reason MUST be null.
 
-      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
-      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
-      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      WRONG: escalation_required=false, escalation_reason="No escalation needed". Schema rejects.
       RIGHT: escalation_required=false, escalation_reason=null.
     </escalation_rule>
 
     <evidence_purity priority="CRITICAL">
-      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
-      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
-      evidence min length = 10 characters. Empty string will fail schema validation.
-
-      WRONG: "Agent greeted customer professionally and identified themselves clearly"
-      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
-
-      WRONG: "N/A" (too short, 3 chars)
-      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+      Every evidence field: verbatim quote or specific timestamp. No paraphrase.
+      N/A evidence: factual reason, min 10 chars.
     </evidence_purity>
 
     <compliance_checks>
-      C-01: Agent stated their name at the start of the call — ALWAYS applicable
-      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
-      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
-      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
-      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
-      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
-      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
-      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
-      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
-      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
-      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
-      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+      C-01: Agent stated their name at the start — ALWAYS applicable
+      C-02: Agent verified identity before accessing account — ALWAYS applicable
+      C-03: Agent disclosed fees, charges, billing implications — ONLY billing
+      C-04: Agent offered escalation — ONLY if customer expressed clear dissatisfaction
+      C-05: Agent delivered proper closing — ALWAYS applicable
+      C-06: Agent placed hold correctly (announced, returned within 2 min, thanked) — ONLY if hold occurred
+      C-07: Agent avoided unauthorized commitments — ALWAYS applicable
+      C-08: Agent followed correct troubleshooting sequence — ONLY technical
+      C-09: Agent offered supervisor escalation when customer expressed frustration — ONLY if customer expressed clear dissatisfaction
+      C-10: Agent confirmed contact info current — ONLY if account changes made
+      C-11: Agent read retention disclosure — ONLY billing AND customer mentioned cancellation/downgrade
+      C-12: Agent completed post-call wrap-up within 60 seconds — ALWAYS applicable
     </compliance_checks>
 
+    <field_definitions>
+      <field name="ticket_type">
+        This call: 2FA lockout, login issue → "technical".
+      </field>
+
+      <field name="hold_event">
+        Hold occurred at [00:01:59], 1:21 duration. Agent announced hold with expected duration ("about 90 seconds"). Agent thanked customer at [00:03:20] ("thanks for holding"). hold_event must be populated (not null).
+        hold_announced=true, hold_duration_seconds=81, thanked_after_hold=true.
+        WRONG: hold_event=null when a hold occurred.
+      </field>
+
+      <field name="followup_required" and "followup_reason">
+        followup_required=false — issue fully resolved during call (bypass code worked, MFA guidance given).
+        followup_reason must be null.
+        WRONG: followup_required=false, followup_reason="No follow-up". Schema rejects.
+      </field>
+
+      <field name="compliance_score_pct">
+        (Y applicable checks)/(Y+N applicable checks)*100. If any N: &lt;100.0.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — Check completed with transcript evidence.
+      N — Required check absent.
+      N/A — Applicability condition absent; evidence must explain (min 10 chars).
+
+      C-08 applicability: technical call. Priya followed structured troubleshooting: confirmed SMS delivery behavior, checked number match, triggered test code, identified carrier blocking from delivery logs, then offered two resolution options. C-08=Y.
+
+      C-03, C-11: N/A — not a billing call, no cancellation mentioned.
+      C-04, C-09: N/A — customer expressed no dissatisfaction.
+      C-10: N/A — no account changes made (agent issued bypass code, did not change account settings).
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — evidence paraphrase:
+        WRONG: evidence="Agent introduced herself at the beginning of the call"
+        RIGHT: evidence="Agent said 'This is Priya Shah' at [00:00:02]"
+
+      ERROR 2 — N/A evidence too short:
+        WRONG: passed="N/A", evidence="N/A"
+        RIGHT: passed="N/A", evidence="Not a billing issue; no fees or charges discussed"
+
+      ERROR 3 — hold_event=null when hold occurred:
+        WRONG: hold_event=null (a hold DID occur at [00:01:59])
+        RIGHT: hold_event={hold_announced: true, hold_duration_seconds: 81, thanked_after_hold: true}
+
+      ERROR 4 — C-06 scored N because hold exceeded 2 minutes:
+        Hold was 1:21 (81 seconds). Agent said "about 90 seconds." C-06=Y — hold was within announced duration AND under 2 minutes.
+
+      ERROR 5 — escalation_reason set when escalation_required=false:
+        WRONG: escalation_required=false, escalation_reason="Customer did not escalate"
+        RIGHT: escalation_required=false, escalation_reason=null
+
+      NOTE (file-specific): Priya Shah (CALL-20240325-011204). Expected grade: PASS. Strong call — systematic troubleshooting, proper hold with announcement and thank, clean resolution (bypass code worked), thorough closing with walkthrough. All applicable checks Y. hold_event must be populated: hold_announced=true, hold_duration_seconds=81, thanked_after_hold=true. followup_required=false (issue fully resolved). escalation_required=false, escalation_reason=null. ticket_type="technical". C-03, C-11=N/A (not billing). C-10=N/A (no account changes made by agent — customer will make changes after call).
+    </common_errors>
+
     <field_caps priority="HIGH">
-      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
-      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
-      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
-      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+      - call_summary: ≤60 words. HARD CAP.
+      - coaching_notes: ≤40 words. HARD CAP.
+      - QualityDimension.evidence: min 20 chars.
     </field_caps>
 
     <quality_dimensions>
       QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
-      - Professionalism: Tone, empathy, language quality throughout the call
-      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
-      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
-      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
-      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+      - Professionalism: Tone, empathy, language quality throughout
+      - Resolution Clarity: Was resolution communicated clearly?
+      - Efficiency: Did agent manage time well and reach resolution without delay?
+      - Empathy: Did agent acknowledge the customer's situation appropriately?
+      - Product Knowledge: Did agent demonstrate accurate knowledge of 2FA and system behavior?
     </quality_dimensions>
 
+    <output_format_template>
+      Return valid SupportCallAudit JSON with all fields. All 12 compliance checks required. 5 quality dimensions required. escalation_reason=null when escalation_required=false. hold_event populated (not null).
+    </output_format_template>
+
     <pre_emit_check priority="CRITICAL">
-      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
-
-      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
-      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
-      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
-      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
-      5. escalation_required = true? → escalation_reason must not be null.
-      6. escalation_required = false? → escalation_reason must be null.
-      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
-      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
-
-      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
-      RIGHT: Two applicable N checks → overall_grade="FAIL".
-
-      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
-      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+      1. ticket_type="technical".
+      2. C-01=N? → overall_grade="FAIL", escalation_required=true.
+      3. Two+ applicable N? → overall_grade="FAIL".
+      4. escalation_required=false → escalation_reason=null.
+      5. followup_required=false → followup_reason=null.
+      6. hold_event NOT null (hold occurred at [00:01:59]).
+      7. Any N check → compliance_score_pct &lt;100.0.
     </pre_emit_check>
 
     <output_schema>
-      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+      Return SupportCallAudit JSON with all fields. evidence min 10 chars on ComplianceCheck. evidence min 20 chars on QualityDimension.
     </output_schema>
   </instructions>
 </prompt>

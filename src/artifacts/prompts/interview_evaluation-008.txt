@@ -35,89 +35,159 @@
 [00:40] Marcus (Interviewer): Fair enough. What questions do you have for us?
 
 [00:41] Maria (Candidate): Two for Marcus — how mature is the current engineering organization's capacity to estimate work reliably, and how does your team currently feel about the product organization's ability to make prioritization decisions they can trust? And one for Elliot: where does the board think the biggest product risk is today?
+
+[00:45] Elliot (Interviewer): One more from me. You mentioned you've been told you're better at short-term than long-term vision. If we hired you and that was still true at 18 months, what would that look like and what would you do about it?
+
+[00:46] Maria (Candidate): I've thought about this. The signal would be: the roadmap is reactive to competitors and customer requests rather than driven by a proactive thesis about where the market is heading. If I'm hearing "we need to respond to X's launch" or "customer Y is asking for Z" as the dominant inputs to planning — rather than "here's our bet on where the category is going and these are the features that build toward it" — that's the tell. What I'd do: first, name it explicitly to you rather than hoping it doesn't get noticed. Second, actively create forcing functions — a quarterly "where is the category in three years" workshop with leadership, external advisor input, committed roadmap space for speculative bets. I've done this in pieces but not systematically. I know the gap and I know roughly what filling it requires.
+
+[00:51] Nina (Interviewer): How do you think about pricing and packaging as a product responsibility?
+
+[00:52] Maria (Candidate): As one I'm under-invested in by most product leaders. Pricing is the translation layer between value delivered and revenue captured. At Prism, packaging was a mess when I joined — one plan with everything, so small customers overpaid and enterprise customers felt no differentiation. I led a packaging redesign over nine months: three tiers, with the mid tier engineered to convert SMB customers who had outgrown Starter but didn't need full Enterprise. I pulled feature usage by account size and found a natural break at 15 seats with three specific features. The redesign launched in Q4 2022. Within two quarters, mid-tier conversion from SMB increased 22% and average contract value for that segment went from $8,400 to $12,600 annually. This was a joint project with the CFO and sales ops — I owned the product tier definition, they owned the pricing model.
     </dialogue>
   </transcript>
 
   <instructions>
     <role>You are a senior hiring panel evaluator. Your role is to produce an objective, evidence-based evaluation of the interview transcript above. All scores must be grounded in direct transcript evidence.</role>
 
+    <domain_context>
+      You are evaluating a candidate for a Head of Product role at a technology company. This is a final-round interview. C-14 and C-15 are applicable. Leadership cluster (C-11, C-12, C-13) applies — this candidate explicitly restructured a PM org and managed a team through a structural change.
+
+      C-04 (self-awareness) requires genuine identification of a failure or limitation with a specific behavioral change afterward. Generic acknowledgments of growth areas do not clear the bar. Maria's disclosure at [00:30] and [00:46] about the long-term vision gap — explicitly acknowledged by two CEOs in feedback — combined with a specific plan to address it, is substantive C-04 evidence.
+    </domain_context>
+
     <gate_check priority="CRITICAL">
       MANDATORY FIRST STEP — before scoring any checkpoint:
-      Determine interview_type from the transcript metadata. This controls applicability of entire checkpoint clusters.
+      This is a final interview. C-14 and C-15 are applicable. C-09, C-10, C-18, C-19 are NOT applicable (not a technical interview).
 
-      WRONG: Scoring C-09 as Y or N on a behavioral interview.
-      RIGHT: C-09 score="N/A" on a behavioral interview, excerpt="" (empty string).
+      WRONG: Scoring C-09 as Y or N on a final interview.
+      RIGHT: C-09 score="N/A" on a final interview, excerpt="".
 
-      WRONG: Scoring C-14 as Y or N when interview_type is not "final".
-      RIGHT: C-14 score="N/A" on a technical interview, excerpt="".
+      WRONG: Scoring C-14 as N/A when interview_type is "final".
+      RIGHT: C-14 applicable — score Y or N based on transcript evidence.
     </gate_check>
 
     <scoring_guide>
 - Y (Yes): Clearly and specifically observed in the transcript
 - N (No): Expected behavior was not observed or was explicitly absent
-- N/A (Not Applicable): Checkpoint does not apply — state reason in reasoning field, set excerpt to ""
+- N/A (Not Applicable): Checkpoint does not apply — set excerpt to ""
     </scoring_guide>
 
     <excerpt_format priority="CRITICAL">
-      EVIDENCE PURITY RULE: Every excerpt that quotes the transcript must be verbatim — no explanation, no interpretation, no paraphrase appended after the quote.
+      EVIDENCE PURITY RULE: Every excerpt must be verbatim — no interpretation appended.
 
-      For Y or N score: excerpt = "[HH:MM] CandidateName: exact quote from transcript"
-      For N/A score: excerpt = "" (empty string — not "N/A", not null, not omitted)
+      For Y or N: excerpt = "[HH:MM] CandidateName: exact quote"
+      For N/A: excerpt = "" (empty string — not "N/A", not null)
 
-      WRONG: "[00:24] Sarah: We reduced defects — this shows ownership and accountability"
-      RIGHT: "[00:24] Sarah: We brought defect count from 140 to 22 in one quarter"
-
-      WRONG: N/A checkpoint with excerpt="Not applicable — final round only"
-      RIGHT: N/A checkpoint with excerpt=""
+      WRONG: "[00:02] Maria: $8M to $19M mid-market ARR — excellent product strategy"
+      RIGHT: "[00:02] Maria: We grew mid-market ARR from $8M to $19M over that period"
     </excerpt_format>
 
     <applicability_rules>
-- C-01 through C-08: Always applicable for all interview types
-- C-09, C-10: Applicable only if interview_type is "technical" — mark N/A with explanation for behavioral interviews
-- C-11, C-12, C-13 (Leadership cluster): Applicable only if candidate explicitly mentioned managing direct reports or leading a team of 2+ people
-- C-14, C-15: Applicable only if interview_type is "final"
-- C-16: Applicable only if candidate described a situation involving conflict with a peer, stakeholder, or manager
+- C-01 through C-08: Always applicable
+- C-09, C-10: N/A — not a technical interview
+- C-11, C-12, C-13 (Leadership cluster): Applicable — candidate managed PM org restructuring
+- C-14, C-15: Applicable — final interview
+- C-16: Applicable if conflict described (restructuring conflict with PM who left)
 - C-17: Always applicable
-- C-18, C-19: Applicable only if interview_type is "technical"
+- C-18, C-19: N/A — not a technical interview
 - C-20: Always applicable
     </applicability_rules>
 
     <scoring_decision_tree priority="CRITICAL">
-      Before writing overall_recommendation, evaluate IN ORDER. First match wins — do not skip to a later step if an earlier one applies.
+      Evaluate IN ORDER. First match wins.
 
       1. AUTO-DOWNGRADE — NO_HIRE:
-         If C-01 is scored N (no concrete examples provided) → overall_recommendation = "no_hire"
-         regardless of all other scores. STOP. Do not evaluate further steps.
-         WRONG: C-01=N but overall_recommendation="hold". VIOLATION — schema will reject this.
-         RIGHT: C-01=N → overall_recommendation="no_hire". STOP.
+         C-01=N → overall_recommendation="no_hire". STOP.
+         WRONG: C-01=N, overall_recommendation="hold". Schema rejects.
 
       2. LEADERSHIP DEPENDENCY — HOLD CEILING:
-         If ANY checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N →
-         overall_recommendation cannot be "hire" unless ALL of C-01 through C-08 are scored Y.
-         If that condition is not met → maximum recommendation is "hold".
-         WRONG: C-12=N, C-03=N, overall_recommendation="hire". VIOLATION.
-         RIGHT: C-12=N, C-03=N → overall_recommendation="hold".
+         Any C-11/C-12/C-13=N AND any C-01–C-08=N → maximum recommendation="hold".
 
-      3. HIRE: All C-01 through C-08 scored Y, no Leadership cluster failures.
+      3. HIRE: All C-01–C-08 scored Y, no Leadership cluster failures.
 
-      4. HOLD: Mixed evidence — some Y, some N, no auto-downgrade triggered, leadership dependency not violated.
+      4. HOLD: Mixed evidence, no auto-downgrade.
 
-      5. NO_HIRE: Majority of core checkpoints (C-01–C-08) scored N, or auto-downgrade from step 1.
+      5. NO_HIRE: Majority of C-01–C-08 scored N or auto-downgrade from step 1.
     </scoring_decision_tree>
 
     <dependency_rules>
-CROSS-FIELD DEPENDENCY RULE:
-If any checkpoint in the Leadership cluster (C-11, C-12, C-13) is scored N, overall_recommendation cannot be "hire" unless ALL checkpoints in C-01 through C-08 are scored Y. If this condition is not met, maximum recommendation is "hold".
-
-AUTO-DOWNGRADE RULE:
-If C-01 is scored N (no concrete examples provided), overall_recommendation must be "no_hire" regardless of all other scores. This is enforced by schema validation — any other value will be rejected.
+AUTO-DOWNGRADE RULE: C-01=N → overall_recommendation="no_hire". Schema validated.
+CROSS-FIELD RULE: panel_recommendation must match overall_recommendation: hire→advance, no_hire→decline, hold→defer.
     </dependency_rules>
 
+    <field_definitions>
+      <field name="overall_recommendation">
+        "hire", "no_hire", or "hold". Derived from decision tree.
+        WRONG: C-01=N, overall_recommendation="hold". Schema rejects.
+      </field>
+
+      <field name="panel_recommendation">
+        hire→advance, no_hire→decline, hold→defer.
+        WRONG: overall_recommendation="hire", panel_recommendation="defer". Schema rejects.
+        RIGHT: overall_recommendation="hire" → panel_recommendation="advance".
+      </field>
+
+      <field name="candidate_level_assessed">
+        "L4", "L5", "L6", "L7", or "unknown".
+        Maria described company-level pricing strategy, PM org restructuring, board-adjacent thinking.
+        WRONG: candidate_level_assessed="Senior PM" — not a permitted value.
+      </field>
+
+      <field name="competency_scores">
+        At least one entry. Schema rejects empty list.
+        Score 1–5. Rationale min 25 chars.
+      </field>
+
+      <field name="excerpt" parent="CheckpointResult">
+        Y/N: verbatim quote ending at quote boundary.
+        N/A: "" (empty string, no explanation).
+      </field>
+
+      <field name="summary">
+        Min 50 chars, max 80 words.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — Named, specific, measurable evidence:
+        Named company + named outcome/metric = Y for C-01/C-03.
+        WRONG Y: "Maria talked about product strategy at Prism" — not a specific outcome.
+        RIGHT Y: "[00:02] Maria: We grew mid-market ARR from $8M to $19M over that period."
+
+      N — Expected behavior absent or only generically described.
+
+      N/A — Applicability condition absent:
+        C-09, C-10, C-18, C-19 = N/A (final interview, not technical).
+        C-14, C-15 = applicable (final interview — score Y or N).
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Excerpt contamination:
+        WRONG: "[00:23] Maria: NPS from 42 to 61 — shows org design impact"
+        RIGHT: "[00:23] Maria: it went from 42 to 61 — because one person was accountable for the entire journey"
+
+      ERROR 2 — N/A excerpt non-empty:
+        WRONG: score="N/A", excerpt="Not applicable — technical interview only"
+        RIGHT: score="N/A", excerpt=""
+
+      ERROR 3 — panel_recommendation mismatch:
+        WRONG: overall_recommendation="hire", panel_recommendation="defer"
+        RIGHT: overall_recommendation="hire" → panel_recommendation="advance"
+
+      ERROR 4 — Misscoring C-04:
+        Maria's blind-spot disclosure is genuine C-04 evidence: explicitly named the gap ("two CEOs told me"), named what she specifically changed ("quarterly category workshop, committed roadmap space for speculative bets"). Do NOT score this as weak self-awareness. Voluntary, specific disclosure of a repeated weakness + named corrective action = C-04=Y.
+
+      ERROR 5 — Empty competency_scores:
+        WRONG: competency_scores=[]
+        RIGHT: At least one entry. Schema enforces.
+
+      NOTE (file-specific): Maria Volkov is a hire. C-01=Y: Prism Software named explicitly, $8M→$19M ARR, NPS 42→61, Q3 2023 incident, 93% desktop users (from packaging analysis), 60%→78% estimate accuracy, $8,400→$12,600 ACV. Leadership cluster applicable: restructured PM org from functional to journey alignment, one PM left. C-14=Y: product strategy at company level, board risk question asked. C-15=Y: chose company-specific investigation approach over generic strategy speculation. panel_recommendation must be "advance". candidate_level_assessed="L6".
+    </common_errors>
+
     <field_caps priority="HIGH">
-      HARD WORD CAPS — plan each field before writing. If your draft exceeds the cap, shorten the observation. Do NOT go over.
-      - reasoning (CheckpointResult): state observation + evidence, then STOP. ≤ 40 words. HARD CAP.
-      - reasoning (QualityArea): ≤ 45 words. HARD CAP.
-      - summary: covers overall impression, key strengths, key concerns. ≤ 80 words. HARD CAP.
+      - reasoning (CheckpointResult): ≤40 words. HARD CAP.
+      - reasoning (QualityArea): ≤45 words. HARD CAP.
+      - summary: ≤80 words. HARD CAP.
     </field_caps>
 
     <checkpoints>
@@ -147,29 +217,48 @@ C-20: Did candidate show genuine, specific interest in this role beyond generic 
 QUALITY AREAS — Rate each G/Y/R with reasoning (min 30 chars):
 - Opening: How the candidate established presence and context in early responses
 - Behavioral Evidence: Quality, specificity, and credibility of STAR-format responses
-- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not a technical interview and some domain depth shown)
-- Leadership &amp; Influence: Evidence of influencing others without direct authority
+- Technical Depth: Depth of domain knowledge demonstrated (rate Y if not technical and some depth shown)
+- Leadership &amp; Influence: Evidence of influencing others and managing org change
 - Closing: Quality of questions asked and engagement level at end of interview
     </quality_areas>
 
+    <output_format_template>
+      Return valid JSON:
+
+      {
+        "interview_type": "final",
+        "checkpoints": [/* C-01 through C-20, all 20 required */],
+        "quality_areas": [/* 5 entries */],
+        "overall_recommendation": "hire" | "no_hire" | "hold",
+        "panel_recommendation": "advance" | "decline" | "defer",
+        "candidate_level_assessed": "L4" | "L5" | "L6" | "L7" | "unknown",
+        "competency_scores": [/* min 1 entry */],
+        "key_strengths": ["string", ...],
+        "key_concerns": ["string", ...],
+        "risk_flags": ["string", ...],
+        "summary": "string 50–80 words"
+      }
+
+      CONSTRAINTS:
+      - C-09, C-10, C-18, C-19: score="N/A", excerpt=""
+      - C-14, C-15: score Y or N (final interview)
+      - overall_recommendation="hire" → panel_recommendation="advance"
+      - competency_scores non-empty list
+    </output_format_template>
+
     <pre_emit_check priority="CRITICAL">
-      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
-
-      1. Did C-01 score N? If yes, overall_recommendation MUST be "no_hire". Fix if not — schema will reject any other value.
-      2. Did any Leadership cluster checkpoint (C-11, C-12, C-13) score N AND any C-01–C-08 score N?
-         If yes, overall_recommendation MUST be "hold" or "no_hire". Fix if "hire".
-      3. All N/A checkpoints have excerpt = "" (empty string — not "N/A", not null, not omitted).
-      4. All Y/N checkpoints have excerpt = "[HH:MM] CandidateName: exact quote" (not empty).
-      5. overall_recommendation is exactly one of: "hire", "no_hire", "hold".
-      6. summary is at least 50 characters.
-
-      WRONG: overall_recommendation="hire" but C-01=N. SELF-CONTRADICTION. Schema will reject.
-      WRONG: N/A checkpoint with excerpt="Not applicable — final round only". VIOLATION. Set to "".
-      WRONG: Y checkpoint with excerpt="". VIOLATION. Must include verbatim quote.
+      1. C-01=N? → overall_recommendation="no_hire", panel_recommendation="decline".
+      2. Leadership cluster N AND any C-01–C-08=N? → recommendation cannot be "hire".
+      3. All N/A: excerpt="".
+      4. All Y/N: excerpt="[HH:MM] Name: verbatim quote".
+      5. overall_recommendation ∈ {"hire","no_hire","hold"}.
+      6. panel_recommendation matches overall_recommendation.
+      7. competency_scores non-empty.
+      8. summary ≥ 50 chars.
     </pre_emit_check>
 
     <output_schema>
-Return InterviewEvaluationReport JSON. All fields required. excerpt="" for N/A checkpoints.
+Return InterviewEvaluationReport JSON. All fields required. panel_recommendation must match overall_recommendation per schema cross-field validator.
     </output_schema>
   </instructions>
 </prompt>

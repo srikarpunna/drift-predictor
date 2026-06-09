@@ -41,7 +41,31 @@ class BenchmarkRun(BaseModel):
     migration_failed: bool    # old passed AND new failed
     migration_improved: bool  # old failed AND new passed
 
+    # Validation attempt tracking — how many schema validation rounds each model needed
+    old_first_attempt_valid: bool = True
+    new_first_attempt_valid: bool = True
+    old_validation_attempts: int = 1
+    new_validation_attempts: int = 1
+
+    # First-attempt validation errors (drift signal even when retry rescues the run)
+    old_first_attempt_error: Optional[str] = None
+    new_first_attempt_error: Optional[str] = None
+
+    # Fine-grained drift: field-level size changes + categorical flags.
+    # A run can "pass" while still drifting — these capture what pass/fail misses.
+    field_drift_events: list[dict] = Field(default_factory=list)
+    drift_flags: list[str] = Field(default_factory=list)
+
     @property
     def token_delta(self) -> int:
         """How many more output tokens new model used vs old."""
         return self.new_tokens_out - self.old_tokens_out
+
+    @property
+    def token_delta_pct(self) -> float:
+        """Output token change as percent of old model's output."""
+        return self.token_delta / max(self.old_tokens_out, 1) * 100
+
+    @property
+    def drifted(self) -> bool:
+        return bool(self.drift_flags)

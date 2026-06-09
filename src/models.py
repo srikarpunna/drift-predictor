@@ -20,6 +20,12 @@ class RunResult(BaseModel):
 
     error: Optional[str] = None
 
+    # Validation attempt tracking
+    first_attempt_valid: bool = True
+    validation_attempts: int = Field(default=1, ge=1)
+    # Validation error from the first attempt (drift signal, even when retry rescues)
+    first_attempt_error: Optional[str] = None
+
     @model_validator(mode="after")
     def check_output_or_error(self) -> "RunResult":
         if self.error is None and not self.output_text:

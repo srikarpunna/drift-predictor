@@ -43,132 +43,218 @@
 [00:03:12] Derek Moss (Agent): No, you shouldn't see any further charges. The account is cancelled and I've flagged the refund for the last charge.
 [00:03:19] Sandra Okonkwo (Customer): Alright. I just hope this doesn't drag on. I've had bad experiences with refund processes before.
 [00:03:25] Derek Moss (Agent): I hear you. Three to five days and it should be there.
-[00:03:29] Sandra Okonkwo (Customer): Fine. I guess that's all I can do.
-[00:03:32] Derek Moss (Agent): Is there anything else I can help with?
-[00:03:35] Sandra Okonkwo (Customer): No. I just hope the refund shows up.
-[00:03:38] Derek Moss (Agent): It will. Thanks for calling. Bye.
-[00:03:41] [CALL END]
-[00:04:23] [WRAP-UP COMPLETE — 42 seconds post-call]
+[00:03:29] Sandra Okonkwo (Customer): Is there anything Horizon could have done differently here? Like, shouldn't you have sent an email before charging me after I cancelled?
+[00:03:38] Derek Moss (Agent): That's fair feedback. The billing queue doesn't always communicate those edge cases clearly to customers. I'll pass that along as feedback internally.
+[00:03:47] Sandra Okonkwo (Customer): Fine. I guess that's all I can do.
+[00:03:50] Derek Moss (Agent): Is there anything else I can help with?
+[00:03:53] Sandra Okonkwo (Customer): No. I just hope the refund shows up.
+[00:03:56] Derek Moss (Agent): It will. Thanks for calling. Bye.
+[00:03:58] [CALL END]
+[00:04:40] [WRAP-UP COMPLETE — 42 seconds post-call]
     </dialogue>
   </transcript>
 
   <instructions>
     <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
 
+    <domain_context>
+      You are auditing a customer support agent for a SaaS company. Your evaluations are used for coaching and escalation decisions. Two auditors reviewing the same call must reach identical compliance scores.
+
+      The ticket_type determination controls which checks apply. Determine it before scoring anything.
+
+      overall_grade is derived mechanically from the grading_decision_tree. C-11 applies when ticket_type="billing" AND the customer mentioned cancellation. The customer explicitly mentioned cancellation in this call ("I cancelled my plan before that billing date") — C-11 is applicable.
+    </domain_context>
+
     <gate_check priority="CRITICAL">
-      MANDATORY FIRST STEP — before evaluating any compliance check:
-      Determine ticket_type from call content. This controls which checks are applicable.
-      Make this determination BEFORE scoring any check.
+      MANDATORY FIRST STEP — determine ticket_type before scoring any check.
 
-      - "billing": customer issue involves charges, invoices, refunds, fees, payment, or subscription cancellation
-      - "technical": customer issue involves product errors, features not working, login/access failures, API issues
-      - "account": customer issue involves profile settings, name/email changes, plan management
-      - "general": does not fit above categories
+      - "billing": charges, invoices, refunds, fees, payment, subscription changes
+      - "technical": product errors, features not working, login failures, API issues
+      - "account": profile settings, name/email changes, plan management
+      - "general": product inquiries, no account access required
 
-      WRONG: Scoring C-08 (troubleshooting sequence) on a billing call. VIOLATION.
-      RIGHT: C-08 on billing call → passed="N/A", evidence="Not a technical issue; billing ticket."
-
-      WRONG: Scoring C-11 (retention disclosure) on a technical call. VIOLATION.
-      RIGHT: C-11 on technical call → passed="N/A", evidence="Not a billing ticket; no cancellation topic."
+      WRONG: Scoring C-08 on a billing call. VIOLATION.
+      RIGHT: C-08 on billing → passed="N/A", evidence="Not a technical issue; billing ticket."
     </gate_check>
 
     <compliance_scoring>
-      - Y: Check was completed as required
-      - N: Check was required but not completed
-      - N/A: Check is not applicable — state reason in evidence field (min 10 chars)
+      - Y: Check completed as required
+      - N: Check required but not completed
+      - N/A: Not applicable — evidence must explain why (min 10 chars)
     </compliance_scoring>
 
     <grading_decision_tree priority="CRITICAL">
-      Before writing overall_grade, evaluate IN ORDER. First match wins — do not proceed past a matching step.
+      Evaluate IN ORDER. First match wins.
 
-      1. AUTO-DOWNGRADE FAIL — check these first, before anything else:
-         - If C-01 = N (agent did not identify themselves) → overall_grade = "FAIL". STOP.
-         - If C-02 = N AND ticket_type = "billing" → overall_grade = "FAIL". STOP.
-         WRONG: C-01=N, overall_grade="COACH". VIOLATION — schema will reject this.
-         RIGHT: C-01=N → overall_grade="FAIL" regardless of all other scores.
+      1. AUTO-DOWNGRADE FAIL:
+         - C-01=N → overall_grade="FAIL". STOP.
+         - C-02=N AND ticket_type="billing" → overall_grade="FAIL". STOP.
 
-      2. FAIL: Auto-downgrade triggered (step 1), OR two or more applicable checks scored N.
+      2. FAIL: Auto-downgrade, OR two or more applicable checks scored N.
 
-      3. COACH: Exactly one applicable check scored N, or one QualityDimension rated R — no auto-downgrade triggered.
+      3. COACH: Exactly one applicable N, or one QualityDimension rated R.
 
-      4. PASS: All applicable checks scored Y, no QualityDimension rated R.
+      4. PASS: All applicable checks Y, no R quality dimension.
     </grading_decision_tree>
 
     <escalation_rule priority="CRITICAL">
-      escalation_required = true if: C-01 = N, OR C-02 = N, OR customer explicitly requested a supervisor.
-      If escalation_required = true → escalation_reason MUST be a non-null string explaining why.
-      If escalation_required = false → escalation_reason MUST be null (not an empty string, not "N/A").
+      escalation_required=true if: C-01=N, C-02=N, or customer explicitly requested a supervisor.
+      If true → escalation_reason NOT null.
+      If false → escalation_reason MUST be null.
 
-      WRONG: escalation_required=true, escalation_reason=null. SCHEMA VIOLATION — will be rejected.
-      WRONG: escalation_required=false, escalation_reason="No escalation needed". SCHEMA VIOLATION.
-      RIGHT: escalation_required=true, escalation_reason="C-01=N: agent failed to identify themselves."
+      WRONG: escalation_required=false, escalation_reason="No issues". Schema rejects.
       RIGHT: escalation_required=false, escalation_reason=null.
     </escalation_rule>
 
     <evidence_purity priority="CRITICAL">
-      EVIDENCE PURITY RULE: Every evidence field must contain direct transcript evidence — verbatim quote or specific timestamp observation. No paraphrase, no interpretation appended after the quote.
-      For N/A checks: evidence = short factual reason (e.g. "No hold taken during this call"; "Not a technical issue").
-      evidence min length = 10 characters. Empty string will fail schema validation.
+      Every evidence field: verbatim quote or specific timestamp observation. No paraphrase.
+      N/A evidence: factual reason, min 10 chars.
 
-      WRONG: "Agent greeted customer professionally and identified themselves clearly"
-      RIGHT: "Agent said 'Horizon Cloud Billing Support, this is Marcus Webb' at [00:00:04]"
-
-      WRONG: "N/A" (too short, 3 chars)
-      RIGHT: "No hold taken during this call — system lookup was silent at [00:00:47]"
+      WRONG: "Agent submitted refund efficiently"
+      RIGHT: "Agent said 'I've submitted the refund for $54.99' at [00:01:37]"
     </evidence_purity>
 
     <compliance_checks>
-      C-01: Agent stated their name at the start of the call — ALWAYS applicable
-      C-02: Agent verified the caller's identity before accessing account details — ALWAYS applicable
-      C-03: Agent disclosed relevant fees, charges, or billing implications when applicable — ONLY if ticket_type = "billing"
-      C-04: Agent offered escalation to a supervisor — ONLY if customer expressed clear dissatisfaction during the call
-      C-05: Agent delivered a proper closing (confirmed resolution, offered further assistance, said goodbye) — ALWAYS applicable
-      C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
-      C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
-      C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
-      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
-      C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
-      C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
-      C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
+      C-01: Agent stated their name at the start — ALWAYS applicable
+      C-02: Agent verified identity before accessing account — ALWAYS applicable
+      C-03: Agent disclosed fees, charges, billing implications — ONLY billing
+      C-04: Agent offered escalation — ONLY if customer expressed clear dissatisfaction
+      C-05: Agent delivered proper closing — ALWAYS applicable
+      C-06: Agent placed hold correctly — ONLY if a hold occurred
+      C-07: Agent avoided unauthorized commitments — ALWAYS applicable
+      C-08: Agent followed troubleshooting sequence — ONLY technical
+      C-09: Agent offered supervisor escalation when customer expressed frustration — ONLY if customer expressed clear dissatisfaction
+      C-10: Agent confirmed contact info current — ONLY if account changes made
+      C-11: Agent read required retention disclosure — ONLY if billing AND customer mentioned cancellation/downgrade
+      C-12: Agent completed post-call wrap-up within 60 seconds — ALWAYS applicable
     </compliance_checks>
 
+    <field_definitions>
+      <field name="ticket_type">
+        "billing", "technical", "account", or "general".
+        This call: customer mentioned cancelled plan and disputed post-cancellation charge → "billing".
+      </field>
+
+      <field name="overall_grade">
+        From decision tree. Two applicable N checks → "FAIL", not "COACH".
+        WRONG: overall_grade="COACH" when C-09=N and C-11=N. Should be "FAIL".
+      </field>
+
+      <field name="escalation_required" and "escalation_reason">
+        escalation_required=true ONLY if C-01=N, C-02=N, or customer asked for supervisor.
+        Customer expressing frustration alone does not trigger escalation_required=true.
+        escalation_reason must be null when escalation_required=false.
+      </field>
+
+      <field name="followup_required" and "followup_reason">
+        followup_required=true if post-call action pending.
+        followup_reason must be null when followup_required=false.
+        WRONG: followup_required=false, followup_reason="No follow-up". Schema rejects.
+      </field>
+
+      <field name="hold_event">
+        No hold occurred in this call — hold_event=null.
+        WRONG: hold_event populated when no [HOLD] marker appears in transcript.
+      </field>
+
+      <field name="compliance_score_pct">
+        (Y checks)/(Y+N applicable checks)*100. If any N: must be &lt;100.0.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — Check completed as required, with transcript evidence.
+      N — Required check absent from transcript.
+      N/A — Applicability condition not met; evidence must explain (min 10 chars).
+
+      C-09 applicability: customer expressed clear dissatisfaction at [00:02:04]: "That's a bit frustrating." Once dissatisfaction is expressed, C-09 is applicable. Agent did not offer escalation to a supervisor → C-09=N.
+
+      C-11 applicability: ticket_type="billing" AND customer mentioned cancellation → C-11 applicable. Agent did not read a retention disclosure (no offer to save the subscription, no mention of downgrade options, no win-back pitch) → C-11=N.
+
+      Two applicable N checks (C-09=N, C-11=N) → step 2 of grading decision tree → overall_grade="FAIL".
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — Evidence paraphrase:
+        WRONG: evidence="Agent acknowledged customer frustration"
+        RIGHT: evidence="Agent said 'I get it. But the refund is in and you should be good.' at [00:02:12]"
+
+      ERROR 2 — N/A evidence too short:
+        WRONG: passed="N/A", evidence="N/A"
+        RIGHT: passed="N/A", evidence="No hold was taken during this call"
+
+      ERROR 3 — escalation_reason set when false:
+        WRONG: escalation_required=false, escalation_reason="Customer did not escalate"
+        RIGHT: escalation_required=false, escalation_reason=null
+
+      ERROR 4 — overall_grade="COACH" with two N checks:
+        WRONG: C-09=N, C-11=N → overall_grade="COACH"
+        RIGHT: Two applicable N checks → overall_grade="FAIL" (grading decision tree step 2)
+
+      ERROR 5 — C-11 scored N/A when customer mentioned cancellation:
+        WRONG: C-11=N/A when customer said "I cancelled my plan" — C-11 IS applicable.
+        RIGHT: ticket_type="billing" AND customer mentioned cancellation → C-11 applicable. Agent gave no retention disclosure → C-11=N.
+
+      NOTE (file-specific): Derek Moss (CALL-20240321-007833). Expected grade: FAIL. Two applicable N checks: C-09=N (customer expressed frustration at [00:02:04], agent did not offer supervisor escalation) and C-11=N (customer explicitly cancelled, agent gave no retention disclosure — no offer to save the subscription, no downgrade option, no win-back pitch). With two applicable N checks, grading_decision_tree step 2 applies → overall_grade="FAIL". Grading this "COACH" is a common model error caused by treating each N in isolation rather than applying the decision tree step 2 condition. No hold occurred → hold_event=null. followup_required=true (refund pending 3-5 business days).
+    </common_errors>
+
     <field_caps priority="HIGH">
-      HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
-      - call_summary: factual summary of issue, resolution, and next steps. ≤ 60 words. HARD CAP.
-      - coaching_notes (if present): one actionable observation per issue. ≤ 40 words total. HARD CAP.
-      - QualityDimension.evidence: specific transcript evidence. min 20 chars. No max but be concise.
+      - call_summary: ≤60 words. HARD CAP.
+      - coaching_notes: ≤40 words total. HARD CAP.
+      - QualityDimension.evidence: min 20 chars.
     </field_caps>
 
     <quality_dimensions>
       QUALITY DIMENSIONS — Rate each G/Y/R with specific transcript evidence (min 20 chars):
-      - Professionalism: Tone, empathy, language quality throughout the call
-      - Resolution Clarity: Was the issue resolution or explanation communicated clearly?
-      - Efficiency: Did the agent manage time well and reach resolution without unnecessary delay?
-      - Empathy: Did the agent acknowledge the customer's frustration or concern appropriately?
-      - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
+      - Professionalism: Tone, empathy, language quality throughout
+      - Resolution Clarity: Was resolution or explanation communicated clearly?
+      - Efficiency: Did agent manage time well?
+      - Empathy: Did agent acknowledge the customer's frustration appropriately?
+      - Product Knowledge: Did agent demonstrate accurate knowledge of billing system?
     </quality_dimensions>
 
+    <output_format_template>
+      Return valid SupportCallAudit JSON:
+
+      {
+        "ticket_type": "billing",
+        "agent_identified_correctly": true | false,
+        "customer_verified": true | false,
+        "compliance_checks": [ /* C-01 through C-12, all 12 */ ],
+        "quality_dimensions": [ /* 5 entries */ ],
+        "resolution_achieved": true | false,
+        "escalation_required": false,
+        "escalation_reason": null,
+        "overall_grade": "PASS" | "COACH" | "FAIL",
+        "call_summary": "string ≤60 words",
+        "coaching_notes": "string" | null,
+        "followup_required": true | false,
+        "followup_reason": "string" | null,
+        "hold_event": null,
+        "agent_actions": [ /* list */ ],
+        "compliance_score_pct": float
+      }
+
+      CONSTRAINTS:
+      - escalation_required=false → escalation_reason=null
+      - hold_event=null (no hold in this call)
+      - Any N check → compliance_score_pct &lt; 100.0
+      - Two applicable N checks → overall_grade="FAIL"
+    </output_format_template>
+
     <pre_emit_check priority="CRITICAL">
-      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
-
-      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
-      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
-      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
-      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
-      5. escalation_required = true? → escalation_reason must not be null.
-      6. escalation_required = false? → escalation_reason must be null.
-      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
-      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
-
-      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
-      RIGHT: Two applicable N checks → overall_grade="FAIL".
-
-      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
-      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+      1. ticket_type ∈ {"billing","technical","account","general"}.
+      2. C-01=N? → overall_grade="FAIL", escalation_required=true.
+      3. Two+ applicable N checks? → overall_grade="FAIL" not "COACH".
+      4. escalation_required=false? → escalation_reason=null.
+      5. followup_required=true? → followup_reason not null.
+      6. followup_required=false? → followup_reason=null.
+      7. Any N check → compliance_score_pct &lt; 100.0.
+      8. hold_event=null (no hold occurred).
     </pre_emit_check>
 
     <output_schema>
-      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+      Return SupportCallAudit JSON with all fields. evidence min 10 chars on ComplianceCheck. evidence min 20 chars on QualityDimension.
     </output_schema>
   </instructions>
 </prompt>

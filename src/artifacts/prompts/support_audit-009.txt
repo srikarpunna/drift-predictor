@@ -54,6 +54,14 @@
   <instructions>
     <role>You are a QA compliance auditor reviewing this customer support call. Evaluate ALL applicable compliance checks and rate all quality dimensions. Your evaluation must be grounded in direct transcript evidence.</role>
 
+    <domain_context>
+      You are auditing a customer support agent for a SaaS company. Your evaluations are used for coaching and escalation decisions. Two auditors reviewing the same call must reach identical compliance scores — evidence must be verbatim transcript quotes or specific timestamp observations, not paraphrase or impression.
+
+      The ticket_type determination is the most critical first step. It controls which checks apply. Determine it before scoring anything.
+
+      This call is a C-06=N case: a hold occurred at [00:03:26] and lasted 4 minutes 3 seconds (243 seconds). C-06 requires the agent to (a) announce the hold with an expected duration, (b) return within 2 minutes, and (c) thank the customer for holding after returning. Fatima failed all three: she said "Let me put you on hold for a moment" (no duration), the hold lasted 243 seconds (exceeds 2-minute limit), and she returned with "I'm back. Sorry about the wait" (apology, not a thank-you). C-06=N. One applicable N check with no auto-downgrade conditions → overall_grade="COACH".
+    </domain_context>
+
     <gate_check priority="CRITICAL">
       MANDATORY FIRST STEP — before evaluating any compliance check:
       Determine ticket_type from call content. This controls which checks are applicable.
@@ -125,11 +133,106 @@
       C-06: Agent placed the customer on hold correctly (announced hold, returned within 2 minutes, thanked for holding) — ONLY if a hold occurred during the call
       C-07: Agent avoided making commitments outside their authority (e.g., unauthorized refunds, policy exceptions) — ALWAYS applicable
       C-08: Agent followed the correct troubleshooting sequence for the issue type — ONLY if ticket_type = "technical"
-      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if ticket_type = "billing" or customer expressed clear dissatisfaction
+      C-09: Agent offered the supervisor escalation path when customer expressed frustration or dissatisfaction — ONLY if customer expressed clear dissatisfaction
       C-10: Agent confirmed the customer's contact information was current — ONLY if account changes were made
       C-11: Agent read the required product/plan upsell or retention disclosure — ONLY if ticket_type = "billing" and customer mentioned cancellation or downgrade
       C-12: Agent completed the post-call wrap-up within 60 seconds of call end — ALWAYS applicable (evaluate based on call end behavior)
     </compliance_checks>
+
+    <field_definitions>
+      <field name="ticket_type">
+        Permitted: "billing", "technical", "account", "general".
+        This call: API 403 error due to incorrect API key scope → "technical".
+        WRONG: ticket_type="account" — API key scope is a technical configuration issue, not profile settings.
+      </field>
+
+      <field name="overall_grade">
+        Permitted: "PASS", "COACH", "FAIL".
+        One applicable N check (C-06=N) and no auto-downgrade → "COACH".
+        WRONG: overall_grade="PASS" when C-06=N. One N check = COACH.
+        WRONG: overall_grade="FAIL" when only one applicable N check and no auto-downgrade.
+      </field>
+
+      <field name="hold_event">
+        A hold DID occur. hold_event must NOT be null.
+        Hold started at [00:03:26], ended at [00:07:29] → duration = 4 minutes 3 seconds = 243 seconds.
+        hold_announced: Fatima said "Let me put you on hold for a moment while I check that." — no duration stated → hold_announced=false.
+        thanked_after_hold: Fatima said "Okay, I'm back. Sorry about the wait" — this is an apology, not a thank-you for holding → thanked_after_hold=false.
+        WRONG: hold_event=null when hold occurred. Schema rejects for this call.
+        RIGHT: hold_event={hold_announced: false, hold_duration_seconds: 243, thanked_after_hold: false}.
+      </field>
+
+      <field name="C-06 scoring">
+        C-06 requires three elements: (1) hold announced with expected duration, (2) return within 2 minutes, (3) thank customer after returning.
+        This hold failed all three:
+          (1) "Let me put you on hold for a moment" — no duration stated.
+          (2) 243 seconds elapsed — exceeds 2-minute limit.
+          (3) "Sorry about the wait" — apology, not a proper thank-you for holding.
+        C-06=N. Evidence: hold began at [00:03:26]; agent returned at [00:07:31] after 243 seconds without announcing duration; return was "Okay, I'm back. Sorry about the wait."
+      </field>
+
+      <field name="escalation_required">
+        false — C-01=Y, C-02=Y, no supervisor requested, Devon expressed no frustration.
+        WRONG: escalation_required=true when no auto-downgrade condition is met.
+      </field>
+
+      <field name="escalation_reason">
+        MUST be null because escalation_required=false.
+        WRONG: escalation_required=false, escalation_reason="Hold exceeded 2 minutes." Schema rejects.
+        RIGHT: escalation_required=false, escalation_reason=null.
+      </field>
+
+      <field name="followup_required">
+        false — API 403 resolved during call; Devon confirmed 200 response at [00:08:02]. Issue fully resolved.
+        RIGHT: followup_required=false, followup_reason=null.
+      </field>
+
+      <field name="compliance_score_pct">
+        C-06=N is the only N check. Compute (Y applicable) / (Y+N applicable) * 100. Must be &lt; 100.0.
+      </field>
+    </field_definitions>
+
+    <scoring_rubric>
+      Y — Check was completed as required:
+        C-01=Y: "this is Fatima Al-Hassan" at [00:00:05].
+        C-02=Y: verified email + org name + phone at [00:00:32]–[00:00:44].
+        C-08=Y: structured troubleshooting — named 3 possible causes (scope, plan permission, deactivated key), confirmed endpoint (/v2/projects), confirmed key age (1 week), checked scope via system lookup, identified missing Projects:Read, offered two options (regenerate or add scope), guided scope update, verified 200 response.
+        C-05=Y: Fatima confirmed fix ("the scope update resolved the 403"), provided documentation link, offered further help, said goodbye.
+        C-07=Y: Fatima said "I can't guarantee a specific discount" — no unauthorized promises.
+        C-12=Y: Wrap-up at [00:09:48], 44 seconds after call end at [00:09:04]. Within 60-second limit.
+
+      N — Check required but not completed:
+        C-06=N: hold at [00:03:26], 243 seconds (4:03), no duration announced, return was "Sorry about the wait" not "thank you for holding." All three C-06 elements failed.
+
+      N/A — Check does not apply:
+        C-03, C-11: N/A — not a billing call; no charges or fees discussed.
+        C-10: N/A — API key scope update is a technical configuration change, not a contact-info account change.
+        C-04, C-09: N/A — Devon expressed no dissatisfaction; accepted the hold graciously ("Sure, no problem").
+    </scoring_rubric>
+
+    <common_errors>
+      ERROR 1 — hold_event=null when hold occurred:
+        WRONG: hold_event=null because the hold was unannounced.
+        RIGHT: A hold DID occur at [00:03:26]. hold_event must be populated regardless of whether it was announced correctly.
+        RIGHT: hold_event={hold_announced: false, hold_duration_seconds: 243, thanked_after_hold: false}.
+
+      ERROR 2 — overall_grade="FAIL" instead of "COACH":
+        WRONG: One N check (C-06=N) → overall_grade="FAIL".
+        RIGHT: One applicable N check with no auto-downgrade → grading decision tree step 3 → overall_grade="COACH".
+
+      ERROR 3 — thanked_after_hold=true because agent said "Sorry about the wait":
+        WRONG: thanked_after_hold=true — Fatima apologized for the wait.
+        RIGHT: thanked_after_hold=false. "Sorry about the wait" is an apology, not a thank-you for holding. C-06 requires thanking the customer for their patience/holding.
+
+      ERROR 4 — hold_announced=true because Fatima said "Let me put you on hold":
+        This is nuanced. Fatima DID tell Devon she was placing him on hold. But the C-06 hold_announced field tracks whether the hold was announced WITH a duration estimate. "For a moment" provides no duration. hold_announced=false.
+
+      ERROR 5 — escalation_reason set when escalation_required=false:
+        WRONG: escalation_required=false, escalation_reason="Hold exceeded limit." Schema rejects.
+        RIGHT: escalation_required=false, escalation_reason=null.
+
+      NOTE (file-specific): Fatima Al-Hassan (CALL-20240426-134809). Expected grade: COACH. C-06=N: hold at [00:03:26]–[00:07:29] = 243 seconds (4:03). No duration announced ("let me put you on hold for a moment"). Return was "I'm back. Sorry about the wait" — not a thank-you. All three C-06 requirements failed. One N check, no auto-downgrade → COACH. hold_event must be populated: hold_announced=false, hold_duration_seconds=243, thanked_after_hold=false. followup_required=false (issue fully resolved, 200 response confirmed). escalation_required=false, escalation_reason=null.
+    </common_errors>
 
     <field_caps priority="HIGH">
       HARD WORD CAPS — plan each field before writing. If draft exceeds cap, shorten the observation. Do NOT go over.
@@ -147,27 +250,75 @@
       - Product Knowledge: Did the agent demonstrate accurate knowledge of the product, policy, or billing system?
     </quality_dimensions>
 
+    <output_format_template>
+      Return valid JSON:
+
+      {
+        "ticket_type": "billing" | "technical" | "account" | "general",
+        "agent_identified_correctly": true | false,
+        "customer_verified": true | false,
+        "compliance_checks": [
+          {
+            "item": "C-01: Agent stated name",
+            "passed": "Y" | "N" | "N/A",
+            "evidence": "string min 10 chars"
+          }
+          // C-01 through C-12, all 12 required
+        ],
+        "quality_dimensions": [
+          {
+            "dimension": "Professionalism" | "Resolution Clarity" | "Efficiency" | "Empathy" | "Product Knowledge",
+            "score": "G" | "Y" | "R",
+            "evidence": "string min 20 chars"
+          }
+          // 5 entries required
+        ],
+        "resolution_achieved": true | false,
+        "escalation_required": true | false,
+        "escalation_reason": "string" | null,
+        "overall_grade": "PASS" | "COACH" | "FAIL",
+        "call_summary": "string ≤60 words",
+        "coaching_notes": "string" | null,
+        "followup_required": true | false,
+        "followup_reason": "string" | null,
+        "hold_event": {
+          "hold_announced": true | false,
+          "hold_duration_seconds": integer ≥0,
+          "thanked_after_hold": true | false
+        } | null,
+        "agent_actions": [
+          {
+            "action_type": "refund_issued" | "cancellation_processed" | "account_updated" | "info_provided" | "escalation_initiated",
+            "action_detail": "string min 15 chars",
+            "authorized": true | false
+          }
+        ],
+        "compliance_score_pct": float 0.0–100.0
+      }
+
+      CONSTRAINTS:
+      - C-06=N → overall_grade="COACH" (one N, no auto-downgrade)
+      - hold_event NOT null (hold occurred at [00:03:26])
+      - escalation_required=false → escalation_reason=null
+      - followup_required=false → followup_reason=null
+      - Any N check → compliance_score_pct &lt; 100.0
+    </output_format_template>
+
     <pre_emit_check priority="CRITICAL">
-      BEFORE FINALIZING OUTPUT — verify all of the following. Fix any violation before submitting.
+      BEFORE FINALIZING OUTPUT:
 
-      1. ticket_type is exactly one of: "billing", "technical", "account", "general".
-      2. C-01 = N? → overall_grade must be "FAIL" AND escalation_required must be true.
-      3. C-02 = N AND ticket_type = "billing"? → overall_grade must be "FAIL".
-      4. Two or more applicable checks scored N? → overall_grade must be "FAIL" (not "COACH").
-      5. escalation_required = true? → escalation_reason must not be null.
-      6. escalation_required = false? → escalation_reason must be null.
-      7. All N/A compliance checks have evidence explaining why (≥ 10 chars).
-      8. overall_grade is exactly one of: "PASS", "COACH", "FAIL".
-
-      WRONG: overall_grade="COACH" but two applicable checks scored N. GRADING VIOLATION.
-      RIGHT: Two applicable N checks → overall_grade="FAIL".
-
-      WRONG: escalation_required=true, escalation_reason=null. Schema will reject.
-      WRONG: escalation_required=false, escalation_reason="No issues". Schema will reject.
+      1. ticket_type="technical".
+      2. C-06=N → overall_grade="COACH" (one N check, no auto-downgrade).
+      3. hold_event NOT null: hold_announced=false, hold_duration_seconds=243, thanked_after_hold=false.
+      4. escalation_required=false → escalation_reason=null.
+      5. followup_required=false → followup_reason=null.
+      6. All N/A checks have evidence ≥10 chars.
+      7. C-06=N → compliance_score_pct &lt; 100.0.
+      8. C-03=N/A (not billing). C-11=N/A (not billing). C-10=N/A (API scope is not contact-info change).
     </pre_emit_check>
 
     <output_schema>
-      Return SupportCallAudit JSON with all fields. evidence field on every ComplianceCheck must be at least 10 characters. evidence field on every QualityDimension must be at least 20 characters.
+      Return SupportCallAudit JSON with all fields. evidence min 10 chars on ComplianceCheck. evidence min 20 chars on QualityDimension.
     </output_schema>
   </instructions>
 </prompt>

@@ -1,0 +1,36 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    gemini_migration
+Old:     gemini-2.5-flash
+New:     gemini-3.1-flash-lite
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  25/30  (83.3%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.17
+  Rescued by retry (new): 5
+    interview_evaluation-002  [interview_evaluation]  attempts=2
+    interview_evaluation-003  [interview_evaluation]  attempts=2
+    interview_evaluation-004  [interview_evaluation]  attempts=2
+    interview_evaluation-005  [interview_evaluation]  attempts=2
+    interview_evaluation-009  [interview_evaluation]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1595.1 tok/response
+  New avg:  1348.7 tok/response
+  Delta:    -246.4 avg tok/response

@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.artifacts.schemas import get_schema
+from src.benchmark.drift_metrics import compare_outputs, drift_flags
 from src.benchmark.prompt_item import BenchmarkRun, PromptItem
 from src.runners.base_runner import BaseRunner
 
@@ -26,6 +27,14 @@ def run_prompt(
         old_result = old_runner.run_text(prompt.prompt_text, prompt.id)
         new_result = new_runner.run_text(prompt.prompt_text, prompt.id)
 
+    field_events = compare_outputs(old_result.output_text, new_result.output_text)
+    tok_delta_pct = (
+        (new_result.tokens_out - old_result.tokens_out)
+        / max(old_result.tokens_out, 1)
+        * 100
+    )
+    flags = drift_flags(tok_delta_pct, field_events, new_result.first_attempt_valid)
+
     return BenchmarkRun(
         prompt_id=prompt.id,
         schema_name=prompt.output_schema,
@@ -45,6 +54,14 @@ def run_prompt(
         new_evidence=new_result.error,
         migration_failed=(old_result.succeeded and not new_result.succeeded),
         migration_improved=(not old_result.succeeded and new_result.succeeded),
+        old_first_attempt_valid=old_result.first_attempt_valid,
+        new_first_attempt_valid=new_result.first_attempt_valid,
+        old_validation_attempts=old_result.validation_attempts,
+        new_validation_attempts=new_result.validation_attempts,
+        old_first_attempt_error=old_result.first_attempt_error,
+        new_first_attempt_error=new_result.first_attempt_error,
+        field_drift_events=field_events,
+        drift_flags=flags,
     )
 
 
@@ -75,11 +92,15 @@ def run_benchmark(
 
             if verbose:
                 status = "FAIL" if run.migration_failed else ("IMPR" if run.migration_improved else "OK")
+                old_att = f"a{run.old_validation_attempts}" if not run.old_first_attempt_valid else "  "
+                new_att = f"a{run.new_validation_attempts}" if not run.new_first_attempt_valid else "  "
+                drift = f"  drift=[{','.join(run.drift_flags)}]" if run.drift_flags else ""
                 print(
                     f"{status}  "
-                    f"old={'✓' if run.old_passed else '✗'}  "
-                    f"new={'✓' if run.new_passed else '✗'}  "
-                    f"Δtok={run.token_delta:+d}"
+                    f"old={'✓' if run.old_passed else '✗'}{old_att}  "
+                    f"new={'✓' if run.new_passed else '✗'}{new_att}  "
+                    f"Δtok={run.token_delta:+d} ({run.token_delta_pct:+.0f}%)"
+                    f"{drift}"
                 )
 
     return results

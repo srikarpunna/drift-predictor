@@ -71,6 +71,22 @@ def print_summary(runs, pair) -> str:
         lines.append(f"  {family:25s}  n={n}  old={old_p}/{n}  new={new_p}/{n}  reg={fails}")
 
     lines.append("")
+    old_first = sum(1 for r in runs if r.old_first_attempt_valid)
+    new_first = sum(1 for r in runs if r.new_first_attempt_valid)
+    old_avg_attempts = sum(r.old_validation_attempts for r in runs) / total
+    new_avg_attempts = sum(r.new_validation_attempts for r in runs) / total
+    lines.append("FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)")
+    lines.append("-" * 40)
+    lines.append(f"  Old first-pass:  {old_first}/{total}  ({old_first/total*100:.1f}%)")
+    lines.append(f"  New first-pass:  {new_first}/{total}  ({new_first/total*100:.1f}%)")
+    lines.append(f"  Old avg attempts: {old_avg_attempts:.2f}")
+    lines.append(f"  New avg attempts: {new_avg_attempts:.2f}")
+    needs_retry = [r for r in runs if not r.new_first_attempt_valid and r.new_passed]
+    if needs_retry:
+        lines.append(f"  Rescued by retry (new): {len(needs_retry)}")
+        for r in needs_retry:
+            lines.append(f"    {r.prompt_id}  [{r.schema_name}]  attempts={r.new_validation_attempts}")
+    lines.append("")
     lines.append("TOKEN ANALYSIS (output tokens)")
     lines.append("-" * 40)
     old_toks = [r.old_tokens_out for r in runs]
@@ -78,6 +94,37 @@ def print_summary(runs, pair) -> str:
     lines.append(f"  Old avg:  {sum(old_toks)/len(old_toks):.1f} tok/response")
     lines.append(f"  New avg:  {sum(new_toks)/len(new_toks):.1f} tok/response")
     lines.append(f"  Delta:    {(sum(new_toks)-sum(old_toks))/len(runs):+.1f} avg tok/response")
+    lines.append("")
+
+    lines.append("DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)")
+    lines.append("-" * 40)
+    drifted = [r for r in runs if r.drifted]
+    total_events = sum(len(r.field_drift_events) for r in runs)
+    lines.append(f"  Prompts with drift flags:  {len(drifted)}/{total}")
+    lines.append(f"  Field-level drift events:  {total_events}")
+    flag_counts = defaultdict(int)
+    for r in runs:
+        for fl in r.drift_flags:
+            flag_counts[fl] += 1
+    for fl, c in sorted(flag_counts.items(), key=lambda x: -x[1]):
+        lines.append(f"    {fl:20s} {c} prompt(s)")
+    worst = sorted(drifted, key=lambda r: -len(r.field_drift_events))[:5]
+    if worst:
+        lines.append("  Worst drifters:")
+        for r in worst:
+            lines.append(
+                f"    {r.prompt_id:28s} Δtok={r.token_delta_pct:+6.1f}%  "
+                f"events={len(r.field_drift_events)}  flags={','.join(r.drift_flags)}"
+            )
+            for ev in r.field_drift_events[:3]:
+                lines.append(f"      {ev['field']:45s} {ev['old']} → {ev['new']}")
+    first_fail = [r for r in runs if r.new_first_attempt_error]
+    if first_fail:
+        lines.append("  First-attempt schema violations (new model, rescued by retry):")
+        for r in first_fail:
+            err = (r.new_first_attempt_error or "").split("\n")
+            head = err[1].strip() if len(err) > 1 else err[0]
+            lines.append(f"    {r.prompt_id:28s} {head[:80]}")
     lines.append("")
 
     if regressions:

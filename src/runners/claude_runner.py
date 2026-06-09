@@ -5,6 +5,7 @@ from typing import Type
 
 import anthropic
 import instructor
+from instructor.core.hooks import HookName, Hooks
 from pydantic import BaseModel as PydanticBaseModel
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -69,21 +70,54 @@ class ClaudeRunner(BaseRunner):
         prompt_id: str,
         schema: Type[PydanticBaseModel],
     ) -> RunResult:
+        messages = [{"role": "user", "content": prompt}]
+        start = time.monotonic()
+
+        attempt_count = [0]
+        first_error: list = [None]
+
+        def _on_attempt(**kwargs):
+            attempt_count[0] += 1
+
+        def _capture_first_error(error, *args, **kwargs):
+            if first_error[0] is None:
+                first_error[0] = f"{type(error).__name__}: {error}"
+
+        hooks = Hooks()
+        hooks.on(HookName.COMPLETION_KWARGS, _on_attempt)
+        hooks.on(HookName.PARSE_ERROR, _capture_first_error)
+
         retrying = self._make_retry()
 
         @retrying
         def _call():
             return self._instructor_client.chat.completions.create_with_completion(
                 response_model=schema,
-                messages=[{"role": "user", "content": prompt}],
+                messages=messages,
                 model=self.model_id,
                 max_tokens=self.DEFAULT_MAX_TOKENS,
+                max_retries=3,
+                hooks=hooks,
             )
 
-        start = time.monotonic()
-        parsed, raw_response = _call()
-        elapsed_ms = (time.monotonic() - start) * 1000
+        try:
+            parsed, raw_response = _call()
+        except Exception as final_err:
+            elapsed_ms = (time.monotonic() - start) * 1000
+            return RunResult(
+                model_id=self.model_id,
+                prompt_id=prompt_id,
+                output_text="",
+                tokens_in=0,
+                tokens_out=0,
+                latency_ms=elapsed_ms,
+                error=f"{type(final_err).__name__}: {final_err}",
+                first_attempt_valid=False,
+                validation_attempts=max(attempt_count[0], 1),
+                first_attempt_error=first_error[0],
+            )
 
+        elapsed_ms = (time.monotonic() - start) * 1000
         usage = raw_response.usage
         return RunResult(
             model_id=self.model_id,
@@ -93,4 +127,7 @@ class ClaudeRunner(BaseRunner):
             tokens_in=usage.input_tokens,
             tokens_out=usage.output_tokens,
             latency_ms=elapsed_ms,
+            first_attempt_valid=(attempt_count[0] == 1),
+            validation_attempts=attempt_count[0],
+            first_attempt_error=first_error[0],
         )

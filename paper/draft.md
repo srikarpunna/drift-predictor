@@ -105,11 +105,31 @@ Three migration pairs were evaluated:
 | Gemini Pro | `gemini-2.5-pro` | `gemini-3.1-pro-preview` |
 | Claude Sonnet | `claude-sonnet-4-5-20250929` | `claude-sonnet-4-6` |
 
-**Table 1.** The three migration pairs evaluated.
+**Table 1.** The three migration pairs evaluated (old model → new model).
+
+#### How to read run labels
+
+Every table and figure compares two sides on the **same prompts**: an **old** model column and a **new** model column. What those columns mean depends on the run type:
+
+| Label part | Meaning |
+|------------|---------|
+| **Flash / Pro / Claude** | Which provider and tier (Table 1). |
+| **migration** (or **mig.**) | Real migration: old model vs *different* new model. This is what you care about for shipping a model swap. |
+| **NF** (noise floor) | Control run: the *same* old model on both sides. Any signal here is randomness, not migration. |
+| **main** | Main prompt suite (30 prompts). |
+| **hard** | Hard prompt suite (12 stress-test prompts). |
+| **r2, r3** | 2nd and 3rd flash *migration* repeats on the main suite (r1 was a shakedown run, excluded from tables). |
+| **r1** (Claude only) | First Claude *migration* run (not the excluded flash shakedown). |
+| **rpt** | Repeat: second migration run of the same pair, to check reproducibility. |
+| **s1, s2** | Session 1 or 2 of a noise floor (same model, run on a different day). |
+
+**Reading counts like `25/30 (83.3%)`:** the model produced schema-valid output on its **first try** on 25 of 30 prompts, before any automatic retry. Final pass rate is still 100% everywhere; these numbers expose what retries hid.
+
+**Reading `old` vs `new` columns:** in a **migration** row, old = pre-migration model, new = post-migration model. In an **NF** row, both columns are the old model compared against itself.
 
 All analyzed runs were conducted on 2026-06-09 and 2026-06-10. Six earlier pilot runs from 2026-05-27 and 2026-05-30 are included in the released data but excluded from analysis: they predate the first-attempt instrumentation and the `Literal` schema hardening, so their records are not comparable to the final protocol. One additional June flash migration run (r1, the shakedown run immediately after the instrumentation was added) is released but excluded from the tables because it predates the serialized field-drift records; the flash main-suite runs are therefore numbered r2 and r3. Its aggregates match them (−15.4% tokens, 25/30 new-model first-pass).
 
-Total analyzed runs: 19, comprising 2 flash migration main-suite runs, 1 flash hard-suite run, 2 flash noise floors (main and hard), 2 pro migration main runs, 2 pro migration hard runs, 3 pro noise floors (two main sessions and one hard), 2 Claude migration main runs, 2 Claude migration hard runs, and 3 Claude noise floors (two main sessions and one hard). The flash hard noise floor and the second pro and Claude main-suite noise-floor sessions were run after the first round of analysis, specifically to close two gaps the analysis itself exposed: hard-suite flips need a matched-suite, matched-tier noise baseline (Section 6.1), and a single noise-floor session underestimates session-to-session variance (Section 6.3). Tables abbreviate run labels where space is tight: NF = noise floor, mig = migration, rpt = repeat.
+Total analyzed runs: 19, comprising 2 flash migration main-suite runs, 1 flash hard-suite run, 2 flash noise floors (main and hard), 2 pro migration main runs, 2 pro migration hard runs, 3 pro noise floors (two main sessions and one hard), 2 Claude migration main runs, 2 Claude migration hard runs, and 3 Claude noise floors (two main sessions and one hard). The flash hard noise floor and the second pro and Claude main-suite noise-floor sessions were run after the first round of analysis, specifically to close two gaps the analysis itself exposed: hard-suite flips need a matched-suite, matched-tier noise baseline (Section 6.1), and a single noise-floor session underestimates session-to-session variance (Section 6.3).
 
 ### 4.3 Provider Configuration
 
@@ -130,6 +150,8 @@ Each prompt yields a paired observation (old model tokens, new model tokens), so
 ---
 
 ## 5. Results
+
+All tables below use the run-label key in Section 4.2 ("How to read run labels"). **Migration** rows compare old vs new models; **NF** rows compare the old model against itself.
 
 ### 5.1 Pass/Fail: The Blind Baseline
 
@@ -157,7 +179,7 @@ First-attempt validity, measured before any retry, reveals a clear divide by cap
 | Claude NF s1 (main) | 29/30 | 29/30 |
 | Claude NF s2 (main) | 30/30 | 30/30 |
 
-**Table 2.** First-attempt schema validity per run (valid first responses / prompts), before any retry.
+**Table 2.** First-attempt schema validity per run, before any retry. Columns: **Old first-pass** = old model valid on first try; **New first-pass** = new model valid on first try. Example row: *Flash mig. r2 (main)* = 2nd flash migration run on the 30 main-suite prompts; 25/30 means the new model needed retries on 5 prompts even though all 30 eventually passed. *Flash NF (main)* = noise floor (same model both sides); the small 30/30 vs 29/30 gap is normal variation, not migration drift.
 
 ![Figure 1: First-attempt schema validity per run, old vs new model. Eventual pass rate is 100% everywhere; only the flash tier degrades before retries.](figures/fig3_first_attempt.png)
 
@@ -184,7 +206,7 @@ Output token averages per response are the most consistent signal in the study. 
 | **Pro migration** | **1576.8** | **1330.0** | **−246.8 (−15.7%)** | [−327.6, −172.3] | <0.001 |
 | **Pro migration repeat** | **1585.3** | **1337.0** | **−248.3 (−15.7%)** | [−332.1, −166.8] | <0.001 |
 
-**Table 3.** Gemini main-suite output tokens per response: noise floors vs migrations, with paired-bootstrap CIs and permutation p-values.
+**Table 3.** Gemini output tokens per response (main suite). *Flash/Pro noise floor* = same model both sides; *Flash migration r2/r3* = two independent flash migration repeats; bold **Pro migration** rows = reproduced −15.7% shrinkage. **Old avg / New avg** = mean tokens per prompt; **Delta** = new minus old; **95% CI** and **p** from paired bootstrap and sign-flip test (Section 4.4).
 
 The pro migration delta is −15.7% in both runs (the two numbers are nearly identical). Its matched floor, the two pro main-suite noise sessions, swings −2.0% and +3.4%, and the two sessions do not even agree on a direction. The evidence for the claim is the pair of confidence intervals excluding zero (p < 0.001 in both runs, same sign both times) against a matched floor whose intervals include zero or barely exclude it; the "roughly 4.6× the wider noise session" multiplier we quote alongside is a descriptive summary of point estimates, not the statistical test. The Gemini 3.1 generation is systematically terser; this is a migration effect, not sampling randomness, and the repeats confirm it is stable.
 
@@ -202,7 +224,7 @@ The second pro noise-floor session deserves a highlight: its +3.4% swing is nomi
 | Claude migration repeat (main) | 2703.8 | 2688.4 | −15.4 (−0.6%) | [−680.0, +407.0] | 1.00 |
 | **Claude migration repeat (hard)** | **1814.5** | **2535.6** | **+721.1 (+39.7%)** | [+532.4, +899.5] | 0.001 |
 
-**Table 4.** Claude output tokens per response, main and hard suites, same statistics as Table 3.
+**Table 4.** Claude output tokens per response (main and hard suites), same columns as Table 3. *Claude migration repeat (hard)* = second hard-suite migration run (+39.7%, reproduced); *Claude migration (main)* did not reproduce and is discussed as a false positive in Section 6.3.
 
 Across the eight noise-floor runs in the study, six have confidence intervals including zero; the two that do not (the flash hard floor at +6.1% and the second pro main session at +3.4%) do not reproduce across sessions and do not agree in direction with anything. The reproduced headline signals (flash and pro shrinkage, Claude hard growth) all have confidence intervals excluding zero and p ≤ 0.006 in both of their runs, with the same sign both times.
 
@@ -227,7 +249,7 @@ The Gemini-pro migration reveals a second layer:
 | Pro migration repeat | hard | **+96.5 (+10.1%)** |
 | Flash migration | hard | −227.5 (−20.5%) |
 
-**Table 5.** Token deltas by suite for the Gemini migrations: the pro tier inverts direction between easy and hard prompts; the flash tier does not.
+**Table 5.** Mean token change by suite for Gemini migrations. *main* = 30 easy prompts; *hard* = 12 stress prompts. Pro tier shrinks on main (−15.7%) but grows on hard (+3.7% / +10.1%); flash shrinks on both.
 
 The new pro model is terser on routine tasks but spends more tokens on hard ones. This claim deserves a candid grading against the paper's own standard. The matched hard-suite pro noise floor is −1.7%, but the run-1 effect of +3.7% is small: it sits inside the widest cross-floor band in Figure 2 and, taken alone, would be directionally suggestive at best. The evidence is the repeat: +10.1% in the second run, same direction, against a matched floor that moved the *opposite* way. We report the finding as a reproduced direction with a modest first-run magnitude, weaker than the headline verbosity results in Section 5.3, and the practical lesson stands regardless: the flash model shrinks regardless of task difficulty, while the pro model's drift inverts between easy and hard inputs. Verbosity drift measured on an easy eval suite does not predict what the model does on complex production inputs. You need both suites to see this.
 
@@ -244,7 +266,7 @@ Field-level event counts (list-length and string-length changes exceeding 40%) s
 | Claude noise floor (hard) | 10/12 | 30 |
 | Claude migration (hard) | 12/12 | 91 |
 
-**Table 6.** Field-level drift events (list-length or string-length changes exceeding 40%) per run.
+**Table 6.** Field-level drift events per run: prompts where any list or string field changed length by more than 40%. Migration rows exceed their matched noise-floor baselines (~2–3×).
 
 Migration produces approximately 2× (Gemini) to 2.7–3× (Claude) the field-level events of self-vs-self variation. Structural drift appears across both providers and is not simply explained by the token-volume effect: individual string and list fields change independently of overall verbosity.
 
@@ -273,7 +295,7 @@ Decision-field flip counts alone are misleading; Section 6 explains why. The ful
 | Claude migration repeat | main | 2 | 0 |
 | Claude migration repeat | hard | 1 | 1 |
 
-**Table 7.** Decision-field flips per run; final-decision flips are the subset on `recommended_action`, `overall_recommendation`, `overall_grade`, or `escalation_required`. Reproducible via `scripts/analyze_flips.py`.
+**Table 7.** Decision-field flips per run (old value ≠ new value on the same prompt). *Final-decision flips* = changes on hire/no-hire, pass/fail, proceed/block, or grade fields only. **NF** rows show how often the model flips against itself with no migration; compare like-for-like (same suite, same tier). Reproducible via `scripts/analyze_flips.py`.
 
 After applying both controls, two findings survive as genuine judgment drift:
 
@@ -301,7 +323,7 @@ The framework records wall-clock latency per request (including any retry round-
 | Claude NF s2 (main) | 44.4 | 44.9 | +1.1% | 0.65 |
 | Claude NF (hard) | 33.9 | 33.3 | −1.8% | 0.57 |
 
-**Table 8.** Latency noise floors: same-model latency swings per suite and tier.
+**Table 8.** Latency noise floors (same model both sides): how much wall-clock time swings with no migration. Use as baseline before reading Table 9; latency noise is wider than token noise.
 
 *Migrations (reproduced signals in bold):*
 
@@ -315,7 +337,7 @@ The framework records wall-clock latency per request (including any retry round-
 | Claude rpt main | 51.2 | 74.7 | +46.0% | 0.25 |
 | Flash (3 runs) | 20.4–25.2 | 4.6–5.8 | **−76 to −78%** | <0.001 |
 
-**Table 9.** Migration latency deltas; bold marks signals reproduced across runs.
+**Table 9.** Migration latency deltas (old vs new model). **Bold** = reproduced in two runs. *Pro mig.* = pro migration; *Claude rpt hard* = Claude repeat on hard suite. *Flash (3 runs)* = all three flash migration runs show ~77% speedup. Rows without bold did not pass the repeat bar (e.g. Claude main-suite latency).
 
 Three results survive the controls:
 

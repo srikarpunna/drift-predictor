@@ -138,7 +138,7 @@ First-attempt validity, measured before any retry, reveals a clear divide by cap
 
 ![Figure 1: First-attempt schema validity per run, old vs new model. Eventual pass rate is 100% everywhere; only the flash tier degrades before retries.](figures/fig3_first_attempt.png)
 
-**Figure 1.** How often each model produced schema-valid output on its first try. Every run still ends at a 100% pass rate after retries, so standard testing reports no difference between any of these runs. The gap between the two bars in each pair is the failure rate the retry layer silently absorbed. Only the flash tier shows a meaningful gap.
+**Figure 1.** How often each model produced schema-valid output on its first try. Every run still ends at a 100% pass rate after retries, so standard testing reports no difference between any of these runs. The gap between the two bars in each pair is the failure rate the retry layer silently absorbed. To read one pair: in Flash migration r2, the old model's first answer was valid on 29 of 30 prompts (97) while the new model managed only 25 of 30 (83); those five rescued failures are invisible in success metrics but cost real latency and API calls. The noise floor pairs on the same chart show how big this gap gets with no model change at all (about 3 points), so only the flash tier's 14 to 25 point gaps are meaningful.
 
 The new flash model fails 10–25% of first attempts, concentrated in `interview_evaluation` (the most constraint-dense schema), and nearly all are silently rescued. The hard suite is worst at 75% first-pass. The pro tier has no such problem in any run. The Claude sonnet tier shows 1–3 retries per 30 main-suite prompts, comparable to the old model's own rate (0–1), and zero retries on both hard-suite runs. Retry-masking is a capability-tier effect, not a universal migration risk.
 
@@ -178,7 +178,7 @@ The cross-provider contrast is sharp: the Gemini 3.1 generation shrinks output ~
 
 ![Figure 2: Output-token change per run. Gemini migrations shrink, Claude migrations grow on hard tasks, noise floors stay within ±2.7%.](figures/fig1_verbosity.png)
 
-**Figure 2.** How much average output length changed in each run. Gray bars compare the old model against itself, so they show pure randomness; the shaded band marks the widest such swing observed (±2.7%). A migration bar landing inside that band is indistinguishable from noise. The reproduced signals (Gemini shrinking ~16%, Claude growing 37–40% on hard tasks) sit far outside it, in opposite directions.
+**Figure 2.** How much average output length changed in each run. To read one bar: −15.7% on the pro migration means the new model's answers averaged 15.7% fewer tokens than the old model's on the same 30 prompts. Gray bars compare the old model against itself, so they show pure randomness; the shaded band marks the widest such swing observed (±2.7%). A migration bar landing inside that band is indistinguishable from noise. The reproduced signals (Gemini shrinking ~16%, Claude growing 37–40% on hard tasks) sit far outside it, in opposite directions.
 
 ### 5.4 Adaptive Effort: Easy and Hard Prompts Diverge (Gemini-Pro)
 

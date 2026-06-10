@@ -1,5 +1,9 @@
 # Drift or Dice? Separating Real Behavioral Change from Sampling Noise in LLM Migrations
 
+**Srikar Punna**
+Independent Researcher
+<!-- TODO: add your email before submission -->
+
 ---
 
 ## Abstract
@@ -12,7 +16,7 @@ Teams operating LLM-backed applications migrate models constantly — provider d
 
 Teams operating LLM-backed production systems face a recurring obligation: migrate to a new model. Provider deprecation timelines, cost restructuring, and capability improvements all produce the same pressure. The standard safety check is straightforward: run the evaluation suite, confirm outputs still validate against your schemas and pass your tests. This check is fast, intuitive, and nearly useless.
 
-"Across 16 benchmark runs of two production migrations, schema-level validation flagged zero regressions; meanwhile output volume shifted up to 40% and one migration systematically downgraded its assessments of human candidates."
+Across 16 benchmark runs of two production migrations, schema-level validation flagged zero regressions; meanwhile output volume shifted up to 40% and one migration systematically downgraded its assessments of human candidates.
 
 Those migrations were Gemini 2.5→3.1 (flash and pro tier) and Claude sonnet-4-5→4-6. In every configuration, every suite, every run: 100% eventual pass rate. A standard regression gate would have concluded all migrations were safe. What it missed: one migration shrank average output by 15.7%, reproduced identically across two independent runs; another grew output on difficult tasks by 37–40%; a cheaper model tier began failing 25% of hard first attempts, rescued silently by the retry layer (the automatic re-submission that happens when an output fails validation); and a pro-tier migration produced eight consecutive downward candidate-level assessments without a single upward exception.
 
@@ -132,6 +136,10 @@ First-attempt validity — measured before any retry — reveals a clear divide 
 | Claude migration repeat (main) | 29/30 | 27/30 |
 | Claude noise floor (main) | 29/30 | 29/30 |
 
+![Figure 1: First-attempt schema validity per run, old vs new model. Eventual pass rate is 100% everywhere; only the flash tier degrades before retries.](figures/fig3_first_attempt.png)
+
+**Figure 1.** First-attempt schema validity before instructor retries, old vs new model. Eventual pass rate is 100% in every run; the degradation is visible only pre-retry, and only in the flash tier.
+
 The new flash model fails 10–25% of first attempts — concentrated in `interview_evaluation`, the most constraint-dense schema — and nearly all are silently rescued. The hard suite is worst at 75% first-pass. The pro tier has no such problem in any run. The Claude sonnet tier shows 1–3 retries per 30 main-suite prompts, comparable to the old model's own rate (0–1), and zero retries on both hard-suite runs. Retry-masking is a capability-tier effect, not a universal migration risk.
 
 ### 5.3 Verbosity Drift: Opposite Directions, Both Reproducible
@@ -167,6 +175,10 @@ The hard-suite growth is the robust finding: +37.2% and +39.7% across two indepe
 The main-suite claim did not reproduce (+12.1% run 1, −0.6% repeat) and is addressed as a false positive in Section 6.
 
 The cross-provider contrast is sharp: the Gemini 3.1 generation shrinks output ~16% (reproduced twice); Claude 4-6 grows output ~38–40% on hard tasks (reproduced twice). Same type of migration event; opposite directions. There is no universal rule.
+
+![Figure 2: Output-token change per run. Gemini migrations shrink, Claude migrations grow on hard tasks, noise floors stay within ±2.7%.](figures/fig1_verbosity.png)
+
+**Figure 2.** Average output-token change per run, new model vs old. The shaded band is the widest same-model noise floor observed (±2.7%). Every reproduced migration signal sits far outside it — and the two providers move in opposite directions.
 
 ### 5.4 Adaptive Effort: Easy and Hard Prompts Diverge (Gemini-Pro)
 
@@ -230,9 +242,13 @@ No equivalent directional or reproducible judgment pattern appeared in the Claud
 
 ## 6. The False Positives
 
-"Half of the drift we initially detected was sampling noise — a same-model noise floor and one repeat run were sufficient to falsify it."
+Half of the drift we initially detected was sampling noise — a same-model noise floor and one repeat run were sufficient to falsify it.
 
 Three findings looked credible after the first migration run. All three were killed by the controls. This section is not a methodological footnote — it is the methodological point of the paper. A single-run comparison without a noise floor would have published all three as results.
+
+![Figure 3: Seven provisional findings pass through two controls; four survive, three are killed.](figures/fig2_funnel.png)
+
+**Figure 3.** Seven provisional findings filtered through the two controls. Four survive (each reproduced and above the noise floor); three are falsified — one by the noise floor, two by the repeat run.
 
 ### 6.1 "Hard Prompts Expose Decision Flips" (Killed)
 
@@ -335,7 +351,7 @@ Schema-level regression testing cannot detect the changes that matter in an LLM 
 
 Just as important: roughly half of the drift we initially detected was noise. Three findings that appeared credible after a first run — hard-prompt decision instability, a cross-provider judgment-harshness pattern, and a 12% Claude verbosity shift — each collapsed under a same-model noise floor or a repeat run. The methodology that found real drift is the methodology that killed these false positives. You cannot have one without the other.
 
-"Drift is universal; its direction is not." Gemini shrank output; Claude grew it. Gemini-pro recalibrated candidate assessments; Claude-sonnet did not. No rule of thumb predicts what a given migration will do. The only reliable approach is to measure it — against a noise floor, with repeats, across your actual task distribution.
+Drift is universal; its direction is not. Gemini shrank output; Claude grew it. Gemini-pro recalibrated candidate assessments; Claude-sonnet did not. No rule of thumb predicts what a given migration will do. The only reliable approach is to measure it — against a noise floor, with repeats, across your actual task distribution.
 
 The framework, prompts, schemas, and raw results are released as a reproducible artifact.
 
@@ -374,29 +390,3 @@ Wang, X., Wei, J., Schuurmans, D., Le, Q., Chi, E., Narang, S., Chowdhery, A., &
 Willard, B. T., & Louf, R. (2023). Efficient guided generation for large language models. arXiv:2307.09702
 
 Zheng, L., Chiang, W.-L., Sheng, Y., Zhuang, S., Wu, Z., et al. (2023). Judging LLM-as-a-judge with MT-bench and Chatbot Arena. *NeurIPS 2023 (Datasets and Benchmarks Track)*. arXiv:2306.05685
-
----
-
-## WRITER'S NOTES
-
-### (a) Citation status
-
-All [CITE] placeholders filled with real references. Full bibliography in References section above. No [NEEDS-DATA] markers were used — all numbers come directly from `gemini_findings.md` or `claude_findings.md`.
-
-### (b) Uncertain claims
-
-1. **Flash migration judgment flips.** Raw flip counts included in Section 5.6 table for completeness, but no surviving finding is claimed from flash migration judgment data. Source does not confirm whether the flash `hold→hire` main-suite flip reproduced; it is left as raw data only.
-
-2. **`interview_evaluation-104` `hold→no_hire`.** Source notes "the old model also flips this one against itself — claim only weakly." Excluded from the two surviving judgment-drift findings; only `COACH→FAIL` and the candidate-level directional pattern are stated as findings.
-
-3. **"~4× compute" estimate (Section 7.1).** Not stated in the source files. Derived as: 1 noise floor + 1 migration + 1 repeat ≈ 3 extra runs vs 1 baseline run. Reasonable but unverified. Flag for review.
-
-4. **"approximately 8×" and "approximately 14×" signal-to-noise ratios.** The source states these ("roughly 8×", "~14× signal") — I preserved the hedge word "approximately" to match the source's phrasing.
-
-### (c) Changes from original draft
-
-- Added inline definitions in parentheses on first use for: schema validation, retry layer, Pydantic, instructor library, Literal types, cross-field validators / @model_validator, hard suite, noise floor (in Framework), decision-field flips, retry-masking.
-- Section 6.1 ("Hard Prompts Expose Decision Flips") rewritten substantially — replaced the academic phrase "conflating input-induced instability with model-change-induced instability" with the "borderline grading rubric" analogy and a plain-language explanation of why the hard-suite noise floor matters.
-- Academic hedging phrases replaced throughout: "not consistent with a pure-noise model of LLM judgment variability" → "not the kind of random flip you would expect from sampling variation alone"; "reproducibility controls" → "repeat runs"; "exhibits this failure mode" → "has this problem"; "analogous implications" → "similar tradeoffs".
-- Definition of "flash" and "lite" added inline in Section 7.2 for readers unfamiliar with Google's model tier naming.
-- No numbers, tables, or section structure changed.

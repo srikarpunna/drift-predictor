@@ -24,17 +24,17 @@ The broader lesson is not that models drift. The lesson is that drift is univers
 
 ## 2. Related Work
 
-BIG-bench [Srivastava et al., 2023], HELM [Liang et al., 2022], and the LM Evaluation Harness [Gao et al., 2021; Biderman et al., 2024] established the paradigm of fixed-prompt evaluation for language models, but these are designed to characterize absolute capability at a point in time, not to detect behavioral change across a specific version transition. The migration-testing problem is structurally different: the prompt set is fixed, the model pair is specific, and the question is not "how capable is this model" but "how did it change and does that matter for my pipeline."
+BIG-bench [Srivastava et al., 2023], HELM [Liang et al., 2022], and the LM Evaluation Harness [Gao et al., 2023; Biderman et al., 2024] established the paradigm of fixed-prompt evaluation for language models, but these are designed to characterize absolute capability at a point in time, not to detect behavioral change across a specific version transition. The migration-testing problem is structurally different: the prompt set is fixed, the model pair is specific, and the question is not "how capable is this model" but "how did it change and does that matter for my pipeline."
 
 Sculley et al. [2015] and Breck et al. [2017] established rubrics for testing production ML systems and identified regression testing as a first-class production concern. Their frameworks treat regression as binary: a test case passes or fails against a reference output. For structured-output tasks with schema contracts, the reference output is the schema — and as we show, schema compliance can remain at 100% across a migration that changes output volume by 40% and judgment direction systematically. Binary regression gates are necessary but not sufficient.
 
-Song et al. [2024] and Atil et al. [2024] document that individual models produce different outputs across runs — including at temperature=0. Atil et al. find accuracy swings up to 15% and best-to-worst performance gaps up to 70% across eight tasks even with deterministic settings. Our contribution is separating within-model sampling variance from between-model migration effects, using empirical self-vs-self noise floor runs rather than analytic estimates. Souren et al. [2024] independently quantify LLM output drift across providers and versions for financial workflows, proposing mitigation strategies that complement our measurement approach.
+Song et al. [2024] and Atil et al. [2024] document that individual models produce different outputs across runs — including at temperature=0. Atil et al. find accuracy swings up to 15% and best-to-worst performance gaps up to 70% across eight tasks even with deterministic settings. Our contribution is separating within-model sampling variance from between-model migration effects, using empirical self-vs-self noise floor runs rather than analytic estimates. Khatchadourian and Franco [2025] independently quantify LLM output drift across providers for financial workflows, proposing mitigation strategies that complement our measurement approach.
 
-Structured output enforcement has become standard practice for production LLM pipelines. Willard and Louf [2023] formalize constrained generation as finite-state machine transitions, enabling token-level enforcement of output schemas with minimal overhead. Tam et al. [2025] benchmark structured output approaches across prompting, fine-tuning, and constrained decoding strategies. Our framework uses the `instructor` library — which enforces schemas via validation-error feedback and retries rather than constrained decoding — and adds pre-retry first-attempt monitoring, exposing a failure mode (retry-masking) that compliant infrastructure hides by design.
+Structured output enforcement has become standard practice for production LLM pipelines. Willard and Louf [2023] formalize constrained generation as finite-state machine transitions, enabling token-level enforcement of output schemas with minimal overhead. Geng et al. [2025] benchmark structured output generation across six constrained decoding frameworks using 10K real-world JSON schemas. Our framework uses the `instructor` library — which enforces schemas via validation-error feedback and retries rather than constrained decoding — and adds pre-retry first-attempt monitoring, exposing a failure mode (retry-masking) that compliant infrastructure hides by design.
 
 Zheng et al. [2023] proposed using strong LLMs as judges for evaluating open-ended outputs and characterized position, verbosity, and self-enhancement biases in LLM judges. Wang et al. [2022] showed through self-consistency sampling that LLM outputs vary meaningfully across samples, and that majority-vote aggregation substantially improves accuracy on reasoning tasks. A recent survey [Gu et al., 2024] covers reliability, calibration, and inter-rater agreement of LLM evaluators comprehensively. Our finding that the Gemini-pro migration produces directional shifts in candidate-level assessment — downward, 8 for 8 across two independent runs — is not the kind of random flip these works describe. Systematic directional drift requires direction-sensitive flip tracking with reproducibility controls, not just flip counts.
 
-Shankar et al. [2022] document recurring production ML challenges — data drift, monitoring gaps, retraining triggers — through interviews with 18 ML engineers. More recent work on LLMOps [Ait-Mlouk et al., 2025] surveys how deployment pipelines must evolve specifically for large language models. Our framework targets the production gap these works identify: outputs are schema-validated but not ground-truth-labeled, so behavioral shifts pass through undetected.
+Shankar et al. [2022] document recurring production ML challenges — data drift, monitoring gaps, retraining triggers — through interviews with 18 ML engineers. More recent work on LLMOps [Pahune et al., 2025] surveys how deployment pipelines must evolve specifically for large language models. Our framework targets the production gap these works identify: outputs are schema-validated but not ground-truth-labeled, so behavioral shifts pass through undetected.
 
 ---
 
@@ -99,7 +99,7 @@ Three migration pairs were evaluated:
 | Gemini Pro | `gemini-2.5-pro` | `gemini-3.1-pro-preview` |
 | Claude Sonnet | `claude-sonnet-4-5-20250929` | `claude-sonnet-4-6` |
 
-All runs were conducted on 2026-06-09 and 2026-06-10. Total runs: 16, comprising 3 flash migration runs (including 2 main-suite repeats), 1 flash hard-suite run, 1 flash noise floor, 2 pro migration main runs, 2 pro migration hard runs, 2 pro noise floor runs (main and hard), 2 Claude migration main runs, 2 Claude migration hard runs, and 1 Claude noise floor run (main and hard).
+All runs were conducted on 2026-06-09 and 2026-06-10. Total runs: 16, comprising 2 flash migration main-suite runs, 1 flash hard-suite run, 1 flash noise floor, 2 pro migration main runs, 2 pro migration hard runs, 2 pro noise floor runs (main and hard), 2 Claude migration main runs, 2 Claude migration hard runs, and 2 Claude noise floor runs (main and hard).
 
 ### 4.3 Provider Configuration
 
@@ -198,23 +198,25 @@ Migration produces approximately 2× (Gemini) to 2.7–3× (Claude) the field-le
 
 ### 5.6 Judgment Drift: Systematic Downgrading (Gemini-Pro)
 
-Decision-field flip counts alone are misleading — Section 6 explains why. The full table is shown here for reference; the noise-floor-and-repeat filters are applied before any finding is stated.
+Decision-field flip counts alone are misleading — Section 6 explains why. The full table is shown here for reference; the noise-floor-and-repeat filters are applied before any finding is stated. Final-decision fields are `recommended_action`, `overall_recommendation`, `overall_grade`, and `escalation_required`; `candidate_level_assessed` flips are counted in the flip total but not as final decisions.
 
 | Run | Suite | Flips | Final-decision flips |
 |-----|-------|-------|---------------------|
 | Flash noise floor | main | 1 (level only) | 0 |
 | Pro noise floor | main | 2 (level only) | 0 |
 | Pro noise floor | **hard** | 3 | **3** |
+| Claude noise floor | main | 1 (level only) | 0 |
+| Claude noise floor | **hard** | 2 | **2** |
 | Flash migration r3 | main | 4 | 1 |
-| Flash migration | hard | 7 | 3 |
+| Flash migration | hard | 7 | 4 |
 | Pro migration | main | 4 (all level) | 0 |
 | Pro migration | hard | 3 | 3 |
 | Pro migration repeat | main | 4 (all level) | 0 |
-| Pro migration repeat | hard | 3 | 3 |
+| Pro migration repeat | hard | 2 | 2 |
 | Claude migration | main | 1 | 0 |
 | Claude migration | hard | 3 | 2 |
 | Claude migration repeat | main | 2 | 0 |
-| Claude migration repeat | hard | 1 | 0 |
+| Claude migration repeat | hard | 1 | 1 |
 
 After applying both controls, two findings survive as genuine judgment drift:
 
@@ -341,19 +343,23 @@ The framework, prompts, schemas, and raw results are released as a reproducible 
 
 ## References
 
-Ait-Mlouk, A., et al. (2025). Transitioning from MLOps to LLMOps: Navigating the unique challenges of large language models. *Information*, 16(2), 87. https://doi.org/10.3390/info16020087
-
 Atil, B., Aykent, S., Chittams, A., Fu, L., Passonneau, R. J., et al. (2024). Non-determinism of "deterministic" LLM settings. *Eval4NLP 2025 Workshop*. arXiv:2408.04667
 
 Biderman, S., Schoelkopf, H., Sutawika, L., Gao, L., Tow, J., et al. (2024). Lessons from the trenches on reproducible evaluation of language models. arXiv:2405.14782
 
 Breck, E., Cai, S., Nielsen, E., Salib, M., & Sculley, D. (2017). The ML Test Score: A rubric for ML production readiness and technical debt reduction. *IEEE International Conference on Big Data (IEEE BigData 2017)*.
 
-Gao, L., et al. (2021). A framework for few-shot language model evaluation. *Zenodo*. https://doi.org/10.5281/zenodo.10256836
+Gao, L., et al. (2023). A framework for few-shot language model evaluation. *Zenodo*. https://doi.org/10.5281/zenodo.10256836
+
+Geng, S., Cooper, H., Moskal, M., Jenkins, S., Berman, J., et al. (2025). Generating structured outputs from language models: Benchmark and studies. arXiv:2501.10868
 
 Gu, J., et al. (2024). A survey on LLM-as-a-judge. arXiv:2411.15594
 
+Khatchadourian, R., & Franco, R. (2025). LLM output drift: Cross-provider validation and mitigation for financial workflows. arXiv:2511.07585
+
 Liang, P., Bommasani, R., Lee, T., et al. (2022). Holistic evaluation of language models. arXiv:2211.09110
+
+Pahune, S., et al. (2025). Transitioning from MLOps to LLMOps: Navigating the unique challenges of large language models. *Information*, 16(2), 87. https://doi.org/10.3390/info16020087
 
 Sculley, D., Holt, G., Golovin, D., Davydov, E., Phillips, T., et al. (2015). Hidden technical debt in machine learning systems. *Advances in Neural Information Processing Systems 28 (NeurIPS 2015)*, 2503–2511.
 
@@ -361,11 +367,7 @@ Shankar, S., Garcia, R., Hellerstein, J. M., & Parameswaran, A. G. (2022). Opera
 
 Song, Y., Wang, G., Li, S., & Lin, B. Y. (2024). The good, the bad, and the greedy: Evaluation of LLMs should not ignore non-determinism. arXiv:2407.10457
 
-Souren, R., et al. (2024). LLM output drift: Cross-provider validation and mitigation for financial workflows. arXiv:2511.07585
-
 Srivastava, A., et al. (2023). Beyond the imitation game: Quantifying and extrapolating the capabilities of language models. *Transactions on Machine Learning Research (TMLR)*. arXiv:2206.04615
-
-Tam, Z. R., et al. (2025). Generating structured outputs from language models: Benchmark and studies. arXiv:2501.10868
 
 Wang, X., Wei, J., Schuurmans, D., Le, Q., Chi, E., Narang, S., Chowdhery, A., & Zhou, D. (2022). Self-consistency improves chain of thought reasoning in language models. *ICLR 2023*. arXiv:2203.11171
 

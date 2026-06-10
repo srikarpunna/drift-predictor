@@ -87,7 +87,13 @@ def fig1_verbosity():
     ax.set_yticks(list(y))
     ax.set_yticklabels(labels, fontsize=9.5)
     ax.set_xlabel("Average output-token change, new vs old model (%)")
-    ax.set_title("Verbosity drift per run vs the same-model noise floor")
+    fig.suptitle("How much longer or shorter did answers get after the migration?",
+                 fontsize=13, y=0.985)
+    ax.set_title(
+        "Each bar is one full benchmark run. Gray = old model compared against itself "
+        "(pure randomness).\nA migration signal is real only if it escapes the gray band "
+        "AND shows up again in the repeat run.",
+        fontsize=9, color="#444444", pad=10)
     ax.set_xlim(min(deltas) - 8, max(deltas) + 8)
 
     handles = [
@@ -98,7 +104,7 @@ def fig1_verbosity():
     ax.legend(handles, ["Noise floor (same model both sides)",
                         "Gemini migration", "Claude migration"],
               loc="upper right", fontsize=9)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
     fig.savefig(OUT / "fig1_verbosity.png", dpi=200)
     plt.close(fig)
 
@@ -134,62 +140,86 @@ def fig3_first_attempt():
     ax.set_xticks(list(x))
     ax.set_xticklabels(labels, fontsize=8.5)
     ax.set_ylabel("First-attempt schema validity (%)")
-    ax.set_ylim(60, 106)
-    ax.set_title("Retry-masking: first-attempt validity before instructor retries\n(eventual pass rate is 100% in every run)")
+    ax.set_ylim(60, 108)
+    fig.suptitle("How often did the model get the output right on the FIRST try?",
+                 fontsize=13, y=0.985)
+    ax.set_title(
+        "Final pass rate is 100% in every run, so normal testing sees nothing. "
+        "The gap between bars is failures\nthat the retry layer silently fixed: "
+        "extra latency and cost that never show up in success metrics.",
+        fontsize=9, color="#444444", pad=10)
+    ax.annotate("new flash model: 1 in 4 hard\nrequests needed a retry rescue",
+                xy=(3 + w / 2, 75), xytext=(4.15, 66),
+                fontsize=8.5, color="#bf360c", ha="left",
+                bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="#bf360c", alpha=0.95),
+                arrowprops=dict(arrowstyle="->", color="#bf360c"))
     ax.legend(loc="lower left", fontsize=9)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     fig.savefig(OUT / "fig3_first_attempt.png", dpi=200)
     plt.close(fig)
 
 
 def fig2_funnel():
     survived = [
-        "Gemini-pro output shrink −15.7%\n(reproduced, ~8× noise)",
-        "Claude hard-suite growth +37→40%\n(reproduced, ~14× noise)",
-        "Flash retry-masking: 75–83% first-pass\n(noise floor: 97–100%)",
-        "Gemini-pro judgment downgrades\n(8/8 downward, COACH→FAIL ×2)",
+        "Gemini-pro output shrank 15.7%\n(showed up in BOTH runs, 8x bigger than noise)",
+        "Claude grew 37-40% on hard tasks\n(showed up in BOTH runs, 14x bigger than noise)",
+        "New flash model fails 1 in 4 hard first tries\n(old model: almost never)",
+        "Gemini-pro judges candidates lower\n(8 of 8 changes were downgrades, twice)",
     ]
-    killed = [
-        "\u201cHard prompts expose decision flips\u201d\n(noise floor flips them too)",
-        "\u201cClaude judges more harshly\u201d\n(0 flips recurred in repeat)",
-        "\u201cClaude +12% main-suite verbosity\u201d\n(repeat: −0.6%, sign flipped)",
+    killed_gate1 = "\u201cHard prompts expose decision flips\u201d\nKILLED: the old model flips these\nprompts against ITSELF too"
+    killed_gate2 = [
+        "\u201cClaude judges more harshly\u201d\nKILLED: ran it again,\nnone of the flips came back",
+        "\u201cClaude +12% longer answers\u201d\nKILLED: ran it again,\ngot \u22120.6% instead",
     ]
 
-    fig, ax = plt.subplots(figsize=(9.5, 5.6))
+    fig, ax = plt.subplots(figsize=(11.5, 6.2))
     ax.axis("off")
 
-    ax.text(0.07, 0.93, "7 provisional findings\n(after first migration runs)",
-            ha="center", va="center", fontsize=11, fontweight="bold",
+    y_flow = 0.80
+
+    ax.text(0.08, y_flow, "START\n\n7 suspected\ndrift signals\nafter the first\nmigration runs",
+            ha="center", va="center", fontsize=10, fontweight="bold",
             bbox=dict(boxstyle="round,pad=0.5", fc="#eceff1", ec="#455a64"))
 
-    ax.text(0.42, 0.93, "Control 1\nSame-model noise floor", ha="center", va="center",
-            fontsize=10, bbox=dict(boxstyle="round,pad=0.4", fc="#fff8e1", ec="#f9a825"))
-    ax.text(0.42, 0.72, "Control 2\nMigration repeat run", ha="center", va="center",
-            fontsize=10, bbox=dict(boxstyle="round,pad=0.4", fc="#fff8e1", ec="#f9a825"))
-    ax.annotate("", xy=(0.30, 0.93), xytext=(0.17, 0.93),
-                arrowprops=dict(arrowstyle="->", color="#455a64"))
-    ax.annotate("", xy=(0.42, 0.78), xytext=(0.42, 0.87),
-                arrowprops=dict(arrowstyle="->", color="#455a64"))
+    ax.text(0.35, y_flow,
+            "CHECK 1: Noise floor\n\nCompare the old model\nagainst ITSELF.\nIf the \u201cdrift\u201d shows up here,\nit is just randomness.",
+            ha="center", va="center", fontsize=9.5,
+            bbox=dict(boxstyle="round,pad=0.5", fc="#fff8e1", ec="#f9a825"))
 
-    ax.text(0.78, 0.97, "SURVIVED (4)", ha="center", fontsize=11,
-            fontweight="bold", color=GREEN)
+    ax.text(0.62, y_flow,
+            "CHECK 2: Repeat\n\nRun the whole migration\ntest a second time.\nReal drift shows up again;\nrandomness does not.",
+            ha="center", va="center", fontsize=9.5,
+            bbox=dict(boxstyle="round,pad=0.5", fc="#fff8e1", ec="#f9a825"))
+
+    ax.text(0.88, 0.94, "CONFIRMED: 4 real drift signals", ha="center",
+            fontsize=10.5, fontweight="bold", color=GREEN)
     for i, s in enumerate(survived):
-        ax.text(0.78, 0.87 - i * 0.135, s, ha="center", va="center", fontsize=8.8,
+        ax.text(0.88, 0.83 - i * 0.155, s, ha="center", va="center", fontsize=8.2,
                 bbox=dict(boxstyle="round,pad=0.35", fc="#e8f5e9", ec=GREEN))
 
-    ax.text(0.42, 0.40, "KILLED (3)", ha="center", fontsize=11,
-            fontweight="bold", color=RED)
-    for i, s in enumerate(killed):
-        ax.text(0.42, 0.30 - i * 0.115, s, ha="center", va="center", fontsize=8.8,
-                bbox=dict(boxstyle="round,pad=0.35", fc="#ffebee", ec=RED))
+    for x0, x1 in [(0.155, 0.25), (0.45, 0.52), (0.72, 0.76)]:
+        ax.annotate("", xy=(x1, y_flow), xytext=(x0, y_flow),
+                    arrowprops=dict(arrowstyle="->", color="#455a64", lw=2))
+    ax.text(0.20, y_flow + 0.06, "7 in", ha="center", fontsize=8.5, color="#455a64")
+    ax.text(0.485, y_flow + 0.06, "6 pass", ha="center", fontsize=8.5, color="#455a64")
+    ax.text(0.74, y_flow + 0.06, "4 pass", ha="center", fontsize=8.5, color="#455a64")
 
-    ax.annotate("", xy=(0.62, 0.80), xytext=(0.52, 0.74),
-                arrowprops=dict(arrowstyle="->", color=GREEN, lw=1.6))
-    ax.annotate("", xy=(0.42, 0.44), xytext=(0.42, 0.65),
-                arrowprops=dict(arrowstyle="->", color=RED, lw=1.6))
+    ax.annotate("", xy=(0.35, 0.40), xytext=(0.35, 0.60),
+                arrowprops=dict(arrowstyle="->", color=RED, lw=2))
+    ax.text(0.355, 0.50, "1 killed", fontsize=8.5, color=RED)
+    ax.text(0.35, 0.28, killed_gate1, ha="center", va="center", fontsize=8.2,
+            bbox=dict(boxstyle="round,pad=0.4", fc="#ffebee", ec=RED))
 
-    ax.set_title("Roughly half of the initially detected drift was sampling noise",
-                 fontsize=12)
+    ax.annotate("", xy=(0.62, 0.44), xytext=(0.62, 0.60),
+                arrowprops=dict(arrowstyle="->", color=RED, lw=2))
+    ax.text(0.625, 0.52, "2 killed", fontsize=8.5, color=RED)
+    for i, s in enumerate(killed_gate2):
+        ax.text(0.62, 0.32 - i * 0.19, s, ha="center", va="center", fontsize=8.2,
+                bbox=dict(boxstyle="round,pad=0.4", fc="#ffebee", ec=RED))
+
+    ax.set_title(
+        "How 7 suspected drift findings became 4: each one had to pass two checks",
+        fontsize=12.5, pad=12)
     fig.tight_layout()
     fig.savefig(OUT / "fig2_funnel.png", dpi=200)
     plt.close(fig)

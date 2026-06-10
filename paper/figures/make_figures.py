@@ -114,14 +114,17 @@ def fig1_verbosity():
 
 def fig3_first_attempt():
     runs = [
-        ("Flash noise floor\n(main)", "noise_floor_20260609_175927.jsonl"),
-        ("Flash migration r2\n(main)", "gemini_migration_20260609_172936.jsonl"),
-        ("Flash migration r3\n(main)", "gemini_migration_20260609_182638.jsonl"),
-        ("Flash migration\n(hard)", "gemini_migration_prompts_hard_20260609_184220.jsonl"),
-        ("Pro migration\n(main)", "gemini_pro_migration_20260609_232303.jsonl"),
-        ("Claude noise floor\n(main)", "noise_floor_claude_20260610_025532.jsonl"),
-        ("Claude migration\n(main)", "claude_migration_20260610_015116.jsonl"),
-        ("Claude migration rpt\n(main)", "claude_migration_20260610_083126.jsonl"),
+        ("Flash NF\n(main)", "noise_floor_20260609_175927.jsonl"),
+        ("Flash NF\n(hard)", "noise_floor_prompts_hard_20260610_164208.jsonl"),
+        ("Flash mig r2\n(main)", "gemini_migration_20260609_172936.jsonl"),
+        ("Flash mig r3\n(main)", "gemini_migration_20260609_182638.jsonl"),
+        ("Flash mig\n(hard)", "gemini_migration_prompts_hard_20260609_184220.jsonl"),
+        ("Pro mig\n(main)", "gemini_pro_migration_20260609_232303.jsonl"),
+        ("Pro NF s2\n(main)", "noise_floor_pro_20260610_164951.jsonl"),
+        ("Claude NF s1\n(main)", "noise_floor_claude_20260610_025532.jsonl"),
+        ("Claude NF s2\n(main)", "noise_floor_claude_20260610_164210.jsonl"),
+        ("Claude mig\n(main)", "claude_migration_20260610_015116.jsonl"),
+        ("Claude mig rpt\n(main)", "claude_migration_20260610_083126.jsonl"),
     ]
     old_vals, new_vals, labels = [], [], []
     for label, fname in runs:
@@ -133,7 +136,7 @@ def fig3_first_attempt():
 
     x = range(len(labels))
     w = 0.38
-    fig, ax = plt.subplots(figsize=(11.5, 4.8))
+    fig, ax = plt.subplots(figsize=(14.5, 5.2))
     ax.bar([i - w / 2 for i in x], old_vals, w, label="Old model", color="#607d8b")
     ax.bar([i + w / 2 for i in x], new_vals, w, label="New model", color="#ef6c00")
     for i, (o, n) in enumerate(zip(old_vals, new_vals)):
@@ -141,7 +144,7 @@ def fig3_first_attempt():
         ax.text(i + w / 2, n + 0.6, f"{n:.0f}", ha="center", fontsize=8.5)
     ax.axhline(100, color=GRAY, lw=0.8, ls="--")
     ax.set_xticks(list(x))
-    ax.set_xticklabels(labels, fontsize=8.5)
+    ax.set_xticklabels(labels, fontsize=7.5)
     ax.set_ylabel("First-attempt schema validity (%)")
     ax.set_ylim(60, 108)
     fig.suptitle("How often did the model get the output right on the FIRST try?",
@@ -151,8 +154,8 @@ def fig3_first_attempt():
         "The gap between bars is failures\nthat the retry layer silently fixed: "
         "extra latency and cost that never show up in success metrics.",
         fontsize=9, color="#444444", pad=10)
-    ax.annotate("new flash model: 1 in 4 hard\nrequests needed a retry rescue",
-                xy=(3 + w / 2, 75), xytext=(4.15, 66),
+    ax.annotate("flash hard mig: 75%\nfirst-pass (9/12)",
+                xy=(4 + w / 2, 75), xytext=(5.2, 66),
                 fontsize=8.5, color="#bf360c", ha="left",
                 bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="#bf360c", alpha=0.95),
                 arrowprops=dict(arrowstyle="->", color="#bf360c"))
@@ -197,7 +200,7 @@ def fig2_funnel():
             ha="center", va="center", fontsize=9.5,
             bbox=dict(boxstyle="round,pad=0.5", fc="#fff8e1", ec="#f9a825"))
 
-    ax.text(0.88, 0.94, "CONFIRMED: 4 real drift signals", ha="center",
+    ax.text(0.88, 0.94, "CONFIRMED: 4 of 7 initial signals", ha="center",
             fontsize=10.5, fontweight="bold", color=GREEN)
     for i, s in enumerate(survived):
         ax.text(0.88, 0.83 - i * 0.155, s, ha="center", va="center", fontsize=8.2,
@@ -224,8 +227,9 @@ def fig2_funnel():
                 bbox=dict(boxstyle="round,pad=0.4", fc="#ffebee", ec=RED))
 
     ax.set_title(
-        "How 7 suspected drift findings became 4: each one had to pass two checks",
-        fontsize=12.5, pad=12)
+        "Seven initial token/retry/judgment findings: four survived both checks\n"
+        "(Latency in Section 5.7 used the same protocol separately.)",
+        fontsize=12, pad=12)
     fig.tight_layout()
     fig.savefig(OUT / "fig2_funnel.png", dpi=200)
     plt.close(fig)

@@ -1,10 +1,12 @@
 # drift-predictor
 
+**Preprint:** [Drift or Dice? (Zenodo)](https://doi.org/10.5281/zenodo.20634676) · [PDF](https://zenodo.org/records/20634676/files/draft.pdf)
+
 A framework for detecting behavioral drift when you migrate from one LLM to another.
 
 Pass/fail schema validation always returns 100% — this framework measures what's actually changing underneath: output volume, first-attempt failure rates, field-level structural changes, and whether high-stakes decisions (hire/no-hire, pass/fail, proceed/block) are flipping.
 
-Includes the prompts, schemas, and raw results from a 19-run study across Gemini 2.5→3.1 and Claude sonnet-4-5→4-6. See [`paper/draft.md`](paper/draft.md) for the full write-up (PDF: [`paper/draft.pdf`](paper/draft.pdf)).
+Includes the prompts, schemas, and raw results from a 19-run study across Gemini 2.5→3.1 and Claude sonnet-4-5→4-6. Full write-up: [`paper/draft.md`](paper/draft.md) · [Zenodo preprint](https://doi.org/10.5281/zenodo.20634676).
 
 ---
 

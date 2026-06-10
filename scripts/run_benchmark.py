@@ -118,6 +118,16 @@ def print_summary(runs, pair) -> str:
             )
             for ev in r.field_drift_events[:3]:
                 lines.append(f"      {ev['field']:45s} {ev['old']} → {ev['new']}")
+    flipped = [r for r in runs if r.decision_flips]
+    if flipped:
+        lines.append("  Decision flips (old vs new value in a judgment field):")
+        for r in flipped:
+            for fl in r.decision_flips:
+                marker = " [FINAL DECISION]" if fl["final_decision"] else ""
+                lines.append(
+                    f"    {r.prompt_id:28s} {fl['field']}: "
+                    f"{fl['old']} → {fl['new']}{marker}"
+                )
     first_fail = [r for r in runs if r.new_first_attempt_error]
     if first_fail:
         lines.append("  First-attempt schema violations (new model, rescued by retry):")

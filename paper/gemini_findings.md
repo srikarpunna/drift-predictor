@@ -32,6 +32,12 @@ plus an auto-generated `_summary.txt`). Every number below is reproducible from 
 | 8 | Pro noise floor (2.5-pro vs itself) | hard | `noise_floor_pro_prompts_hard_20260610_005204` |
 | 9 | Pro migration repeat 2 | main | `gemini_pro_migration_20260610_010202` |
 | 10 | Pro migration repeat 2 | hard | `gemini_pro_migration_prompts_hard_20260610_013734` |
+| 11 | Flash noise floor (2.5-flash vs itself) | hard | `noise_floor_prompts_hard_20260610_164208` |
+| 12 | Pro noise floor session 2 (2.5-pro vs itself) | main | `noise_floor_pro_20260610_164951` |
+
+Runs 11–12 were added after the first round of analysis: run 11 closes the matched-tier
+hard-suite noise baseline gap (Finding 6 / paper §6.1), run 12 measures session-to-session
+noise-floor variance.
 
 ## Finding 1 — Pass/fail evaluation sees nothing
 
@@ -57,7 +63,7 @@ First-attempt validity (output valid *before* instructor's error-feedback retry)
   latency, extra cost, and a model running closer to its failure boundary.
 - The pro tier does not exhibit this failure mode at all; it drifts in *judgment* instead (Finding 5).
 
-## Finding 3 — Verbosity drift: 8× above the noise floor
+## Finding 3 — Verbosity drift: ~4.6× above the (two-session) noise floor
 
 Average output tokens per response (main suite, 30 prompts):
 
@@ -66,13 +72,20 @@ Average output tokens per response (main suite, 30 prompts):
 | Flash noise floor (self vs self) | 1532.7 | 1554.5 | **+21.9 (+1.4%)** |
 | Flash migration r2 | 1505.8 | 1328.4 | −177.3 (−11.8%) |
 | Flash migration r3 | 1552.3 | 1322.8 | −229.6 (−14.8%) |
-| Pro noise floor (self vs self) | 1588.9 | 1557.6 | **−31.3 (−2.0%)** |
+| Pro noise floor s1 (self vs self) | 1588.9 | 1557.6 | **−31.3 (−2.0%)** |
+| Pro noise floor s2 (self vs self) | 1549.8 | 1602.3 | **+52.4 (+3.4%)** |
 | Pro migration | 1576.8 | 1330.0 | −246.8 (−15.7%) |
 | Pro migration repeat 2 | 1585.3 | 1337.0 | −248.3 (−15.7%) — **identical to run 1** |
 
-Self-vs-self variation is ±2%. Both migrations shrink output by 12–16% — roughly **8× the
-noise floor**. The 3.1 generation is systematically terser, and this is a migration effect,
-not sampling randomness. Repeats (r2 vs r3) show the magnitude is stable across runs.
+Self-vs-self variation across two pro sessions is −2.0% / +3.4% (the sessions don't even
+agree on a direction). Taking the wider session as the floor, both migrations shrink output
+12–16% — roughly **4.6× the noise floor**, same sign in every run. The 3.1 generation is
+systematically terser, and this is a migration effect, not sampling randomness. Repeats
+(r2 vs r3) show the magnitude is stable across runs.
+
+Note: pro noise-floor session 2 (+3.4%) is nominally significant against itself
+(p = 0.013, sign-flip permutation). A same-model run can pass a significance test —
+single-session significance is not evidence of drift; magnitude vs floor + reproduction is.
 
 Structural drift shows the same separation: pro noise floor flags 16/30 prompts (43 field
 events) vs pro migration 26/30 (83 events) — ~2× prompts, ~2× events.
@@ -99,7 +112,9 @@ Decision-field flips (`recommended_action`, `overall_recommendation`,
 | Run | Suite | Flips | Final-decision flips (rec/grade/action) |
 |-----|-------|-------|------------------------------------------|
 | Flash noise floor | main | 1 (`L6→L5` level only) | 0 |
-| Pro noise floor | main | 2 (both `unknown↔L4` on prompts 002/003) | **0** |
+| Flash noise floor | **hard** | 2 | **2** (`conditional→block`, `COACH→FAIL`) |
+| Pro noise floor s1 | main | 2 (both `unknown↔L4` on prompts 002/003) | **0** |
+| Pro noise floor s2 | main | 4 | **1** (`hold→hire` on prompt 004) |
 | Pro noise floor | **hard** | 3 | **3** (`conditional→block`, `block→conditional`, `hold→no_hire`) |
 | Flash migration r3 | main | 4 | 1 (`hold → hire`!) |
 | Flash migration | hard | 7 | 4 (2× `block → conditional_proceed`, `no_hire → hold`, `escalation: True → False`) |
@@ -108,10 +123,12 @@ Decision-field flips (`recommended_action`, `overall_recommendation`,
 
 Key observations:
 
-1. **On the main suite, models never flip their own final decisions.** Across 60 self-vs-self
-   main-suite prompts, zero changes in hire/no-hire, pass/fail, proceed/block. The only
-   self-flips are `candidate_level_assessed` on prompts 002/003 — inherently ambiguous;
-   their migration flips should be discounted.
+1. **Main-suite final-decision self-flips are rare but not zero.** Across three main-suite
+   self-vs-self sessions, one final flip occurred (`hold→hire` on interview prompt 004 in
+   pro noise-floor session 2). This (a) marks prompt 004's recommendation as
+   boundary-unstable, and (b) explains the flash r3 migration's `hold→hire` flip on the
+   same prompt as boundary noise, not drift. Level self-flips on 002/003/006 are inherently
+   ambiguous; their migration flips should be discounted.
 2. **CRITICAL CAVEAT — hard prompts are decision-unstable even within a model.** The
    hard-suite noise floor (run 8) shows 2.5-pro flips 3/12 of its *own* final decisions,
    the same rate as the migration, on overlapping prompts (diagnostic-104,
@@ -122,11 +139,17 @@ Key observations:
 3. **Directional consistency CONFIRMED by repeats (runs 9–10).** Noise-floor flips are
    random in direction; migration flips are not:
    - **Candidate levels (main suite):** 8 flips across 2 migration runs, **all 8 downward**
-     (`L6→L5`, `L5→unknown`, `L4→unknown`); noise-floor flips went *upward* (`unknown→L4`).
-     Prompts 003 and 005 reproduce their exact flips in both runs. The new pro model
-     systematically assesses candidates lower.
+     (`L6→L5`, `L5→unknown`, `L4→unknown`). Across both pro noise-floor sessions, level
+     self-flips are upward assignments (`unknown→L4`) or abstention retreats
+     (`L5→unknown`, `L4→unknown`) — **never a strict downgrade**. Abstention retreats occur
+     in noise too, so the defensible core is the strict `L6→L5` downgrades (prompts
+     001/004/005, with 005 reproducing exactly). The new pro model systematically assesses
+     candidates lower.
    - **support_audit-104 (hard):** `COACH → FAIL` in *both* migration runs, never flips in
-     the noise floor — the single cleanest judgment-drift datapoint in the study.
+     either pro noise-floor session — the single cleanest judgment-drift datapoint in the
+     study. (Disclosure: the same prompt does flip `COACH→FAIL` in the *flash* hard noise
+     floor — the prompt sits near a grading boundary in general; the pro claim is
+     tier-matched: stable pro floor + reproduced pro migration flip.)
    - **interview_evaluation-104 (hard):** `hold → no_hire` in both migration runs, but the
      old model also flips this one against itself — claim only weakly.
    - **diagnostic-104 (hard):** correctly discarded as noise (flips both directions in

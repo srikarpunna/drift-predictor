@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.artifacts.schemas import get_schema
-from src.benchmark.drift_metrics import compare_outputs, drift_flags
+from src.benchmark.drift_metrics import compare_outputs, decision_flips, drift_flags
 from src.benchmark.prompt_item import BenchmarkRun, PromptItem
 from src.runners.base_runner import BaseRunner
 
@@ -28,12 +28,15 @@ def run_prompt(
         new_result = new_runner.run_text(prompt.prompt_text, prompt.id)
 
     field_events = compare_outputs(old_result.output_text, new_result.output_text)
+    flips = decision_flips(old_result.output_text, new_result.output_text)
     tok_delta_pct = (
         (new_result.tokens_out - old_result.tokens_out)
         / max(old_result.tokens_out, 1)
         * 100
     )
-    flags = drift_flags(tok_delta_pct, field_events, new_result.first_attempt_valid)
+    flags = drift_flags(
+        tok_delta_pct, field_events, new_result.first_attempt_valid, flips
+    )
 
     return BenchmarkRun(
         prompt_id=prompt.id,
@@ -61,6 +64,7 @@ def run_prompt(
         old_first_attempt_error=old_result.first_attempt_error,
         new_first_attempt_error=new_result.first_attempt_error,
         field_drift_events=field_events,
+        decision_flips=flips,
         drift_flags=flags,
     )
 

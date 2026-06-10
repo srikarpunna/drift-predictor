@@ -1,0 +1,58 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor_pro
+Old:     gemini-2.5-pro
+New:     gemini-2.5-pro
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  30/30  (100.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.00
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1549.8 tok/response
+  New avg:  1602.3 tok/response
+  Delta:    +52.4 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  18/30
+  Field-level drift events:  44
+    structure_drift      18 prompt(s)
+    content_shrink       5 prompt(s)
+  Worst drifters:
+    interview_evaluation-003     Δtok=  -3.1%  events=6  flags=structure_drift,content_shrink
+      candidate_level_assessed.__chars              2 → 7
+      competency_scores.__len                       3 → 2
+      competency_scores.rationale.__chars           657 → 353
+    interview_evaluation-008     Δtok=  +7.0%  events=4  flags=structure_drift,content_shrink
+      competency_scores.__len                       4 → 3
+      key_concerns.__chars                          289 → 168
+      key_concerns.__len                            2 → 1
+    support_audit-001            Δtok= +18.3%  events=4  flags=structure_drift
+      agent_actions.__len                           2 → 3
+      agent_actions.action_detail.__chars           172 → 251
+      agent_actions.action_type.__chars             26 → 41
+    diagnostic-001               Δtok=  +8.4%  events=3  flags=structure_drift
+      failure_patterns.example_run_ids.__len        11 → 10
+      metrics.interpretation.__chars                545 → 811
+      priority_fixes.__chars                        255 → 371
+    diagnostic-004               Δtok= +18.4%  events=3  flags=structure_drift
+      failure_patterns.__len                        3 → 4
+      failure_patterns.recommendation.__chars       535 → 863
+      failure_patterns.root_cause.__chars           562 → 812

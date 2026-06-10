@@ -5,9 +5,10 @@ from typing import Type
 
 import anthropic
 import instructor
+from instructor.core.exceptions import InstructorRetryException
 from instructor.core.hooks import HookName, Hooks
 from pydantic import BaseModel as PydanticBaseModel
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_exponential
 
 from src.models import RunResult
 from src.runners.base_runner import BaseRunner
@@ -27,6 +28,10 @@ class ClaudeRunner(BaseRunner):
         )
 
     def _make_retry(self):
+        # Tenacity handles transient transport/API errors only. Schema-validation
+        # retries are instructor's job (max_retries inside the structured call);
+        # if instructor exhausts them, that is a real result, not something to
+        # re-run — so InstructorRetryException is excluded here.
         return retry(
             stop=stop_after_attempt(self._retry_cfg.max_attempts),
             wait=wait_exponential(
@@ -34,7 +39,7 @@ class ClaudeRunner(BaseRunner):
                 min=self._retry_cfg.wait_min_seconds,
                 max=self._retry_cfg.wait_max_seconds,
             ),
-            retry=retry_if_exception_type(Exception),
+            retry=retry_if_not_exception_type(InstructorRetryException),
             reraise=True,
         )
 
@@ -91,6 +96,10 @@ class ClaudeRunner(BaseRunner):
 
         @retrying
         def _call():
+            # Reset per-attempt instrumentation so a transient-error re-run by
+            # tenacity doesn't inflate the counts from the aborted attempt.
+            attempt_count[0] = 0
+            first_error[0] = None
             return self._instructor_client.chat.completions.create_with_completion(
                 response_model=schema,
                 messages=messages,
@@ -118,6 +127,9 @@ class ClaudeRunner(BaseRunner):
             )
 
         elapsed_ms = (time.monotonic() - start) * 1000
+        # instructor accumulates usage across its validation retries, so
+        # tokens_out = tokens consumed to obtain a compliant response (all
+        # attempts), not the size of the final response alone.
         usage = raw_response.usage
         return RunResult(
             model_id=self.model_id,

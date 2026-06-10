@@ -122,7 +122,20 @@ python scripts/run_benchmark.py --pair noise_floor
 
 Any signal the noise floor produces is natural model variation. A migration signal is only real if it exceeds this baseline. Without the noise floor, every non-deterministic model looks like it drifted.
 
-Then **repeat the migration run** at least once. A signal that appears in run 1 but not run 2 is a false positive. In our 16-run study, this falsified three of our six initial "findings" before we published anything.
+Then **repeat the migration run** at least once. A signal that appears in run 1 but not run 2 is a false positive. In our 19-run study, this falsified three of our initial "findings" before we published anything.
+
+---
+
+## Analyzing results
+
+Two analysis scripts work directly on the `.jsonl` result files:
+
+```bash
+python scripts/compute_stats.py    # paired bootstrap CIs + permutation p-values for token/latency deltas
+python scripts/analyze_flips.py    # decision-field flips per run (--verbose lists each flip)
+```
+
+Both recompute everything from the raw outputs, so they work on any run, including ones recorded before a given metric existed.
 
 ---
 
@@ -153,7 +166,7 @@ Three schemas, two prompt suites:
 | `noise_floor_pro` | `gemini-2.5-pro` | `gemini-2.5-pro` |
 | `noise_floor_claude` | `claude-sonnet-4-5-20250929` | `claude-sonnet-4-5-20250929` |
 
-Raw results for all 16 runs are in `data/benchmark_results/`.
+Raw results for all runs are in `data/benchmark_results/`.
 
 ---
 
@@ -163,6 +176,8 @@ Raw results for all 16 runs are in `data/benchmark_results/`.
 config.json                   # model pairs, prompt sets, output dir
 scripts/
   run_benchmark.py            # main entry point
+  compute_stats.py            # statistical analysis of token/latency deltas
+  analyze_flips.py            # decision-field flip analysis
 src/
   artifacts/
     prompts/                  # main suite (.txt files)

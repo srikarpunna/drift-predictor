@@ -19,6 +19,13 @@ Companion to `gemini_findings.md`, same methodology. All raw evidence in
 | 4 | Claude noise floor | hard | `noise_floor_claude_prompts_hard_20260610_034614` |
 | 5 | Claude migration repeat | main | `claude_migration_20260610_083126` |
 | 6 | Claude migration repeat | hard | `claude_migration_prompts_hard_20260610_093426` |
+| 7 | Claude noise floor session 2 | main | `noise_floor_claude_20260610_164210` |
+
+Run 7 was added after the first round of analysis to measure session-to-session noise-floor
+variance. Result: +0.7% token delta (p = 0.66), 30/30 first-pass on both sides, 1 level-only
+flip (`L5→L6`, upward). The Claude noise floor is quiet and stable across both sessions; the
+±7% *cross-day* swing in the old model's aggregate (see verbosity finding) remains the wider
+band that killed the main-suite verbosity claim.
 
 ## Finding 1 — Pass/fail still sees nothing
 

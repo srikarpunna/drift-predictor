@@ -8,7 +8,7 @@ Independent Researcher
 
 ## Abstract
 
-Teams operating LLM-backed applications migrate models constantly: provider deprecations, pricing restructuring, and capability releases all force the update. The standard safety check is schema validation (checking that the model's output still matches your data contracts): run the eval suite, confirm outputs still validate. Across 16 benchmark runs of two production migrations (Gemini 2.5→3.1 and Claude sonnet-4-5→4-6), this check reported zero regressions every time. Underneath those results: one migration silently shrank output by 15.7% (reproduced twice, approximately 8× above the self-vs-self noise floor), another grew output by 39.7% on difficult tasks (approximately 14× above noise), a cheaper model tier failed 25% of hard first attempts and was rescued silently by retry infrastructure, and one migration's pro tier systematically downgraded candidate assessments in eight consecutive cases. Equally important: roughly half of the drift we initially detected was sampling noise, caught only because the framework ships with same-model noise floors and requires migration repeats. Three separate provisional findings collapsed under these controls. We describe the framework, its two mandatory controls (noise floor and migration repeats), the four surviving drift signals, and the three false positives the method caught. We release all prompts, schemas, and raw results as a reproducible artifact. The central finding is that drift is universal but its direction is provider- and tier-specific; there is no rule of thumb, and every migration must be measured against its own baseline.
+Teams operating LLM-backed applications migrate models constantly: provider deprecations, pricing restructuring, and capability releases all force the update. The standard safety check is schema validation (checking that the model's output still matches your data contracts): run the eval suite, confirm outputs still validate. Across 19 benchmark runs of two production migrations (Gemini 2.5→3.1, where the flash tier moves to the cheaper flash-lite and the pro tier to pro-preview, and Claude sonnet-4-5→4-6), this check reported zero regressions every time. Underneath those results: one migration silently shrank output by 15.7% (reproduced twice, roughly 4.6× the widest swing its own two-session noise floor produced) while simultaneously getting 17–18% slower per request, another grew output by 39.7% on difficult tasks (approximately 14× above its matched noise floor), a cheaper model tier failed 25% of hard first attempts and was rescued silently by retry infrastructure, and one migration's pro tier shifted candidate seniority assessments in only one direction: across two independent runs, every change was a downgrade or a retreat to "unknown", never an upgrade. Equally important: roughly half of the drift we initially detected was sampling noise, caught only because the framework ships with same-model noise floors and requires migration repeats. Three separate provisional findings collapsed under these controls. We describe the framework, its two mandatory controls (noise floor and migration repeats), the four surviving drift signals, and the three false positives the method caught. We release all prompts, schemas, and raw results as a reproducible artifact. The central finding is that drift is universal but its direction is provider- and tier-specific; there is no rule of thumb, and every migration must be measured against its own baseline.
 
 ---
 
@@ -16,11 +16,11 @@ Teams operating LLM-backed applications migrate models constantly: provider depr
 
 Teams operating LLM-backed production systems face a recurring obligation: migrate to a new model. Provider deprecation timelines, cost restructuring, and capability improvements all produce the same pressure. The standard safety check is straightforward: run the evaluation suite, confirm outputs still validate against your schemas and pass your tests. This check is fast, intuitive, and nearly useless.
 
-Across 16 benchmark runs of two production migrations, schema-level validation flagged zero regressions; meanwhile output volume shifted up to 40% and one migration systematically downgraded its assessments of human candidates.
+Across 19 benchmark runs of two production migrations, schema-level validation flagged zero regressions; meanwhile output volume shifted up to 40% and one migration systematically downgraded its assessments of human candidates.
 
-Those migrations were Gemini 2.5→3.1 (flash and pro tier) and Claude sonnet-4-5→4-6. In every configuration, every suite, every run: 100% eventual pass rate. A standard regression gate would have concluded all migrations were safe. What it missed: one migration shrank average output by 15.7%, reproduced identically across two independent runs; another grew output on difficult tasks by 37–40%; a cheaper model tier began failing 25% of hard first attempts, rescued silently by the retry layer (the automatic re-submission that happens when an output fails validation); and a pro-tier migration produced eight consecutive downward candidate-level assessments without a single upward exception.
+Those migrations were Gemini 2.5→3.1 (flash and pro tier) and Claude sonnet-4-5→4-6. In every configuration, every suite, every run: 100% eventual pass rate. A standard regression gate would have concluded all migrations were safe. What it missed: one migration shrank average output by 15.7%, reproduced identically across two independent runs; another grew output on difficult tasks by 37–40%; a cheaper model tier began failing 25% of hard first attempts, rescued silently by the retry layer (the automatic re-submission that happens when an output fails validation); and a pro-tier migration changed candidate-level assessments only downward or to "unknown", never upward, across two independent runs.
 
-This paper makes three contributions. First, a measuring tool. Standard migration testing asks one question: does the output still validate? Our framework asks five: did the model pass on its first attempt or did a retry rescue it, how many retries did it need, did output volume change, did individual fields change shape, and did any final decision (hire or no hire, pass or fail, proceed or block) flip on the same input. Second, a warning about noise. When we first ran the tool, we found what looked like seven drift signals. We then applied two checks: comparing the old model against itself (a noise floor) and re-running every migration test (repeats). Three of the findings evaporated under those checks: hard-prompt decision instability, a cross-provider judgment-harshness pattern, and a 12% Claude verbosity shift. They were not drift; they were the model's own randomness fooling us. Reporting how we almost fooled ourselves is as important as reporting what survived. Third, the receipts. We release the framework, schemas, prompts, and all raw results so anyone can re-run the study and check the numbers.
+This paper makes three contributions. First, a measuring tool. Standard migration testing asks one question: does the output still validate? Our framework asks six: did the model pass on its first attempt or did a retry rescue it, how many retries did it need, did output volume change, did latency change, did individual fields change shape, and did any final decision (hire or no hire, pass or fail, proceed or block) flip on the same input. Second, a warning about noise. When we first ran the tool, we found what looked like seven drift signals. We then applied two checks: comparing the old model against itself (a noise floor) and re-running every migration test (repeats). Three of the findings evaporated under those checks: hard-prompt decision instability, a cross-provider judgment-harshness pattern, and a 12% Claude verbosity shift. They were not drift; they were the model's own randomness fooling us. Reporting how we almost fooled ourselves is as important as reporting what survived. Third, the receipts. We release the framework, schemas, prompts, and all raw results so anyone can re-run the study and check the numbers.
 
 The broader lesson is not that models drift. The lesson is that drift is universal but its direction is not. Gemini shrank output; Claude grew it. Gemini-pro recalibrated human candidate assessments; Claude-sonnet did not. No rule of thumb predicts what a given migration will do. The only reliable approach is to measure it: against a noise floor, with repeats, on your own task distribution.
 
@@ -36,7 +36,7 @@ Song et al. [2024] and Atil et al. [2024] document that individual models produc
 
 Structured output enforcement has become standard practice for production LLM pipelines. Willard and Louf [2023] formalize constrained generation as finite-state machine transitions, enabling token-level enforcement of output schemas with minimal overhead. Geng et al. [2025] benchmark structured output generation across six constrained decoding frameworks using 10K real-world JSON schemas. Our framework uses the `instructor` library, which enforces schemas via validation-error feedback and retries rather than constrained decoding, and adds pre-retry first-attempt monitoring, exposing a failure mode (retry-masking) that compliant infrastructure hides by design.
 
-Zheng et al. [2023] proposed using strong LLMs as judges for evaluating open-ended outputs and characterized position, verbosity, and self-enhancement biases in LLM judges. Wang et al. [2022] showed through self-consistency sampling that LLM outputs vary meaningfully across samples, and that majority-vote aggregation substantially improves accuracy on reasoning tasks. A recent survey [Gu et al., 2024] covers reliability, calibration, and inter-rater agreement of LLM evaluators comprehensively. Our finding that the Gemini-pro migration produces directional shifts in candidate-level assessment (downward, 8 for 8 across two independent runs) is not the kind of random flip these works describe. Systematic directional drift requires direction-sensitive flip tracking with reproducibility controls, not just flip counts.
+Zheng et al. [2023] proposed using strong LLMs as judges for evaluating open-ended outputs and characterized position, verbosity, and self-enhancement biases in LLM judges. Wang et al. [2022] showed through self-consistency sampling that LLM outputs vary meaningfully across samples, and that majority-vote aggregation substantially improves accuracy on reasoning tasks. A recent survey [Gu et al., 2024] covers reliability, calibration, and inter-rater agreement of LLM evaluators comprehensively. Our finding that the Gemini-pro migration produces directional shifts in candidate-level assessment (all changes downward or to abstention across two independent runs, none upward) is not the kind of random flip these works describe. Systematic directional drift requires direction-sensitive flip tracking with reproducibility controls, not just flip counts.
 
 Shankar et al. [2022] document recurring production ML challenges (data drift, monitoring gaps, retraining triggers) through interviews with 18 ML engineers. More recent work on LLMOps [Pahune et al., 2025] surveys how deployment pipelines must evolve specifically for large language models. Our framework targets the production gap these works identify: outputs are schema-validated but not ground-truth-labeled, so behavioral shifts pass through undetected.
 
@@ -50,19 +50,21 @@ The framework takes two inputs: a directory of prompt files (`.txt`, one task pe
 
 ### 3.2 Metrics
 
-The framework records six signal classes beyond binary pass/fail:
+The framework records seven signal classes beyond binary pass/fail: one for each of the six questions in the Introduction, plus compound drift flags derived from them.
 
 **First-attempt validity.** Before instructor has a chance to retry, did the model's raw first response pass validation? A pre-retry hook captures this. Standard pass/fail reporting never surfaces it: the retry happens invisibly and the final result looks clean.
 
 **Retry counts.** Per-prompt attempt counts (maximum 3). A model that needs 3 attempts on a straightforward prompt has failed in a way pass/fail will never tell you.
 
-**Output token counts.** Average tokens per response, recorded per attempt and aggregated. Reported as delta (new average − old average) and percentage change. This is the primary volume-drift signal.
+**Output token counts.** Average tokens per response, reported as delta (new average − old average) and percentage change. This is the primary volume-drift signal. One precision: `instructor` accumulates usage across its validation retries, so the recorded count measures the tokens consumed to obtain a compliant response; for any run with 100% first-attempt validity it equals the final response size exactly.
+
+**Request latency.** Wall-clock milliseconds per request, including any retry round-trips. Latency drift can move independently of token drift (Section 5.7) and is the noisiest of the seven signals, so it is held to a stricter reproducibility bar.
 
 **Field-level structural drift.** For list fields, the change in list length (`__len`); for string fields, the change in character count (`__chars`). Events are flagged when the delta exceeds 40%. This surfaces changes to individual output components, for example a model that shortens summary fields while leaving numeric fields intact.
 
 **Aggregate drift flags.** Compound per-prompt booleans: `verbosity_grow`, `verbosity_shrink` (±25% overall), `structure_drift` (any field event), `content_shrink`.
 
-**Decision-field flips.** For fields representing high-stakes categorical decisions (`recommended_action`, `overall_recommendation`, `candidate_level_assessed`, `overall_grade`, `escalation_required`), a flip is recorded when the new model's value differs from the old model's value on the same input. For example: 'hire' becoming 'no_hire', or 'proceed_migration' becoming 'block_migration'. These are the signals most directly relevant to behavioral risk in human-impacting pipelines.
+**Decision-field flips.** For fields representing high-stakes categorical decisions (`recommended_action`, `overall_recommendation`, `candidate_level_assessed`, `overall_grade`, `escalation_required`), a flip is recorded when the new model's value differs from the old model's value on the same input. For example: 'hire' becoming 'no_hire', or 'proceed_migration' becoming 'block_migration'. These are the signals most directly relevant to behavioral risk in human-impacting pipelines. Flip detection is implemented in the framework (`drift_metrics.decision_flips`); every flip count in this paper is reproducible from the released raw results via `scripts/analyze_flips.py`, which recomputes flips directly from the recorded outputs.
 
 ### 3.3 The Two Controls
 
@@ -103,11 +105,25 @@ Three migration pairs were evaluated:
 | Gemini Pro | `gemini-2.5-pro` | `gemini-3.1-pro-preview` |
 | Claude Sonnet | `claude-sonnet-4-5-20250929` | `claude-sonnet-4-6` |
 
-All runs were conducted on 2026-06-09 and 2026-06-10. Total runs: 16, comprising 2 flash migration main-suite runs, 1 flash hard-suite run, 1 flash noise floor, 2 pro migration main runs, 2 pro migration hard runs, 2 pro noise floor runs (main and hard), 2 Claude migration main runs, 2 Claude migration hard runs, and 2 Claude noise floor runs (main and hard).
+All analyzed runs were conducted on 2026-06-09 and 2026-06-10. Six earlier pilot runs from 2026-05-27 and 2026-05-30 are included in the released data but excluded from analysis: they predate the first-attempt instrumentation and the `Literal` schema hardening, so their records are not comparable to the final protocol. One additional June flash migration run (r1, the shakedown run immediately after the instrumentation was added) is released but excluded from the tables because it predates the serialized field-drift records; the flash main-suite runs are therefore numbered r2 and r3. Its aggregates match them (−15.4% tokens, 25/30 new-model first-pass).
+
+Total analyzed runs: 19, comprising 2 flash migration main-suite runs, 1 flash hard-suite run, 2 flash noise floors (main and hard), 2 pro migration main runs, 2 pro migration hard runs, 3 pro noise floors (two main sessions and one hard), 2 Claude migration main runs, 2 Claude migration hard runs, and 3 Claude noise floors (two main sessions and one hard). The flash hard noise floor and the second pro and Claude main-suite noise-floor sessions were run after the first round of analysis, specifically to close two gaps the analysis itself exposed: hard-suite flips need a matched-suite, matched-tier noise baseline (Section 6.1), and a single noise-floor session underestimates session-to-session variance (Section 6.3).
 
 ### 4.3 Provider Configuration
 
 Both providers used the `instructor` library with `max_retries=3` and structured-output mode. A hook fires on each `COMPLETION` call to record token counts; a separate hook fires on `PARSE_ERROR` (when the first response fails schema validation) to capture the error details for retry-masking analysis. No model-specific prompt tuning was applied; the same prompt text went to every model in every run.
+
+Three configuration details affect interpretation and are disclosed for fairness:
+
+- **Output ceilings differ by provider.** Claude calls set `max_tokens=4096`; Gemini calls used the provider default ceiling (higher). Gemini outputs peaked well below either limit, so this asymmetry does not affect the Gemini token deltas. A handful of the longest Claude responses (in `interview_evaluation`) approached the 4096 cap, and at least two first-attempt failures in the Claude main-suite runs are consistent with truncation at the cap rather than a pure schema failure. The Claude hard-suite runs, where the surviving Claude claims live, peak at ~3,700 tokens with zero retries, so they are unaffected.
+- **Token counts accumulate across retries.** As noted in Section 3.2, a retried response records the tokens of all attempts. All surviving token claims come from runs with 100% (pro) or near-100% first-attempt validity, where this accumulation is zero or negligible. For the flash migration, retries occur on the *new* side, so accumulation makes the measured shrinkage conservative (the true final-response shrinkage is larger than reported).
+- **Gemini token counts exclude internal reasoning.** Our instrumentation records the SDK's `candidates_token_count`, the visible response; the SDK reports reasoning separately as `thoughts_token_count`, which is billed as output but not counted here. This matters for the cost analysis in Section 7.4.
+
+Transport-level retries (a `tenacity` wrapper for transient network and API errors) sit outside the instructor loop and are excluded from validation-attempt counts; no analyzed run shows attempt counts exceeding instructor's own retry budget, confirming the transport layer never re-ran a validation cycle.
+
+### 4.4 Statistical Analysis
+
+Each prompt yields a paired observation (old model tokens, new model tokens), so token-delta claims are tested on per-prompt paired deltas. For every run we report the mean delta with a 95% confidence interval from a paired bootstrap (10,000 resamples of prompts with replacement) and a p-value from a sign-flip permutation test (10,000 permutations; null hypothesis: deltas have no systematic direction). The analysis script (`scripts/compute_stats.py`) is included in the released artifact.
 
 ---
 
@@ -131,10 +147,13 @@ First-attempt validity, measured before any retry, reveals a clear divide by cap
 | Flash migration r3 (main, 30 prompts) | 30/30 (100.0%) | 27/30 (90.0%) |
 | Flash migration (hard, 12 prompts) | 12/12 (100.0%) | **9/12 (75.0%)** |
 | Flash noise floor (main) | 30/30 (100.0%) | 29/30 (96.7%) |
+| Flash noise floor (hard) | 12/12 (100.0%) | 11/12 (91.7%) |
 | Pro migration (all runs) | 100% | 100% |
+| Pro noise floor s2 (main) | 30/30 (100.0%) | 30/30 (100.0%) |
 | Claude migration r1 (main) | 30/30 | 29/30 |
 | Claude migration repeat (main) | 29/30 | 27/30 |
-| Claude noise floor (main) | 29/30 | 29/30 |
+| Claude noise floor s1 (main) | 29/30 | 29/30 |
+| Claude noise floor s2 (main) | 30/30 | 30/30 |
 
 ![Figure 1: First-attempt schema validity per run, old vs new model. Eventual pass rate is 100% everywhere; only the flash tier degrades before retries.](figures/fig3_first_attempt.png)
 
@@ -148,37 +167,44 @@ Output token averages per response are the most consistent signal in the study:
 
 **Gemini (main suite):**
 
-| Comparison | Old avg | New avg | Delta |
-|-----------|---------|---------|-------|
-| Flash noise floor | 1532.7 | 1554.5 | +21.9 (+1.4%) |
-| Flash migration r2 | 1505.8 | 1328.4 | −177.3 (−11.8%) |
-| Flash migration r3 | 1552.3 | 1322.8 | −229.6 (−14.8%) |
-| Pro noise floor | 1588.9 | 1557.6 | −31.3 (−2.0%) |
-| **Pro migration** | **1576.8** | **1330.0** | **−246.8 (−15.7%)** |
-| **Pro migration repeat** | **1585.3** | **1337.0** | **−248.3 (−15.7%)** |
+| Comparison | Old avg | New avg | Delta | 95% CI (tokens) | p |
+|-----------|---------|---------|-------|-----------------|---|
+| Flash noise floor (main) | 1532.7 | 1554.5 | +21.9 (+1.4%) | [−49.1, +105.2] | 0.61 |
+| Flash noise floor (hard) | 1108.5 | 1176.2 | +67.8 (+6.1%) | [+9.4, +125.8] | 0.06 |
+| Flash migration r2 | 1505.8 | 1328.4 | −177.3 (−11.8%) | [−270.5, −82.7] | 0.001 |
+| Flash migration r3 | 1552.3 | 1322.8 | −229.6 (−14.8%) | [−286.2, −174.5] | <0.001 |
+| Pro noise floor s1 | 1588.9 | 1557.6 | −31.3 (−2.0%) | [−69.4, +3.0] | 0.11 |
+| Pro noise floor s2 | 1549.8 | 1602.3 | +52.4 (+3.4%) | [+15.3, +93.1] | 0.013 |
+| **Pro migration** | **1576.8** | **1330.0** | **−246.8 (−15.7%)** | [−327.6, −172.3] | <0.001 |
+| **Pro migration repeat** | **1585.3** | **1337.0** | **−248.3 (−15.7%)** | [−332.1, −166.8] | <0.001 |
 
-The pro migration delta is −15.7% in both runs (the two numbers are nearly identical) against a self-vs-self variation of ±2.0%. That is approximately 8× the noise floor. The Gemini 3.1 generation is systematically terser; this is a migration effect, not sampling randomness, and the repeats confirm it is stable.
+The pro migration delta is −15.7% in both runs (the two numbers are nearly identical). The two pro noise-floor sessions swing −2.0% and +3.4%; taking the wider session as the floor, the migration effect is roughly 4.6× the noise, in the same direction in both runs, while the noise sessions do not even agree on a direction. The Gemini 3.1 generation is systematically terser; this is a migration effect, not sampling randomness, and the repeats confirm it is stable.
+
+The second pro noise-floor session deserves a highlight: its +3.4% swing is nominally significant (p = 0.013) despite being the same model compared against itself. A same-model run can pass a significance test. This is the strongest single piece of evidence in the study for the paper's central protocol: statistical significance within one session establishes only that the deltas were directional in that session, not that the model changed. Magnitude relative to the noise floor plus reproduction across runs is the evidence standard; significance alone is not.
 
 **Claude (main and hard suites):**
 
-| Comparison | Old avg | New avg | Delta |
-|-----------|---------|---------|-------|
-| Claude noise floor (main) | 2524.0 | 2498.3 | −25.7 (−1.0%) |
-| Claude noise floor (hard) | 1856.2 | 1806.5 | −49.8 (−2.7%) |
-| Claude migration (main) | 2374.0 | 2661.0 | +286.9 (+12.1%) |
-| Claude migration (hard) | 1865.8 | 2560.6 | +694.8 (+37.2%) |
-| Claude migration repeat (main) | 2703.8 | 2688.4 | −15.4 (−0.6%) |
-| **Claude migration repeat (hard)** | **1814.5** | **2535.6** | **+721.1 (+39.7%)** |
+| Comparison | Old avg | New avg | Delta | 95% CI (tokens) | p |
+|-----------|---------|---------|-------|-----------------|---|
+| Claude noise floor s1 (main) | 2524.0 | 2498.3 | −25.7 (−1.0%) | [−118.3, +72.4] | 0.62 |
+| Claude noise floor s2 (main) | 2365.4 | 2381.9 | +16.5 (+0.7%) | [−54.3, +85.2] | 0.66 |
+| Claude noise floor (hard) | 1856.2 | 1806.5 | −49.8 (−2.7%) | [−148.8, +49.0] | 0.36 |
+| Claude migration (main) | 2374.0 | 2661.0 | +286.9 (+12.1%) | [+129.7, +497.9] | <0.001 |
+| Claude migration (hard) | 1865.8 | 2560.6 | +694.8 (+37.2%) | [+515.7, +858.8] | <0.001 |
+| Claude migration repeat (main) | 2703.8 | 2688.4 | −15.4 (−0.6%) | [−680.0, +407.0] | 1.00 |
+| **Claude migration repeat (hard)** | **1814.5** | **2535.6** | **+721.1 (+39.7%)** | [+532.4, +899.5] | 0.001 |
 
-The hard-suite growth is the robust finding: +37.2% and +39.7% across two independent runs, against a noise floor of −2.7%. That is approximately 14× the noise floor. Sonnet-4-6 spends substantially more tokens on difficult inputs.
+Across the eight noise-floor runs in the study, six have confidence intervals including zero; the two that do not (the flash hard floor at +6.1% and the second pro main session at +3.4%) do not reproduce across sessions and do not agree in direction with anything. The reproduced headline signals (flash and pro shrinkage, Claude hard growth) all have confidence intervals excluding zero and p ≤ 0.006 in both of their runs, with the same sign both times.
+
+The hard-suite growth is the robust finding: +37.2% and +39.7% across two independent runs, against a matched noise floor of −2.7%. That is approximately 14× the noise floor. Sonnet-4-6 spends substantially more tokens on difficult inputs.
 
 The main-suite claim did not reproduce (+12.1% run 1, −0.6% repeat) and is addressed as a false positive in Section 6.
 
 The cross-provider contrast is sharp: the Gemini 3.1 generation shrinks output ~16% (reproduced twice); Claude 4-6 grows output ~38–40% on hard tasks (reproduced twice). Same type of migration event; opposite directions. There is no universal rule.
 
-![Figure 2: Output-token change per run. Gemini migrations shrink, Claude migrations grow on hard tasks, noise floors stay within ±2.7%.](figures/fig1_verbosity.png)
+![Figure 2: Output-token change per run. Gemini migrations shrink, Claude migrations grow on hard tasks, noise floors stay within ±6.1%.](figures/fig1_verbosity.png)
 
-**Figure 2.** How much average output length changed in each run. To read one bar: −15.7% on the pro migration means the new model's answers averaged 15.7% fewer tokens than the old model's on the same 30 prompts. Gray bars compare the old model against itself, so they show pure randomness; the shaded band marks the widest such swing observed (±2.7%). A migration bar landing inside that band is indistinguishable from noise. The reproduced signals (Gemini shrinking ~16%, Claude growing 37–40% on hard tasks) sit far outside it, in opposite directions.
+**Figure 2.** How much average output length changed in each run. To read one bar: −15.7% on the pro migration means the new model's answers averaged 15.7% fewer tokens than the old model's on the same 30 prompts. Gray bars compare the old model against itself, so they show pure randomness; the shaded band marks the widest such swing observed across all eight noise-floor runs (±6.1%, set by the flash hard floor). A migration bar landing inside that band is indistinguishable from noise. The reproduced signals (Gemini shrinking ~16%, Claude growing 37–40% on hard tasks) sit outside it in both of their runs, in opposite directions.
 
 ### 5.4 Adaptive Effort: Easy and Hard Prompts Diverge (Gemini-Pro)
 
@@ -191,7 +217,7 @@ The Gemini-pro migration reveals a second layer:
 | Pro migration repeat | hard | **+96.5 (+10.1%)** |
 | Flash migration | hard | −227.5 (−20.5%) |
 
-The new pro model is terser on routine tasks but spends more tokens on hard ones, reproduced in both hard-suite runs. The flash model shrinks regardless of task difficulty. This matters practically: verbosity drift measured on an easy eval suite does not predict what the model does on complex production inputs. You need both suites to see this.
+The new pro model is terser on routine tasks but spends more tokens on hard ones, with the direction reproduced in both hard-suite runs (+3.7% and +10.1% against a matched hard-suite noise floor of −1.7%; the run-1 effect is modest, the repeat is clearer). The flash model shrinks regardless of task difficulty. This matters practically: verbosity drift measured on an easy eval suite does not predict what the model does on complex production inputs. You need both suites to see this.
 
 ### 5.5 Structural Drift: 2–3× Noise Across Providers
 
@@ -215,9 +241,12 @@ Decision-field flip counts alone are misleading; Section 6 explains why. The ful
 | Run | Suite | Flips | Final-decision flips |
 |-----|-------|-------|---------------------|
 | Flash noise floor | main | 1 (level only) | 0 |
-| Pro noise floor | main | 2 (level only) | 0 |
+| Flash noise floor | **hard** | 2 | **2** |
+| Pro noise floor s1 | main | 2 (level only) | 0 |
+| Pro noise floor s2 | main | 4 | 1 |
 | Pro noise floor | **hard** | 3 | **3** |
-| Claude noise floor | main | 1 (level only) | 0 |
+| Claude noise floor s1 | main | 1 (level only) | 0 |
+| Claude noise floor s2 | main | 1 (level only) | 0 |
 | Claude noise floor | **hard** | 2 | **2** |
 | Flash migration r3 | main | 4 | 1 |
 | Flash migration | hard | 7 | 4 |
@@ -232,11 +261,44 @@ Decision-field flip counts alone are misleading; Section 6 explains why. The ful
 
 After applying both controls, two findings survive as genuine judgment drift:
 
-**Directional candidate-level recalibration (Gemini-pro, main suite).** Across both pro migration main-suite runs, the new model produced 8 candidate-level assessment flips; all 8 were downward (`L6→L5`, `L5→unknown`, `L4→unknown`). Self-vs-self noise-floor flips went the other way (`unknown→L4`). Prompts 003 and 005 reproduced their exact same flips in both migration runs. The new pro model consistently assesses candidate seniority lower.
+**Directional candidate-level recalibration (Gemini-pro, main suite).** Across both pro migration main-suite runs, the new model changed `candidate_level_assessed` on 8 prompt-run instances. Every change moved down a level (`L6→L5`) or retreated to `unknown`; none moved up. The two pro noise-floor sessions provide the contrast: their level flips are upward assignments (`unknown→L4`, twice) or abstention retreats (`L5→unknown`, `L4→unknown`); no noise-floor session ever produced a strict downgrade. Two caveats keep this claim honest. First, prompts 002, 003, and 006 are unstable in the old model itself (they flip in the noise floors), so their migration flips should be discounted; the second noise-floor session also shows that abstention retreats occur in pure noise, so retreats to `unknown` carry little evidential weight on their own. Second, the second noise-floor session produced one final-decision flip of its own (`hold→hire` on prompt 004), confirming that prompt's recommendation field is boundary-unstable. The defensible core survives both caveats: the strict `L6→L5` downgrade on three distinct prompts (001, 004, 005), with prompt 005 reproducing exactly in both runs; no pro noise-floor session produced a strict downgrade on any prompt. Combined with the complete absence of upward changes across all pro migration runs, the direction is consistent: the new pro model assesses candidate seniority lower or declines to assess it.
 
-**COACH→FAIL support grade (Gemini-pro, hard suite).** The `overall_grade` field in the support audit schema flipped from `COACH` to `FAIL` on the same hard-suite prompt in both pro migration runs, and never flipped in the pro noise floor on any run. This is the cleanest single-prompt judgment-drift signal in the study: same value change, reproduced twice, clean noise-floor negative.
+**COACH→FAIL support grade (Gemini-pro, hard suite).** The `overall_grade` field in the support audit schema flipped from `COACH` to `FAIL` on the same hard-suite prompt in both pro migration runs, and never flipped in the pro noise floor on any run. This is the cleanest single-prompt judgment-drift signal in the study: same value change, reproduced twice, clean noise-floor negative. One disclosure keeps the claim precise: the same prompt *does* flip in the flash-tier hard noise floor, so the prompt sits near a grading boundary in general. The claim is tier-matched: at pro tier the noise floor is stable and the migration reproduces the same directional flip twice, which is exactly the evidence standard Section 3.3 requires. Appendix A shows the two models' full assessments of the identical call transcript side by side.
 
 No equivalent directional or reproducible judgment pattern appeared in the Claude migration. Claude's judgment flips are addressed in Section 6.
+
+### 5.7 Latency Drift: Terser but Slower
+
+The framework records wall-clock latency per request (including any retry round-trips). Latency is the noisiest metric in the study: the pro hard-suite noise floor swings −11.3% and the flash hard floor +8.9% on their own, wider than any token noise floor. Claims below are restricted to signals that are reproduced and statistically separated from that wider band.
+
+| Run | Old avg (s) | New avg (s) | Delta | p |
+|-----|------------|------------|-------|---|
+| Pro noise floor s1 (main) | 32.1 | 32.2 | +0.2% | 0.95 |
+| Pro noise floor s2 (main) | 30.2 | 31.3 | +3.5% | 0.38 |
+| Pro noise floor (hard) | 26.4 | 23.4 | −11.3% | 0.15 |
+| Flash noise floor (hard) | 18.4 | 20.0 | +8.9% | 0.27 |
+| Claude noise floor s1 (main) | 51.1 | 50.2 | −1.9% | 0.46 |
+| Claude noise floor s2 (main) | 44.4 | 44.9 | +1.1% | 0.65 |
+| Claude noise floor (hard) | 33.9 | 33.3 | −1.8% | 0.57 |
+| **Pro migration (main)** | **30.8** | **36.5** | **+18.3%** | <0.001 |
+| **Pro migration repeat (main)** | **32.8** | **38.2** | **+16.6%** | <0.001 |
+| **Claude migration (hard)** | **35.1** | **46.4** | **+32.3%** | <0.001 |
+| **Claude migration repeat (hard)** | **33.1** | **46.4** | **+40.0%** | 0.001 |
+| Claude migration (main) | 46.3 | 49.5 | +6.8% | 0.04 |
+| Claude migration repeat (main) | 51.2 | 74.7 | +46.0% | 0.25 |
+| Flash migration (all 3 runs) | 20.4–25.2 | 4.6–5.8 | **−76 to −78%** | <0.001 |
+
+Three results survive the controls:
+
+**The pro inversion.** The Gemini-pro migration produces 15.7% *fewer* output tokens but takes 17–18% *longer* per request, reproduced in both main-suite runs against a +0.2% noise floor. Terser output with slower responses is consistent with the new model spending more compute on internal reasoning before answering: the Gemini SDK reports visible output (`candidates_token_count`, which our instrumentation records) separately from internal reasoning (`thoughts_token_count`, which is billed as output but not part of the visible response). This is a third drift dimension: even within a single migration, the drift directions do not agree. Output shrank; latency grew.
+
+**Claude hard-suite slowdown.** +32% and +40% latency, reproduced, tracking its 37–40% verbosity growth. The longer outputs are paid for twice: in tokens and in wall-clock time.
+
+**Flash speedup.** The flash-to-lite migration cuts latency by roughly 77% in all three runs (about 25s to about 5.5s). Drift is not always degradation; this is a large, reproducible improvement, and it coexists with the same migration's first-attempt failures. A team looking only at latency would call this migration a clear win; a team looking only at retry-masking would call it a regression. Both are true.
+
+One latency signal did *not* reproduce: Claude main-suite latency was +6.8% in run 1 and +46.0% in the repeat, with the repeat's confidence interval spanning zero (a single slow session or load variance). Like the Claude verbosity false positive in Section 6.3, this is exactly the kind of signal the repeat protocol exists to filter.
+
+Caveats: latency includes retry round-trips, was measured in single sessions per run, and is exposed to provider load and network variance that token counts are not. The hard-suite noise floor's −11.3% swing shows the practical band; latency claims should be held to a higher reproducibility bar than token claims, as done here.
 
 ---
 
@@ -254,11 +316,11 @@ Three findings looked credible after the first migration run. All three were kil
 
 After the first flash migration hard-suite run, 7 decision-field flips were recorded, far more than the main-suite baseline of 0. The initial read: hard prompts reveal judgment instability that easy prompts mask.
 
-Then we ran the hard-suite noise floor (run 8): the old model tested against itself on the same hard prompts, with no model change at all. It produced 3 final-decision flips on its own. The same prompt (`diagnostic-104`) that flipped in the migration also flipped when we compared the old model to itself, in a different direction. There is no stable "old model answer" to migrate away from on these prompts.
+Then we ran the hard-suite noise floors: the old model tested against itself on the same hard prompts, with no model change at all. The pro-tier hard noise floor produced 3 final-decision flips on its own, including `diagnostic-104`, the same prompt that flipped in the flash migration. The matched-tier check is more direct: the flash hard noise floor (`gemini-2.5-flash` against itself) produced 2 final-decision flips, including a `COACH→FAIL` grade flip on `support_audit-104`, the very flip that at pro tier is one of this paper's surviving findings. At flash tier it happens with no model change at all. There is no stable "old model answer" to migrate away from on these prompts.
 
 Here's why that happens: the hard prompts are designed to sit right on the edge of a decision. Think of a grading rubric where a candidate's answer is genuinely borderline: a fair evaluator could score it either way. Any model, old or new, will give slightly different answers when the input is that ambiguous. So when you see a flip in a migration run, you cannot tell whether it is because the model changed or because the input is just noisy. Counting those flips as "migration drift" is measuring input ambiguity, not model change.
 
-The fix is simple but easy to miss: run your noise floor on the same prompt suite you are analyzing. Comparing hard-suite migration flips against a main-suite noise baseline is an apples-to-oranges comparison; the baselines are completely different. Without the hard-suite noise floor, those 7 flips looked significant. With it, they vanished.
+The fix is simple but easy to miss: run your noise floor on the same prompt suite *and the same model tier* you are analyzing. Comparing hard-suite migration flips against a main-suite noise baseline is an apples-to-oranges comparison, and so is borrowing another tier's noise floor: a prompt that is noise-floor-stable for one model can be a coin flip for another. Without the matched hard-suite noise floor, those 7 flips looked significant. With it, they vanished.
 
 ### 6.2 "Claude Judges Candidates More Harshly" (Killed)
 
@@ -266,13 +328,15 @@ After the first Claude migration run, three judgment observations surfaced: an `
 
 The repeat migration run (Claude main suite, run 5) falsified it completely. Not a single flip from run 1 recurred. The repeat produced flips on different prompts entirely, and included an upward flip (`L5→L6`), breaking any downgrade pattern. The hard-suite repeat (run 6) produced one flip on a different diagnostic prompt, not the ones that flipped in run 1.
 
-The "harsher judge" story was a single-run artifact. The Gemini-pro claim survives because it reproduced with 8/8 directional consistency across two independent runs. The Claude claim died because 0 out of the original flips recurred. "Newer models judge more harshly" is a Gemini-pro-specific observation; it cannot be generalized.
+The "harsher judge" story was a single-run artifact. The Gemini-pro claim survives because its direction was fully consistent across two independent runs (every change downward or to abstention, with one prompt reproducing its exact flip). The Claude claim died because 0 out of the original flips recurred. "Newer models judge more harshly" is a Gemini-pro-specific observation; it cannot be generalized.
 
 ### 6.3 "Claude +12% Verbosity on Main Suite" (Killed)
 
-Run 1 of the Claude main-suite migration showed +286.9 tokens average, a +12.1% increase. The noise floor at that time showed −1.0%. The separation looked approximately 12×, and the finding appeared strong.
+Run 1 of the Claude main-suite migration showed +286.9 tokens average, a +12.1% increase. The noise floor at that time showed −1.0%. The separation looked approximately 12×, and the finding appeared strong. It was even statistically significant: the paired bootstrap CI was [+130.0, +495.0] and the permutation p-value was below 0.001.
 
 Run 5 (migration repeat, main suite) showed −0.6%. The sign had flipped.
+
+This false positive deserves emphasis precisely because it passed a significance test. The permutation test correctly tells you the run-1 deltas were not random noise *within that session*; it cannot tell you the old model's own baseline would move ±7% by the next session. Statistical significance on a single run is not a substitute for the repeat.
 
 Root cause: the old model's average output differed substantially between the two main-suite runs (2374.0 tokens in run 1 vs 2703.8 tokens in run 5). That is a ±7% spread in the old model's own aggregate output across different invocation days, much larger than the single-run noise floor suggested. The noise floor measured in one session estimated instantaneous sampling variance, not how much the old model's aggregate naturally shifts from day to day.
 
@@ -305,13 +369,21 @@ The minimum viable migration test the data supports:
 
 This costs roughly 4× the prompt compute of a single migration run. The alternative, shipping a silent 40% output change or systematic judgment recalibration into production, costs more.
 
+A protocol without an accept/reject criterion is a dashboard, not a gate. As a starting default, calibrated against your own noise floor rather than ours:
+
+- **Block** if any final-decision field flip reproduces across both migration runs on a prompt that is stable in the noise floor.
+- **Investigate** if the token or latency delta exceeds 3× your noise floor in the same direction in both runs, or if first-attempt validity drops more than 10 points below the noise floor's own gap.
+- **Accept** otherwise, and record the run artifacts as the baseline for the next migration.
+
+These thresholds come from one study of 19 runs and should be treated as defaults to calibrate, not constants. The structure of the rule (reproduced + noise-floor-stable = block; large + directional = investigate) is the durable part.
+
 ### 7.2 Tier-Specific Drift Profiles
 
 The results show a consistent pattern: the *form* of drift depends on the capability tier of the model being replaced.
 
 The Gemini flash-to-lite migration (flash is Google's cheaper, faster tier; lite is the further stripped-down variant) produced output shrinkage and first-attempt failures. Users accepting the cost reduction are also accepting quiet capability regression under constraint-dense schemas, visible only in first-attempt validity data.
 
-The Gemini pro migration produced output shrinkage on routine tasks, adaptive verbosity increases on hard tasks, and systematic judgment recalibration. The seniority judgment finding is the operationally significant one, not because any individual assessment is necessarily wrong, but because the direction is fixed and reproducible. Eight consecutive downward candidate assessments across two independent runs is not noise. Any pipeline using an LLM for candidate screening should treat this as a mandatory pre-production check.
+The Gemini pro migration produced output shrinkage on routine tasks, adaptive verbosity increases on hard tasks, and systematic judgment recalibration. The seniority judgment finding is the operationally significant one, not because any individual assessment is necessarily wrong, but because the direction is fixed and reproducible. Three distinct prompts downgraded from L6 to L5 (one reproducing exactly in both runs), zero upward changes anywhere in the migration runs, and opposite-direction flips in the noise floor: that pattern is not noise. Any pipeline using an LLM for candidate screening should treat this as a mandatory pre-production check.
 
 The Claude migration went the other way on verbosity: Sonnet-4-6 produces 38–40% more tokens on difficult tasks. This is helpful if you want comprehensive answers and problematic if you care about latency and API cost at scale.
 
@@ -321,11 +393,13 @@ Both surviving judgment-drift findings (the `COACH→FAIL` support grade flip an
 
 Standard pass/fail regression testing cannot detect this. Detection requires tracking the actual value of categorical decision fields, analyzing whether flips have a consistent direction, and confirming they reproduce. We recommend any team running LLMs in screening, evaluation, or grading pipelines add decision-field directionality as a first-class migration gate.
 
+This is also becoming a compliance question, not just an engineering one. The EU AI Act classifies AI systems used in employment decisions (recruitment, screening, evaluation) as high-risk, with obligations for monitoring substantial modifications to the system; NYC Local Law 144 requires bias audits of automated employment decision tools. A silent model migration that reproducibly downgrades candidate assessments is precisely the class of change these frameworks expect operators to detect and document. Today, a team could swap the model behind a screening pipeline, observe 100% schema validation, and have no record that the system's judgment distribution shifted. The measurement protocol in this paper is one concrete way to produce that record.
+
 ### 7.4 Cost and Latency Implications
 
-The retry-masking finding has direct production cost implications. For the Gemini flash migration hard suite (75% first-pass), roughly one in four requests requires an error-feedback retry. At production volume, this degrades effective throughput and raises per-compliant-response cost, with no signal in application-level success metrics.
+The retry-masking finding has direct production cost implications. For the Gemini flash migration hard suite (75% first-pass), the new model averages 1.25 validation attempts per compliant response versus the old model's 1.00; every retry re-sends the full prompt plus the validation error and regenerates the output, so the cost and latency per *compliant* response rise by roughly the retry fraction, with no signal in application-level success metrics.
 
-The Claude verbosity increase has analogous implications: +39.7% output tokens on hard tasks is +39.7% API cost and +39.7% response size for any downstream processing. Whether the longer outputs are worth it depends on the application; whether the change happened depends on measuring it.
+The verbosity drift translates directly into dollars. Claude Sonnet 4.5 and 4.6 share identical pricing ($3 per million input tokens, $15 per million output tokens), so the hard-suite drift of +721 output tokens per request is a pure volume cost: about $0.011 per request, or roughly **$1,100 per month for a pipeline handling 100K such requests**, added silently by a model swap whose pass rate never moved. For the Gemini pro migration the arithmetic inverts: the new model emits 15.7% fewer visible tokens but costs 20% more per output token ($12 vs $10 per million), leaving per-request output cost approximately flat ($0.0158 to $0.0160), while the 17–18% latency increase suggests additional billed thinking tokens our instrumentation does not see. A team forecasting cost savings from the terser model would likely be wrong in the optimistic direction. (Prices as of June 2026.)
 
 ---
 
@@ -337,7 +411,9 @@ The Claude verbosity increase has analogous implications: +39.7% output tokens o
 
 - **Single SDK retry path.** The `instructor` library sends validation errors back to the model as text feedback, then retries. This is one implementation choice; models using constrained decoding (where the decoding algorithm itself enforces the schema, with no retry needed) would not exhibit retry-masking in the same way. The retry-masking finding is specific to this retry strategy.
 
-- **Single-run noise floor underestimates cross-day variance.** As demonstrated by the Claude main-suite verbosity false positive, a noise floor measured in one session does not capture how much the old model's aggregate output naturally shifts across different invocation days. Running the noise floor across multiple sessions would produce a more conservative and more reliable variance estimate.
+- **Noise floors underestimate cross-day variance.** As demonstrated by the Claude main-suite verbosity false positive, a noise floor measured in one session does not capture how much the old model's aggregate output naturally shifts across different invocation days. We added a second same-day noise-floor session for the pro and Claude main suites in response; multi-day noise floors remain future work, and the cross-day ±7% swing observed in the Claude old-model baseline suggests they would be materially wider than the single-session estimates.
+
+- **Change, not quality.** The framework measures behavioral change, not correctness. No ground-truth labels exist for these tasks, so we cannot say whether a 15.7% shorter rationale is worse or tighter, or whether L5 or L6 is the right assessment for a given candidate. The claim is narrower: these shifts are real, directional, and invisible to schema validation, so they deserve human review before a migration ships. Whether any specific shift is a regression is application-dependent.
 
 - **Snapshot comparison only.** Each run submits one request per prompt at provider-default temperature. Within-session variance across multiple invocations of the same prompt is not characterized.
 
@@ -347,7 +423,7 @@ The Claude verbosity increase has analogous implications: +39.7% output tokens o
 
 ## 9. Conclusion
 
-Schema-level regression testing cannot detect the changes that matter in an LLM migration. Across 16 benchmark runs of two production-representative migrations, pass/fail evaluation reported zero regressions every single time. The metrics underneath those results showed output volume shifting 15–40%, a cheaper model tier requiring error feedback on 25% of hard requests, and a pro-tier migration producing eight consecutive downward candidate assessments without exception.
+Schema-level regression testing cannot detect the changes that matter in an LLM migration. Across 19 benchmark runs of two production-representative migrations, pass/fail evaluation reported zero regressions every single time. The metrics underneath those results showed output volume shifting 15–40%, latency moving independently of volume (one migration got terser and slower at once), a cheaper model tier requiring error feedback on 25% of hard requests, and a pro-tier migration that changed candidate assessments only downward, never upward.
 
 Just as important: roughly half of the drift we initially detected was noise. Three findings that appeared credible after a first run (hard-prompt decision instability, a cross-provider judgment-harshness pattern, and a 12% Claude verbosity shift) each collapsed under a same-model noise floor or a repeat run. The methodology that found real drift is the methodology that killed these false positives. You cannot have one without the other.
 
@@ -390,3 +466,26 @@ Wang, X., Wei, J., Schuurmans, D., Le, Q., Chi, E., Narang, S., Chowdhery, A., &
 Willard, B. T., & Louf, R. (2023). Efficient guided generation for large language models. arXiv:2307.09702
 
 Zheng, L., Chiang, W.-L., Sheng, Y., Zhuang, S., Wu, Z., et al. (2023). Judging LLM-as-a-judge with MT-bench and Chatbot Arena. *NeurIPS 2023 (Datasets and Benchmarks Track)*. arXiv:2306.05685
+
+---
+
+## Appendix A: The COACH→FAIL Flip, Side by Side
+
+Both models audited the identical support call transcript (`support_audit-104`): an agent named Marcus correctly diagnoses a WiFi problem and fixes it, but verifies the customer with only one identity factor, leaves 47 seconds of unannounced silence, and promises a technician visit he is not authorized to guarantee. The outputs below are abridged from the first pro migration run; the same `COACH→FAIL` flip reproduced in the second run.
+
+| Field | Old model (gemini-2.5-pro) | New model (gemini-3.1-pro-preview) |
+|---|---|---|
+| `overall_grade` | **COACH** | **FAIL** |
+| `compliance_score_pct` | 71.4 | 57.1 |
+| Quality dimensions | Problem Solving: G, Empathy: G, Communication: Y | Technical Resolution: G, Verification and Compliance: **R**, Call Handling: **R** |
+| Unauthorized action flagged | Not flagged | "Promised to escalate to a technician visit if the issue recurs" marked `authorized: false` |
+
+Old model, `coaching_notes` (abridged):
+
+> "Agent correctly diagnosed and resolved a technical issue, but failed two compliance items. COACHING NEEDED on: 1) C-02: Must verify customer with two factors... 2) C-06: Must announce periods of silence or hold..."
+
+New model, `coaching_notes` (abridged):
+
+> "Agent needs coaching on three critical areas: 1) Identity Verification... 2) Hold Procedures... 3) Unauthorized Commitments: Do not guarantee or commit to a technician dispatch, as it requires supervisor approval."
+
+Both readings of the call are defensible. The old model weighs the successful resolution and grades the compliance gaps as coachable; the new model additionally catches the unauthorized technician promise the old model missed entirely, weighs compliance more heavily, and fails the call. Neither output violates the schema. But if this audit pipeline feeds an agent's performance record, the same call now produces a failing grade where it previously produced a coaching note, on every such call, deterministically in direction. That is the class of change schema validation cannot see and this framework is built to surface.

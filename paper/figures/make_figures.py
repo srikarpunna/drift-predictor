@@ -41,9 +41,12 @@ def first_pass_pct(records, side):
 # (label, file, kind) — kind drives the bar color.
 RUNS = [
     ("Flash noise floor (main)", "noise_floor_20260609_175927.jsonl", "noise"),
+    ("Flash noise floor (hard)", "noise_floor_prompts_hard_20260610_164208.jsonl", "noise"),
     ("Pro noise floor (main)", "noise_floor_pro_20260610_000737.jsonl", "noise"),
+    ("Pro noise floor s2 (main)", "noise_floor_pro_20260610_164951.jsonl", "noise"),
     ("Pro noise floor (hard)", "noise_floor_pro_prompts_hard_20260610_005204.jsonl", "noise"),
     ("Claude noise floor (main)", "noise_floor_claude_20260610_025532.jsonl", "noise"),
+    ("Claude noise floor s2 (main)", "noise_floor_claude_20260610_164210.jsonl", "noise"),
     ("Claude noise floor (hard)", "noise_floor_claude_prompts_hard_20260610_034614.jsonl", "noise"),
     ("Flash migration r2 (main)", "gemini_migration_20260609_172936.jsonl", "gemini"),
     ("Flash migration r3 (main)", "gemini_migration_20260609_182638.jsonl", "gemini"),
@@ -160,11 +163,14 @@ def fig3_first_attempt():
 
 
 def fig2_funnel():
+    # Conceptual diagram, intentionally hand-specified rather than data-derived:
+    # it narrates the paper's filtering story (Section 6). If the findings
+    # change, update these labels alongside the paper text.
     survived = [
-        "Gemini-pro output shrank 15.7%\n(showed up in BOTH runs, 8x bigger than noise)",
-        "Claude grew 37-40% on hard tasks\n(showed up in BOTH runs, 14x bigger than noise)",
+        "Gemini-pro output shrank 15.7%\n(showed up in BOTH runs, ~4.6x bigger than noise)",
+        "Claude grew 37-40% on hard tasks\n(showed up in BOTH runs, ~14x bigger than noise)",
         "New flash model fails 1 in 4 hard first tries\n(old model: almost never)",
-        "Gemini-pro judges candidates lower\n(8 of 8 changes were downgrades, twice)",
+        "Gemini-pro judges candidates lower\n(every level change was a downgrade\nor abstention, in both runs)",
     ]
     killed_gate1 = "\u201cHard prompts expose decision flips\u201d\nKILLED: the old model flips these\nprompts against ITSELF too"
     killed_gate2 = [

@@ -54,6 +54,8 @@ class BenchmarkRun(BaseModel):
     # Fine-grained drift: field-level size changes + categorical flags.
     # A run can "pass" while still drifting — these capture what pass/fail misses.
     field_drift_events: list[dict] = Field(default_factory=list)
+    # Decision-field value changes (e.g. hire -> no_hire). The highest-stakes signal.
+    decision_flips: list[dict] = Field(default_factory=list)
     drift_flags: list[str] = Field(default_factory=list)
 
     @property

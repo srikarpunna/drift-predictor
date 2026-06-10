@@ -1,0 +1,63 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor
+Old:     gemini-2.5-flash
+New:     gemini-2.5-flash
+============================================================
+Total prompts:   12
+Old model pass:  12/12  (100.0%)
+New model pass:  12/12  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=4  old=4/4  new=4/4  reg=0
+  interview_evaluation       n=4  old=4/4  new=4/4  reg=0
+  support_audit              n=4  old=4/4  new=4/4  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  12/12  (100.0%)
+  New first-pass:  11/12  (91.7%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.08
+  Rescued by retry (new): 1
+    diagnostic-103  [diagnostic]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1108.5 tok/response
+  New avg:  1176.2 tok/response
+  Delta:    +67.8 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  9/12
+  Field-level drift events:  39
+    structure_drift      9 prompt(s)
+    content_shrink       5 prompt(s)
+    first_attempt_fail   1 prompt(s)
+  Worst drifters:
+    interview_evaluation-102     Δtok= +12.8%  events=7  flags=structure_drift,content_shrink
+      competency_scores.rationale.__chars           854 → 473
+      key_concerns.__chars                          268 → 410
+      key_concerns.__len                            3 → 4
+    diagnostic-102               Δtok= +10.3%  events=6  flags=structure_drift
+      failure_patterns.frequency.__chars            60 → 92
+      failure_patterns.pattern_name.__chars         55 → 89
+      metrics.__len                                 1 → 3
+    diagnostic-103               Δtok=  +5.2%  events=5  flags=first_attempt_fail,structure_drift
+      consistency_vs_accuracy_note.__chars          192 → 361
+      failure_patterns.frequency.__chars            27 → 42
+      metrics.__len                                 3 → 4
+    support_audit-102            Δtok=  +1.8%  events=5  flags=structure_drift,content_shrink
+      agent_actions.__len                           2 → 1
+      agent_actions.action_detail.__chars           173 → 95
+      agent_actions.action_type.__chars             26 → 13
+    support_audit-104            Δtok= +19.7%  events=4  flags=structure_drift
+      agent_actions.__len                           2 → 3
+      agent_actions.action_detail.__chars           105 → 198
+      agent_actions.action_type.__chars             28 → 41
+  First-attempt schema violations (new model, rescued by retry):
+    diagnostic-103               metrics.0.interpretation

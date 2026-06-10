@@ -5,9 +5,10 @@ from typing import Type
 
 import instructor
 from google import genai
+from instructor.core.exceptions import InstructorRetryException
 from instructor.core.hooks import HookName, Hooks
 from pydantic import BaseModel as PydanticBaseModel
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_exponential
 
 from src.models import RunResult
 from src.runners.base_runner import BaseRunner
@@ -25,6 +26,10 @@ class GeminiRunner(BaseRunner):
         )
 
     def _make_retry(self):
+        # Tenacity handles transient transport/API errors only. Schema-validation
+        # retries are instructor's job (max_retries inside the structured call);
+        # if instructor exhausts them, that is a real result, not something to
+        # re-run — so InstructorRetryException is excluded here.
         return retry(
             stop=stop_after_attempt(self._retry_cfg.max_attempts),
             wait=wait_exponential(
@@ -32,7 +37,7 @@ class GeminiRunner(BaseRunner):
                 min=self._retry_cfg.wait_min_seconds,
                 max=self._retry_cfg.wait_max_seconds,
             ),
-            retry=retry_if_exception_type(Exception),
+            retry=retry_if_not_exception_type(InstructorRetryException),
             reraise=True,
         )
 
@@ -87,6 +92,10 @@ class GeminiRunner(BaseRunner):
 
         @retrying
         def _call():
+            # Reset per-attempt instrumentation so a transient-error re-run by
+            # tenacity doesn't inflate the counts from the aborted attempt.
+            attempt_count[0] = 0
+            first_error[0] = None
             return self._instructor_client.chat.completions.create_with_completion(
                 response_model=schema,
                 messages=messages,
@@ -113,6 +122,10 @@ class GeminiRunner(BaseRunner):
             )
 
         elapsed_ms = (time.monotonic() - start) * 1000
+        # candidates_token_count covers the visible response only; the SDK
+        # reports internal reasoning separately as thoughts_token_count, which
+        # is billed as output but not counted here. Usage accumulates across
+        # instructor's validation retries (all attempts, not just the last).
         usage = getattr(raw_response, "usage_metadata", None)
         return RunResult(
             model_id=self.model_id,

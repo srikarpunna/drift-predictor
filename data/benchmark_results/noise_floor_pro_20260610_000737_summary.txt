@@ -1,0 +1,58 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor_pro
+Old:     gemini-2.5-pro
+New:     gemini-2.5-pro
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  30/30  (100.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.00
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1588.9 tok/response
+  New avg:  1557.6 tok/response
+  Delta:    -31.3 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  16/30
+  Field-level drift events:  43
+    structure_drift      14 prompt(s)
+    content_shrink       7 prompt(s)
+  Worst drifters:
+    diagnostic-001               Δtok= -18.5%  events=7  flags=structure_drift,content_shrink
+      failure_patterns.__len                        3 → 2
+      failure_patterns.example_run_ids.__chars      75 → 40
+      failure_patterns.example_run_ids.__len        15 → 8
+    interview_evaluation-003     Δtok= -14.8%  events=4  flags=structure_drift,content_shrink
+      candidate_level_assessed.__chars              7 → 2
+      competency_scores.__len                       2 → 1
+      competency_scores.competency.__chars          32 → 16
+    support_audit-009            Δtok= -15.0%  events=4  flags=structure_drift,content_shrink
+      agent_actions.__len                           2 → 1
+      agent_actions.action_detail.__chars           266 → 85
+      agent_actions.action_type.__chars             26 → 13
+    interview_evaluation-007     Δtok=  +1.0%  events=3  flags=structure_drift
+      competency_scores.__len                       4 → 3
+      risk_flags.__chars                            114 → 238
+      risk_flags.__len                              1 → 2
+    support_audit-003            Δtok=  +9.1%  events=3  flags=structure_drift
+      agent_actions.__len                           2 → 3
+      agent_actions.action_detail.__chars           219 → 313
+      agent_actions.action_type.__chars             26 → 39

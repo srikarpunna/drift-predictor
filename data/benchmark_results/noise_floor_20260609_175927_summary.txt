@@ -1,0 +1,62 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor
+Old:     gemini-2.5-flash
+New:     gemini-2.5-flash
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  29/30  (96.7%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.03
+  Rescued by retry (new): 1
+    interview_evaluation-005  [interview_evaluation]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1532.7 tok/response
+  New avg:  1554.5 tok/response
+  Delta:    +21.9 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  24/30
+  Field-level drift events:  69
+    structure_drift      24 prompt(s)
+    content_shrink       7 prompt(s)
+    verbosity_grow       2 prompt(s)
+    first_attempt_fail   1 prompt(s)
+  Worst drifters:
+    diagnostic-009               Δtok= -13.6%  events=8  flags=structure_drift,content_shrink
+      failure_patterns.__len                        2 → 1
+      failure_patterns.example_run_ids.__chars      50 → 25
+      failure_patterns.example_run_ids.__len        10 → 5
+    interview_evaluation-008     Δtok= +28.0%  events=7  flags=verbosity_grow,structure_drift
+      checkpoints.reasoning.__chars                 2229 → 3209
+      competency_scores.__len                       3 → 5
+      competency_scores.competency.__chars          45 → 76
+    support_audit-010            Δtok=+130.4%  events=6  flags=verbosity_grow,structure_drift
+      agent_actions.__len                           2 → 3
+      agent_actions.action_detail.__chars           179 → 305
+      compliance_checks.__len                       1 → 12
+    interview_evaluation-002     Δtok=  -6.4%  events=4  flags=structure_drift,content_shrink
+      key_concerns.__len                            4 → 3
+      key_strengths.__len                           3 → 4
+      risk_flags.__chars                            304 → 152
+    diagnostic-002               Δtok=  +7.1%  events=3  flags=structure_drift
+      failure_patterns.example_run_ids.__chars      35 → 85
+      failure_patterns.example_run_ids.__len        7 → 17
+      failure_patterns.pattern_name.__chars         35 → 54

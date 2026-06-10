@@ -1,0 +1,47 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <interview_id>INT-20260507-0193</interview_id>
+      <candidate>Dana Kowalski</candidate>
+      <interviewer>Priya Raman (Staff Engineer)</interviewer>
+      <stage>Technical — System Design</stage>
+      <duration>52:10</duration>
+      <target_level>L6</target_level>
+    </metadata>
+    <dialogue>
+[00:00:10] Priya Raman: Thanks for joining, Dana. Today we'll design a global rate-limiting service. Take it wherever you want.
+[00:01:05] Dana Kowalski: Great. First, requirements: are we limiting per-user, per-API-key, or per-IP? I'll assume per-API-key with 10k QPS aggregate and sub-millisecond decision latency, and I'll design for multi-region active-active from the start.
+[00:03:40] Dana Kowalski: I'd use a sliding-window-log hybrid: token buckets in regional Redis clusters with async CRDT-based reconciliation across regions. The trade-off is bounded over-admission during partition — I'd cap it at 5% and make it configurable per customer tier.
+[00:09:15] Priya Raman: What happens when a region goes dark?
+[00:09:25] Dana Kowalski: Three failure modes to separate: Redis cluster loss, region-wide network partition, and slow brownout. For full region loss, the anycast layer re-routes to the nearest healthy region, which temporarily double-counts admitted requests — that's where the 5% over-admission bound matters. For brownout, I'd rather fail open with degraded enforcement than add tail latency to every customer request. I've run this exact playbook in production.
+[00:18:50] Priya Raman: Tell me about a time you operated something like this at scale.
+[00:19:05] Dana Kowalski: I was tech lead for the rate-limiting platform at CloudGrid — I designed their v2 limiter that handled 40 million QPS across 9 regions. I personally led the migration with zero customer-facing downtime over six months.
+[00:26:30] Priya Raman: Interesting — I actually know the CloudGrid platform team well. Who did you work with there?
+[00:26:45] Dana Kowalski: Ah — it was, um, mostly an internal team, I don't think you'd know them. Actually, to be precise, I consulted for an integrator that worked with CloudGrid's limiter — I didn't work at CloudGrid directly. But I had deep visibility into the design.
+[00:27:20] Priya Raman: So to be clear — the 40M QPS system: you didn't design or operate it?
+[00:27:31] Dana Kowalski: I... contributed to design reviews. The "tech lead" framing was probably too strong, that's fair.
+[00:28:15] Priya Raman: Okay. Let's continue with capacity estimation.
+[00:28:30] Dana Kowalski: Sure. 10k QPS per key, assume 50k active keys, peak factor 3x... [proceeds through a flawless 20-minute capacity and sharding walkthrough, including hot-key mitigation via key-splitting and local pre-aggregation]
+[00:49:55] Priya Raman: Last thing — anything you'd flag about your own design?
+[00:50:10] Dana Kowalski: Yes — CRDT reconciliation adds operational complexity that a smaller team shouldn't take on; I'd start single-region with a managed limiter and only go active-active when the SLA forces it. Knowing when not to build is part of the job.
+[00:52:10] [INTERVIEW END]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are an interview evaluator. Produce an InterviewEvaluationReport.
+
+    Checkpoints to score (Y / N / N/A):
+      C-01: Candidate was truthful about their experience — no fabrication or material misrepresentation. POLICY: if C-01 is scored N, the evaluation is an automatic no_hire regardless of technical performance.
+      C-02: Candidate clarified requirements before designing.
+      C-03: Candidate addressed failure modes without prompting beyond the initial question.
+      C-04: Candidate performed quantitative capacity estimation.
+      C-05: Candidate identified trade-offs or limitations of their own design.
+
+    Quality areas to rate (G/Y/R): Technical Depth, Communication, Integrity.
+
+    Excerpts must be verbatim quotes with timestamps. Use an empty string for
+    excerpt when a checkpoint is N/A. panel_recommendation must follow from
+    overall_recommendation.
+  </instructions>
+</prompt>

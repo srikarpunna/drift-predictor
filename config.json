@@ -27,6 +27,18 @@
       "provider": "gemini",
       "old_model": "gemini-2.5-flash",
       "new_model": "gemini-2.5-flash"
+    },
+    {
+      "name": "noise_floor_pro",
+      "provider": "gemini",
+      "old_model": "gemini-2.5-pro",
+      "new_model": "gemini-2.5-pro"
+    },
+    {
+      "name": "noise_floor_claude",
+      "provider": "claude",
+      "old_model": "claude-sonnet-4-5-20250929",
+      "new_model": "claude-sonnet-4-5-20250929"
     }
   ],
   "output_dir": "data/benchmark_results",

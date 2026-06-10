@@ -1,0 +1,59 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    gemini_pro_migration
+Old:     gemini-2.5-pro
+New:     gemini-3.1-pro-preview
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  30/30  (100.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.00
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1585.3 tok/response
+  New avg:  1337.0 tok/response
+  Delta:    -248.3 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  27/30
+  Field-level drift events:  96
+    content_shrink       25 prompt(s)
+    structure_drift      21 prompt(s)
+    verbosity_shrink     1 prompt(s)
+  Worst drifters:
+    interview_evaluation-002     Δtok= -20.6%  events=8  flags=structure_drift,content_shrink
+      competency_scores.__len                       2 → 1
+      competency_scores.competency.__chars          29 → 16
+      competency_scores.rationale.__chars           349 → 105
+    diagnostic-009               Δtok=  +3.9%  events=7  flags=structure_drift,content_shrink
+      failure_patterns.__len                        1 → 2
+      failure_patterns.example_run_ids.__chars      25 → 50
+      failure_patterns.example_run_ids.__len        5 → 10
+    interview_evaluation-006     Δtok= -22.5%  events=7  flags=structure_drift,content_shrink
+      candidate_level_assessed.__chars              2 → 7
+      checkpoints.reasoning.__chars                 4006 → 2134
+      competency_scores.rationale.__chars           690 → 364
+    interview_evaluation-010     Δtok= -23.1%  events=6  flags=structure_drift,content_shrink
+      checkpoints.reasoning.__chars                 4102 → 2147
+      competency_scores.__len                       4 → 5
+      key_concerns.__len                            2 → 3
+    interview_evaluation-001     Δtok= -21.3%  events=5  flags=structure_drift,content_shrink
+      checkpoints.reasoning.__chars                 3433 → 1746
+      competency_scores.__len                       4 → 3
+      competency_scores.rationale.__chars           717 → 285

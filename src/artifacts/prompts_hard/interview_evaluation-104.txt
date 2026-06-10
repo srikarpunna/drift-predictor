@@ -1,0 +1,62 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <interview_id>INT-20260602-0531</interview_id>
+      <candidate>Devon Okafor</candidate>
+      <interviewer>Sienna Marsh (Director of Engineering)</interviewer>
+      <stage>Behavioral</stage>
+      <duration>47:30</duration>
+      <target_level>L5</target_level>
+    </metadata>
+    <dialogue>
+[00:00:10] Sienna Marsh: Hi Devon. This is a behavioral round for the L5 Senior Engineer position. I'll ask for specific examples from your experience.
+[00:00:22] Devon Okafor: Ready. Looking forward to it.
+[00:00:27] Sienna Marsh: Let's start — tell me about your most impactful technical delivery in the last two years.
+[00:01:02] Devon Okafor: At Gridline, I re-architected the invoice generation service. It had accumulated 50 edge cases inline, was hitting timeouts under load, and required five different engineers to debug. I broke it into a rules engine with a pluggable handler registry. Processing time dropped from 8.2 seconds to 340 milliseconds, and on-call pages for invoice errors went from weekly to zero the following quarter.
+[00:05:10] Sienna Marsh: Who was involved in the decision to do that?
+[00:05:18] Devon Okafor: Mostly my team. We had a design review with my tech lead and two engineers. I drove the design and wrote the migration plan.
+[00:06:40] Sienna Marsh: Tell me about a time you took on something ambiguous and had to define the scope yourself.
+[00:07:12] Devon Okafor: At Gridline, the sales team kept getting a custom reporting request in enterprise deals — clients wanted spend by cost center across multiple billing periods. No formal project existed. I scoped a reporting module on my own — estimated three weeks of work — got a quick sign-off from my manager, and shipped it. Three enterprise deals cited it as a factor in their Q3 renewal.
+[00:11:20] Sienna Marsh: How did you get buy-in beyond your manager?
+[00:11:29] Devon Okafor: Honestly, mostly through my manager. He looped in the product team and got the formal sign-off. I focused on building it quickly rather than navigating the org process myself.
+[00:13:00] Sienna Marsh: Tell me about a time you had to influence a decision you didn't own, outside your team.
+[00:13:35] Devon Okafor: The platform team owned our deployment pipeline and had a freeze window blocking our invoice service release. I sent a write-up explaining the customer impact and they carved out an exception for us. It went through their lead — took about two days of back-and-forth.
+[00:17:40] Sienna Marsh: Have you driven initiatives that required sustained alignment across multiple teams, not just a one-time exception?
+[00:17:55] Devon Okafor: I've had a few touch points like the deployment exception, but most of my work has been within my team or service boundary. I'd like to grow into that kind of scope.
+[00:19:10] Sienna Marsh: Appreciate the honesty. Tell me about a significant technical failure you were responsible for.
+[00:19:42] Devon Okafor: I deployed a database migration script without a dry run in staging — forgot to check the backfill logic on a column default. It corrupted about 4,000 invoice records. I noticed within minutes, rolled back, and spent the next day writing a verification layer. We added a mandatory staging sign-off to our migration playbook. No customer-visible impact because we caught it before the daily batch ran.
+[00:25:30] Sienna Marsh: How does your work connect to the business?
+[00:26:00] Devon Okafor: The invoice service work reduced support tickets by 40 percent in the quarter after launch. The reporting module contributed to three deal renewals — my manager said that was roughly $500k in ARR. I don't always have visibility into the downstream business number, but I try to connect my work to support volume or usage metrics I do see.
+[00:32:15] Sienna Marsh: Any questions for me?
+[00:32:30] Devon Okafor: Yes — how does engineering collaborate with the product roadmap process here? I've been wanting to understand how much upstream input engineers actually have.
+[00:34:00] Sienna Marsh: We run quarterly investment reviews where tech leads and PMs co-write the brief. Engineers at L5 and above typically sponsor individual roadmap items. It's an area we're actively improving.
+[00:34:45] Devon Okafor: That's helpful to understand.
+[00:47:30] [INTERVIEW END]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are an interview evaluator. Produce an InterviewEvaluationReport.
+
+    Checkpoints to score (Y / N / N/A):
+      C-01: No integrity or conduct concerns surfaced.
+            POLICY: C-01=N means automatic no_hire regardless of other performance.
+      C-02: Candidate provided specific, measurable outcome evidence (not vague "positive result").
+      C-03: Candidate demonstrated personally driving ambiguous scope — not delegated upward.
+      C-04: Candidate showed sustained cross-functional alignment (more than a single handoff
+            or one-time exception — required for L5 bar).
+      C-05: Candidate described business impact using a concrete figure (ARR, SLA value,
+            support-ticket metric, or similar — not relative or approximate only).
+      C-06: Candidate described managing or growing other engineers
+            (N/A if no evidence of this topic surfaced in the transcript).
+      C-07: Final-round panel interview stage
+            (N/A for all earlier stages — this checkpoint covers panel-level signals only).
+
+    Quality areas to rate (G/Y/R):
+      Behavioral Evidence, Cross-Functional Influence, Leadership & Influence.
+
+    Excerpts must be verbatim quotes with timestamps. Use empty string for excerpt when
+    a checkpoint is N/A. panel_recommendation must be consistent with
+    overall_recommendation.
+  </instructions>
+</prompt>

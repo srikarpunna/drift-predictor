@@ -1,0 +1,69 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    gemini_migration
+Old:     gemini-2.5-flash
+New:     gemini-3.1-flash-lite
+============================================================
+Total prompts:   12
+Old model pass:  12/12  (100.0%)
+New model pass:  12/12  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=4  old=4/4  new=4/4  reg=0
+  interview_evaluation       n=4  old=4/4  new=4/4  reg=0
+  support_audit              n=4  old=4/4  new=4/4  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  12/12  (100.0%)
+  New first-pass:  9/12  (75.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.25
+  Rescued by retry (new): 3
+    diagnostic-103  [diagnostic]  attempts=2
+    support_audit-101  [support_audit]  attempts=2
+    support_audit-103  [support_audit]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1108.4 tok/response
+  New avg:  880.9 tok/response
+  Delta:    -227.5 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  12/12
+  Field-level drift events:  79
+    structure_drift      11 prompt(s)
+    content_shrink       10 prompt(s)
+    verbosity_shrink     4 prompt(s)
+    first_attempt_fail   3 prompt(s)
+    verbosity_grow       1 prompt(s)
+  Worst drifters:
+    interview_evaluation-103     Δtok= -44.7%  events=12  flags=verbosity_shrink,structure_drift,content_shrink
+      checkpoints.excerpt.__chars                   2560 → 1074
+      checkpoints.reasoning.__chars                 1617 → 825
+      competency_scores.__len                       5 → 3
+    interview_evaluation-101     Δtok=  -3.6%  events=8  flags=structure_drift,content_shrink
+      checkpoints.excerpt.__chars                   847 → 1611
+      competency_scores.__len                       4 → 3
+      key_concerns.__chars                          150 → 247
+    interview_evaluation-102     Δtok= -18.9%  events=8  flags=structure_drift,content_shrink
+      candidate_level_assessed.__chars              7 → 2
+      checkpoints.excerpt.__chars                   745 → 1075
+      competency_scores.rationale.__chars           519 → 241
+    diagnostic-102               Δtok=  +6.5%  events=7  flags=structure_drift,content_shrink
+      failure_patterns.pattern_name.__chars         55 → 86
+      metrics.__len                                 1 → 3
+      metrics.interpretation.__chars                52 → 128
+    interview_evaluation-104     Δtok= -29.4%  events=7  flags=verbosity_shrink,structure_drift,content_shrink
+      competency_scores.__len                       5 → 3
+      competency_scores.competency.__chars          76 → 45
+      competency_scores.rationale.__chars           1314 → 336
+  First-attempt schema violations (new model, rescued by retry):
+    diagnostic-103               Value error, FamilyBreakdown(policy_parse): rate_pct=25.0 does not match regress
+    support_audit-101            Value error, followup_reason required when followup_required=True [type=value_er
+    support_audit-103            Value error, followup_reason required when followup_required=True [type=value_er

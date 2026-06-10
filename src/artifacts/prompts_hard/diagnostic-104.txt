@@ -1,0 +1,59 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-06-05</evaluation_date>
+      <model_pair>
+        <old_model>contract-parser-v2</old_model>
+        <new_model>contract-parser-v3-mini</new_model>
+      </model_pair>
+      <prompt_set>legal_docs_battery_v4</prompt_set>
+      <total_runs>19</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family    | old_passed | new_passed | regression | failure_type
+R-501  | P-601     | contract_parse | NO         | NO         | NO         | enum_drift
+R-502  | P-602     | contract_parse | NO         | NO         | NO         | enum_drift
+R-503  | P-603     | contract_parse | NO         | NO         | NO         | field_omission
+R-504  | P-604     | contract_parse | YES        | NO         | YES        | enum_drift
+R-505  | P-605     | contract_parse | YES        | YES        | NO         | none
+R-506  | P-606     | contract_parse | YES        | NO         | YES        | enum_drift
+R-507  | P-607     | contract_parse | YES        | YES        | NO         | none
+R-508  | P-608     | contract_parse | YES        | NO         | YES        | type_coercion
+R-509  | P-609     | summary_gen    | NO         | NO         | NO         | verbosity_collapse
+R-510  | P-610     | summary_gen    | NO         | NO         | NO         | field_omission
+R-511  | P-611     | summary_gen    | NO         | NO         | NO         | verbosity_collapse
+R-512  | P-612     | summary_gen    | NO         | NO         | NO         | enum_drift
+R-513  | P-613     | summary_gen    | YES        | NO         | YES        | verbosity_collapse
+R-514  | P-614     | summary_gen    | YES        | YES        | NO         | none
+R-515  | P-615     | summary_gen    | YES        | NO         | YES        | verbosity_collapse
+R-516  | P-616     | summary_gen    | YES        | YES        | NO         | none
+R-517  | P-617     | summary_gen    | YES        | NO         | YES        | verbosity_collapse
+R-518  | P-618     | summary_gen    | YES        | YES        | NO         | none
+R-519  | P-619     | summary_gen    | YES        | NO         | YES        | field_omission
+    </run_log>
+
+    <failure_detail_log>
+R-501: old model returned contract_type="Addendum" — permitted enum requires lowercase, pre-existing.
+R-502: old model returned contract_type="Amendment" — case drift, pre-existing.
+R-503: old model omitted party_roles field on multi-party agreements, pre-existing.
+R-504: new model returned contract_type="Addendum" — same case drift on same enum field.
+R-506: new model returned contract_type="Amendment" — enum case drift.
+R-508: new model returned effective_date as string "2026-01-15"; schema requires ISO date object.
+R-509: old model compressed rationale to 7 words on narrative-heavy contracts, pre-existing.
+R-510: old model omitted citations field on contracts referencing external statutes, pre-existing.
+R-511: old model compressed rationale to 9 words, pre-existing.
+R-512: old model returned risk_tier="MEDIUM-HIGH" — not a permitted enum value, pre-existing.
+R-513: new model compressed rationale to 8 words; baseline averaged 72 words.
+R-515: new model compressed rationale to 12 words; baseline averaged 68 words.
+R-517: new model compressed rationale to 6 words; baseline averaged 71 words.
+R-519: new model omitted citations field on a statute-referencing contract.
+    </failure_detail_log>
+  </run_data>
+
+  <instructions>
+    You are a QA analyst. Produce a DiagnosticReport for this migration evaluation.
+    The migration team prefers proceed_migration where the data permits — use it
+    if the numbers support it. Base all numbers on the run_log.
+  </instructions>
+</prompt>

@@ -1,0 +1,64 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    claude_migration
+Old:     claude-sonnet-4-5-20250929
+New:     claude-sonnet-4-6
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  29/30  (96.7%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.03
+  Rescued by retry (new): 1
+    interview_evaluation-008  [interview_evaluation]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  2374.0 tok/response
+  New avg:  2661.0 tok/response
+  Delta:    +286.9 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  27/30
+  Field-level drift events:  121
+    structure_drift      25 prompt(s)
+    verbosity_grow       3 prompt(s)
+    content_shrink       2 prompt(s)
+    first_attempt_fail   1 prompt(s)
+  Worst drifters:
+    interview_evaluation-003     Δtok= +21.5%  events=9  flags=structure_drift,content_shrink
+      competency_scores.__len                       3 → 5
+      competency_scores.competency.__chars          45 → 76
+      competency_scores.rationale.__chars           955 → 2052
+    diagnostic-009               Δtok= +20.5%  events=8  flags=structure_drift
+      executive_summary.__chars                     342 → 508
+      failure_patterns.__len                        2 → 3
+      failure_patterns.example_run_ids.__len        15 → 16
+    interview_evaluation-001     Δtok= +18.1%  events=6  flags=structure_drift
+      checkpoints.excerpt.__chars                   2732 → 3986
+      competency_scores.__len                       3 → 5
+      competency_scores.competency.__chars          45 → 76
+    support_audit-001            Δtok= +20.7%  events=6  flags=structure_drift
+      agent_actions.__len                           3 → 5
+      agent_actions.action_detail.__chars           300 → 559
+      agent_actions.action_type.__chars             41 → 67
+    support_audit-006            Δtok= +23.9%  events=6  flags=structure_drift
+      agent_actions.__len                           2 → 4
+      agent_actions.action_detail.__chars           314 → 665
+      agent_actions.action_type.__chars             28 → 61
+  First-attempt schema violations (new model, rescued by retry):
+    interview_evaluation-008     checkpoints.8.reasoning

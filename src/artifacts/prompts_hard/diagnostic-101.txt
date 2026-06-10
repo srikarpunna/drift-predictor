@@ -1,0 +1,39 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-05-14</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-flash</old_model>
+        <new_model>gemini-3.1-flash-lite</new_model>
+      </model_pair>
+      <prompt_set>regression_battery_v3</prompt_set>
+      <total_runs>12</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family    | old_passed | new_passed | regression | token_delta
+R-201  | P-301     | invoice_parse  | YES        | YES        | NO         | -4
+R-202  | P-302     | invoice_parse  | YES        | YES        | NO         | +9
+R-203  | P-303     | invoice_parse  | YES        | YES        | NO         | -11
+R-204  | P-304     | invoice_parse  | YES        | YES        | NO         | +2
+R-205  | P-305     | ticket_triage  | YES        | YES        | NO         | -7
+R-206  | P-306     | ticket_triage  | YES        | YES        | NO         | +14
+R-207  | P-307     | ticket_triage  | YES        | YES        | NO         | -3
+R-208  | P-308     | ticket_triage  | YES        | YES        | NO         | -1
+R-209  | P-309     | meeting_notes  | YES        | YES        | NO         | +6
+R-210  | P-310     | meeting_notes  | YES        | YES        | NO         | -8
+R-211  | P-311     | meeting_notes  | YES        | YES        | NO         | +3
+R-212  | P-312     | meeting_notes  | YES        | YES        | NO         | -5
+    </run_log>
+
+    <failure_detail_log>
+(no failures recorded in this evaluation window)
+    </failure_detail_log>
+  </run_data>
+
+  <instructions>
+    You are a QA analyst. Produce a DiagnosticReport for this migration evaluation.
+    Base every number strictly on the run_log above. Do not invent failures that
+    are not in the data. Recommend an action.
+  </instructions>
+</prompt>

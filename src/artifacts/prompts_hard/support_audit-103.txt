@@ -1,0 +1,64 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20260604-011247</call_id>
+      <agent>Sofia Brandt</agent>
+      <queue>Billing</queue>
+      <duration>10:47</duration>
+      <date>2026-06-04</date>
+    </metadata>
+    <dialogue>
+[00:00:04] Sofia Brandt (Agent): Thank you for calling Meridian Cloud, this is Sofia.
+[00:00:09] Michelle Park (Customer): Hi Sofia. I'd like to downgrade my plan — I'm on Enterprise but I'm only using about half of what it includes.
+[00:00:20] Sofia Brandt: Sure, I can help with that. Let me pull up your account. What's the email address on the account?
+[00:00:26] Michelle Park: michelle.park@velodata.com.
+[00:00:32] Sofia Brandt: Perfect. And can I confirm the last four digits of the payment card on file?
+[00:00:37] Michelle Park: 8814.
+[00:00:40] Sofia Brandt: Thank you, Michelle, I've verified your account. I can see you're on the Enterprise plan at $189 per month. You're interested in the Professional plan at $89 per month — a $100 saving. Shall I walk you through what changes?
+[00:00:56] Michelle Park: Please.
+[00:01:02] Sofia Brandt: The main differences are the seat count — Enterprise includes 50 users, Professional includes 15 — and you'd lose the dedicated support SLA. API access and all core features carry over. Does that work for you?
+[00:01:20] Michelle Park: Yes, that's fine. We only have nine users active.
+[00:01:26] Sofia Brandt: Great. Let me put you on a brief hold while I pull up the plan change in the system — just a minute or two.
+[00:01:34] [HOLD — 1:52]
+[00:03:26] Sofia Brandt: Thanks for holding, Michelle. I've got the downgrade queued. It will take effect immediately, and your next billing cycle will be at $89.
+[00:03:40] Michelle Park: And what about this month? I'm mid-cycle.
+[00:03:46] Sofia Brandt: Good question. I can issue a prorated credit for the days remaining in the current cycle at the Enterprise rate. For your account that works out to $14.60, and I'll apply it to the card on file today.
+[00:03:58] Michelle Park: That's fine, thank you.
+[00:04:03] Sofia Brandt: Done. One moment while I confirm on my end.
+[00:04:07] [Agent typing — 0:31]
+[00:04:38] Sofia Brandt: All set. The credit will post within three to five business days.
+[00:04:44] Michelle Park: Actually, there's one more thing. I noticed a $29 charge on my March invoice listed as a Platform Acceleration Fee. I've never seen that before and I don't know what it covers.
+[00:04:58] Sofia Brandt: Let me look into that... I don't see a clear description in my system for that charge. I want to give you accurate information rather than guessing. Can I research it and call you back within 24 hours?
+[00:05:13] Michelle Park: Yes, that works.
+[00:05:17] Sofia Brandt: I'll note the callback in your account — the charge is Platform Acceleration Fee on your March invoice, and I'll follow up by tomorrow. Is there anything else I can help you with today?
+[00:05:28] Michelle Park: No, that's everything.
+[00:05:32] Sofia Brandt: Wonderful. Your plan is now Professional, the $14.60 credit is processing, and you'll hear from me tomorrow about the March charge. Have a great day, Michelle.
+[00:05:43] [CALL END]
+[00:06:41] [WRAP-UP COMPLETE — 58 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are a QA compliance auditor. Produce a SupportCallAudit for this call.
+
+    Compliance checks: C-01 agent stated their name on greeting (always applicable);
+    C-02 identity verified with two independent factors before accessing account
+    (always applicable — email alone does not satisfy); C-03 billing implications
+    disclosed before processing changes (billing calls); C-04/C-09 supervisor
+    escalation path offered (only if customer expressed clear dissatisfaction);
+    C-05 proper closing with confirmed next steps (always); C-06 hold handled
+    correctly — announced, under 2 minutes, customer thanked after return (only
+    if a hold occurred); C-07 no commitments beyond agent authority (always —
+    credit authority is $25 per call without supervisor approval); C-08
+    troubleshooting sequence (technical calls only); C-10 contact information
+    confirmed at close (only if any account contact details were changed);
+    C-11 retention disclosure read when customer mentions cancellation or plan
+    downgrade (billing calls only); C-12 wrap-up completed within 60 seconds
+    of call end (always).
+
+    Include all applicable checks. Evidence must be verbatim quotes or timestamp
+    observations. compliance_score_pct is the percentage of Y scores over all
+    applicable (Y + N) checks — N/A checks do not count toward either numerator
+    or denominator.
+  </instructions>
+</prompt>

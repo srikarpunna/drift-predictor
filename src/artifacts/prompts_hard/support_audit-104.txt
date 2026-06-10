@@ -1,0 +1,55 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20260605-014308</call_id>
+      <agent>Marcus Delaney</agent>
+      <queue>Technical Support</queue>
+      <duration>09:18</duration>
+      <date>2026-06-05</date>
+    </metadata>
+    <dialogue>
+[00:00:03] Marcus Delaney (Agent): Thank you for calling ClearNet support. This is Marcus, how can I help you?
+[00:00:11] Priya Sharma (Customer): Hi Marcus. My home WiFi keeps dropping every hour or so since yesterday. It's getting pretty disruptive.
+[00:00:19] Marcus Delaney: I'm sorry to hear that. Let me pull up your account. Can I get the email address on the account?
+[00:00:25] Priya Sharma: priya.sharma@outlook.com.
+[00:00:31] Marcus Delaney: Got it. Okay Priya, I can see your account. You have the Gig plan and a ClearNet CR-7 router. Let me pull up your connection logs.
+[00:00:43] [SILENCE — 0:47]
+[00:01:30] Marcus Delaney: Okay, I can see what's happening. You're on the 2.4GHz band and there's significant channel congestion — five neighboring networks on the same channel. I'm going to push a firmware update to your router that will enable auto-channel selection. It'll take about 30 seconds and your WiFi will briefly disconnect while it applies.
+[00:01:52] Priya Sharma: Okay, ready when you are.
+[00:01:57] Marcus Delaney: Pushing now.
+[00:02:28] Priya Sharma: It's back.
+[00:02:33] Marcus Delaney: Great. You should see the network name show a 5GHz band now — the router will have switched you off the congested channel. Can you confirm that?
+[00:02:46] Priya Sharma: Yes, it shows 5GHz.
+[00:02:51] Marcus Delaney: Perfect. The auto-channel firmware should prevent the drops going forward. If you see the problem again in the next 48 hours, call back and we can escalate to a technician visit. Is there anything else I can help you with?
+[00:03:08] Priya Sharma: No, that's great. Thank you.
+[00:03:12] Marcus Delaney: Happy to help. Have a good day.
+[00:03:16] [CALL END]
+[00:04:01] [WRAP-UP COMPLETE — 45 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are a QA compliance auditor. Produce a SupportCallAudit for this call.
+
+    Compliance checks: C-01 agent stated their name on greeting (always applicable);
+    C-02 identity verified with two independent factors before account access
+    (always — account email alone is insufficient; a second factor such as
+    account number, last four digits of payment card, or registered phone number
+    is required); C-03 billing implications disclosed (billing calls only);
+    C-04/C-09 supervisor escalation path offered (only if customer expressed
+    clear dissatisfaction); C-05 proper closing (always); C-06 hold handled
+    correctly — announced before placing, duration under 2 minutes, customer
+    thanked on return (only if a hold or period of agent-side silence occurred
+    where the customer received no response); C-07 no unauthorized commitments
+    (always — technician dispatch requires supervisor approval and must not be
+    committed as a guaranteed outcome); C-08 troubleshooting followed — logs
+    reviewed, root cause identified, fix applied, resolution verified (technical
+    calls only); C-10 contact info confirmed at close (only if account contact
+    details were changed); C-11 retention disclosure (only if customer mentioned
+    cancellation); C-12 wrap-up within 60 seconds of call end (always).
+
+    Evidence must be verbatim quotes or timestamp observations. compliance_score_pct
+    is the percentage of Y scores over applicable (Y + N) checks — N/A checks are
+    excluded from both numerator and denominator.
+  </instructions>
+</prompt>

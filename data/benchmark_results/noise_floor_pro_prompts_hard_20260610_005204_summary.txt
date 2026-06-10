@@ -1,0 +1,58 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor_pro
+Old:     gemini-2.5-pro
+New:     gemini-2.5-pro
+============================================================
+Total prompts:   12
+Old model pass:  12/12  (100.0%)
+New model pass:  12/12  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=4  old=4/4  new=4/4  reg=0
+  interview_evaluation       n=4  old=4/4  new=4/4  reg=0
+  support_audit              n=4  old=4/4  new=4/4  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  11/12  (91.7%)
+  New first-pass:  12/12  (100.0%)
+  Old avg attempts: 1.08
+  New avg attempts: 1.00
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  983.5 tok/response
+  New avg:  966.4 tok/response
+  Delta:    -17.1 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  8/12
+  Field-level drift events:  32
+    structure_drift      8 prompt(s)
+    content_shrink       4 prompt(s)
+  Worst drifters:
+    interview_evaluation-102     Δtok=  +9.8%  events=9  flags=structure_drift,content_shrink
+      checkpoints.reasoning.__chars                 713 → 1045
+      competency_scores.__len                       1 → 2
+      competency_scores.competency.__chars          16 → 29
+    diagnostic-103               Δtok=  -8.7%  events=5  flags=structure_drift,content_shrink
+      failure_patterns.frequency.__chars            81 → 12
+      metrics.__len                                 2 → 3
+      metrics.metric_name.__chars                   32 → 53
+    interview_evaluation-104     Δtok=  -6.8%  events=5  flags=structure_drift,content_shrink
+      competency_scores.__len                       4 → 5
+      key_strengths.__chars                         326 → 194
+      overall_recommendation.__chars                4 → 7
+    diagnostic-104               Δtok= +14.2%  events=3  flags=structure_drift
+      failure_patterns.recommendation.__chars       509 → 715
+      metrics.__len                                 3 → 4
+      metrics.metric_name.__chars                   53 → 77
+    support_audit-103            Δtok=  +3.8%  events=3  flags=structure_drift
+      agent_actions.__len                           2 → 3
+      agent_actions.action_detail.__chars           119 → 204
+      agent_actions.action_type.__chars             28 → 48

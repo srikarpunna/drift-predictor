@@ -1,0 +1,50 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20260603-009147</call_id>
+      <agent>Lucia Fernandez</agent>
+      <queue>Technical</queue>
+      <duration>03:12 (disconnected)</duration>
+      <date>2026-06-03</date>
+    </metadata>
+    <dialogue>
+[00:00:02] Lucia Fernandez (Agent): Thank you for calling Horizon Cloud Support, this is Lucia Fernandez speaking. How can I help?
+[00:00:10] Dev Patel (Customer): Hi, our API calls started returning 401s about an hour ago. Nothing changed on our side. This is blocking our production deploy.
+[00:00:21] Lucia Fernandez (Agent): I understand, that sounds urgent. Before I look at the account, can you verify the account email and the last four of the payment card?
+[00:00:30] Dev Patel (Customer): dev@quanta-labs.io, and the card is 7741.
+[00:00:36] Lucia Fernandez (Agent): Verified, thank you. I see the account. Let me check the API key status first — that's the most common cause of sudden 401s.
+[00:00:48] Lucia Fernandez (Agent): Okay, I can see your primary API key was auto-rotated last night as part of a security policy update. The old key was revoked at 02:00 UTC.
+[00:01:02] Dev Patel (Customer): That would explain it. Why didn't we get notified?
+[00:01:08] Lucia Fernandez (Agent): You should have — there's a notification email that goes to the account owner. I'll flag that for investigation. For the immediate fix: you'll need to pull the new key from the dashboard under Settings, API Keys, and redeploy with it.
+[00:01:24] Dev Patel (Customer): Okay, I'm logging in now... I see the new key. Hold on, updating our secrets manager...
+[00:01:48] Lucia Fernandez (Agent): Take your time, I'll stay on the line.
+[00:02:40] Dev Patel (Customer): Deploying now. It'll take about two minutes to roll out. Can you stay on while —
+[00:02:47] [LINE DISCONNECTED — carrier drop]
+[00:03:12] [CALL END — no reconnection attempt recorded]
+[00:03:12] [NO WRAP-UP RECORD FOUND]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are a QA compliance auditor. Produce a SupportCallAudit for this call.
+
+    Compliance checks: C-01 agent stated their name (always applicable); C-02
+    identity verified before account access (always applicable); C-03 billing
+    implications disclosed (billing calls); C-04/C-09 supervisor escalation
+    path offered (only if customer clearly dissatisfied); C-05 proper closing
+    (always); C-06 hold handled correctly (only if a hold occurred); C-07 no
+    commitments beyond agent authority (always); C-08 correct troubleshooting
+    sequence followed (technical calls); C-10 contact info confirmed (only if
+    account changes made); C-11 retention disclosure (billing cancellation
+    calls); C-12 wrap-up within 60 seconds of call end (always).
+
+    Note the call ended by carrier disconnection mid-resolution, with no
+    reconnection attempt and no wrap-up record. Audit what actually happened,
+    not what probably would have happened. Was the issue resolved? Is follow-up
+    needed? Be precise about which checks can even be assessed on a truncated
+    call, and grade accordingly.
+
+    Include all 12 checks. Evidence must be verbatim quotes or timestamp
+    observations. compliance_score_pct counts Y over applicable (Y+N) checks.
+  </instructions>
+</prompt>

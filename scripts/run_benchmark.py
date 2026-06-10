@@ -140,11 +140,22 @@ def print_summary(runs, pair) -> str:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pair", required=True, help="Model pair name from config.json")
+    parser.add_argument(
+        "--prompts",
+        default=None,
+        help="Optional prompt folder override (e.g. src/artifacts/prompts_hard). "
+        "Defaults to the prompt sets in config.json.",
+    )
     args = parser.parse_args()
 
     cfg = load_config()
     pair = cfg.get_pair(args.pair)
-    prompts = load_all_prompts(cfg)
+    if args.prompts:
+        from src.benchmark.loader import PromptSetConfig, load_prompt_set
+
+        prompts = load_prompt_set(PromptSetConfig(path=Path(args.prompts)))
+    else:
+        prompts = load_all_prompts(cfg)
 
     print(f"Loaded {len(prompts)} prompts from {len(cfg.prompt_sets)} set(s)")
     print(f"Running: {pair.old_model}  →  {pair.new_model}")
@@ -153,8 +164,9 @@ def main():
     old_runner, new_runner = build_runners(pair, settings)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_jsonl = cfg.output_dir / f"{pair.name}_{timestamp}.jsonl"
-    output_summary = cfg.output_dir / f"{pair.name}_{timestamp}_summary.txt"
+    run_name = pair.name if not args.prompts else f"{pair.name}_{Path(args.prompts).name}"
+    output_jsonl = cfg.output_dir / f"{run_name}_{timestamp}.jsonl"
+    output_summary = cfg.output_dir / f"{run_name}_{timestamp}_summary.txt"
     cfg.output_dir.mkdir(parents=True, exist_ok=True)
 
     runs = run_benchmark(

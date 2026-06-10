@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -27,7 +29,7 @@ class DiagnosticReport(BaseModel):
     failure_patterns: list[FailurePattern]
     consistency_vs_accuracy_note: str = Field(min_length=50)
     priority_fixes: list[str]
-    recommended_action: str = Field(description="proceed_migration, block_migration, or conditional_proceed")
+    recommended_action: Literal["proceed_migration", "block_migration", "conditional_proceed"]
     regression_rate_pct: float = Field(ge=0.0, le=100.0, description="Overall regression rate: regressions / previously-passing runs * 100")
     regression_by_family: list[FamilyBreakdown] = Field(description="Per-task-family regression breakdown. Must not be empty when failure_patterns is non-empty.")
 
@@ -42,9 +44,6 @@ class DiagnosticReport(BaseModel):
 
     @model_validator(mode='after')
     def recommended_action_consistent(self):
-        valid = {"proceed_migration", "block_migration", "conditional_proceed"}
-        if self.recommended_action not in valid:
-            raise ValueError(f"recommended_action must be one of {valid}, got '{self.recommended_action}'")
         if self.regression_rate_pct > 50.0 and self.recommended_action == "proceed_migration":
             raise ValueError(
                 f"recommended_action cannot be 'proceed_migration' when regression_rate_pct={self.regression_rate_pct} > 50.0"

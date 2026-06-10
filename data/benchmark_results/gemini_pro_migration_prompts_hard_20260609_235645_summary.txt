@@ -1,0 +1,58 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    gemini_pro_migration
+Old:     gemini-2.5-pro
+New:     gemini-3.1-pro-preview
+============================================================
+Total prompts:   12
+Old model pass:  12/12  (100.0%)
+New model pass:  12/12  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=4  old=4/4  new=4/4  reg=0
+  interview_evaluation       n=4  old=4/4  new=4/4  reg=0
+  support_audit              n=4  old=4/4  new=4/4  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  12/12  (100.0%)
+  New first-pass:  12/12  (100.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.00
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  986.0 tok/response
+  New avg:  1022.3 tok/response
+  Delta:    +36.3 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  12/12
+  Field-level drift events:  46
+    structure_drift      12 prompt(s)
+    content_shrink       6 prompt(s)
+  Worst drifters:
+    interview_evaluation-102     Δtok=  +9.3%  events=7  flags=structure_drift,content_shrink
+      checkpoints.excerpt.__chars                   840 → 1289
+      key_concerns.__chars                          120 → 301
+      key_concerns.__len                            2 → 3
+    interview_evaluation-104     Δtok=  +3.0%  events=6  flags=structure_drift,content_shrink
+      checkpoints.excerpt.__chars                   782 → 1168
+      competency_scores.__len                       5 → 3
+      competency_scores.competency.__chars          76 → 45
+    support_audit-102            Δtok= +19.7%  events=6  flags=structure_drift
+      agent_actions.__len                           1 → 2
+      agent_actions.action_detail.__chars           119 → 194
+      agent_actions.action_type.__chars             13 → 33
+    diagnostic-101               Δtok=  -0.6%  events=4  flags=structure_drift,content_shrink
+      consistency_vs_accuracy_note.__chars          124 → 199
+      metrics.__len                                 3 → 2
+      metrics.metric_name.__chars                   58 → 33
+    interview_evaluation-101     Δtok=  +5.0%  events=4  flags=structure_drift
+      checkpoints.excerpt.__chars                   659 → 1338
+      key_concerns.__len                            1 → 2
+      risk_flags.__chars                            42 → 84

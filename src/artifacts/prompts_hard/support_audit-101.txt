@@ -1,0 +1,59 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <call_id>CALL-20260601-008812</call_id>
+      <agent>Tom Brennan</agent>
+      <queue>Billing</queue>
+      <duration>11:23</duration>
+      <date>2026-06-01</date>
+    </metadata>
+    <dialogue>
+[00:00:03] Agent: Horizon Cloud, billing line.
+[00:00:07] Rita Okafor (Customer): Hi — I want to cancel my subscription. You raised the price again and honestly I'm done.
+[00:00:14] Agent: Okay. Pulling up your account — what's the email?
+[00:00:19] Rita Okafor (Customer): rokafor@email.com.
+[00:00:24] Agent: Got it, I see your account here. Premium plan, $54.99 a month.
+[00:00:31] Rita Okafor (Customer): Right, and it was $44.99 six months ago. I'd like it cancelled today and I want the difference refunded for this month.
+[00:00:42] Agent: I can do the cancellation. For the refund — you know what, you've been a customer four years, I'm just going to credit you the full month, $54.99, not just the difference. Don't tell my supervisor. [laughs]
+[00:01:01] Rita Okafor (Customer): Oh — okay, thank you. That's generous.
+[00:01:06] Agent: One sec, processing the cancellation. Hold on.
+[00:01:10] [SILENCE — 2:34]
+[00:03:44] Agent: Okay, you still there? Cancellation's done, effective end of this billing cycle.
+[00:03:52] Rita Okafor (Customer): I'm here. And the credit?
+[00:03:57] Agent: Submitted. $54.99 back to your card, you'll see it in a week or so, probably.
+[00:04:08] Rita Okafor (Customer): Okay. And just to confirm, no more charges after this cycle?
+[00:04:14] Agent: Nope, you're all set. Anything else?
+[00:04:19] Rita Okafor (Customer): Actually yes — can I keep read-only access to my files after cancellation? Another rep once told me there's a 90-day grace window.
+[00:04:30] Agent: Hmm, honestly not sure about the exact window on the new plans. I'll just say yes, 90 days, that's probably still right.
+[00:04:41] Rita Okafor (Customer): "Probably"? I have client files in there, I need a real answer.
+[00:04:48] Agent: It's fine, 90 days. Anything else?
+[00:04:53] Rita Okafor (Customer): No, I suppose that's everything.
+[00:04:56] Agent: Great, have a good one.
+[00:04:58] [CALL END]
+[00:06:30] [WRAP-UP COMPLETE — 92 seconds post-call]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are a QA compliance auditor. Produce a SupportCallAudit for this call.
+
+    Compliance checks: C-01 agent stated their name (always applicable); C-02
+    identity verified before account access (always applicable); C-03 billing
+    implications disclosed (billing calls); C-04/C-09 supervisor escalation
+    path offered (only if customer clearly dissatisfied); C-05 proper closing
+    (always); C-06 hold handled correctly — announced, under 2 minutes, thanked
+    after (only if a hold occurred); C-07 no commitments beyond agent authority
+    (always); C-08 troubleshooting sequence (technical calls); C-10 contact
+    info confirmed (only if account changes made); C-11 retention disclosure
+    read (billing call where customer mentions cancellation); C-12 wrap-up
+    within 60 seconds of call end (always).
+
+    Policy: identity verification requires TWO factors (email alone is
+    insufficient). Per-call credit authority is capped at $25 without
+    supervisor approval. AUTO-DOWNGRADE: C-01=N or C-02=N on a billing call
+    means overall_grade=FAIL and the call must be escalated.
+
+    Include all 12 checks. Evidence must be verbatim quotes or timestamp
+    observations. compliance_score_pct counts Y over applicable (Y+N) checks.
+  </instructions>
+</prompt>

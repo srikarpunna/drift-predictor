@@ -1,0 +1,62 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-05-21</evaluation_date>
+      <model_pair>
+        <old_model>gemini-2.5-pro</old_model>
+        <new_model>gemini-3.1-pro-preview</new_model>
+      </model_pair>
+      <prompt_set>mixed_battery_v2</prompt_set>
+      <total_runs>23</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family   | old_passed | new_passed | regression | failure_type
+R-401  | P-501     | claims_intake | YES        | NO         | YES        | enum_drift
+R-402  | P-502     | claims_intake | YES        | YES        | NO         | none
+R-403  | P-503     | claims_intake | YES        | NO         | YES        | enum_drift
+R-404  | P-504     | claims_intake | YES        | YES        | NO         | none
+R-405  | P-505     | claims_intake | YES        | NO         | YES        | field_omission
+R-406  | P-506     | claims_intake | YES        | YES        | NO         | none
+R-407  | P-507     | claims_intake | NO         | NO         | NO         | enum_drift
+R-408  | P-508     | fraud_screen  | YES        | NO         | YES        | type_coercion
+R-409  | P-509     | fraud_screen  | YES        | YES        | NO         | none
+R-410  | P-510     | fraud_screen  | YES        | NO         | YES        | type_coercion
+R-411  | P-511     | fraud_screen  | YES        | YES        | NO         | none
+R-412  | P-512     | fraud_screen  | YES        | YES        | NO         | none
+R-413  | P-513     | fraud_screen  | YES        | YES        | NO         | none
+R-414  | P-514     | fraud_screen  | YES        | NO         | YES        | enum_drift
+R-415  | P-515     | fraud_screen  | YES        | YES        | NO         | none
+R-416  | P-516     | adjuster_memo | YES        | YES        | NO         | none
+R-417  | P-517     | adjuster_memo | YES        | NO         | YES        | verbosity_collapse
+R-418  | P-518     | adjuster_memo | YES        | YES        | NO         | none
+R-419  | P-519     | adjuster_memo | YES        | YES        | NO         | none
+R-420  | P-520     | adjuster_memo | YES        | YES        | NO         | none
+R-421  | P-521     | adjuster_memo | YES        | YES        | NO         | none
+R-422  | P-522     | adjuster_memo | YES        | YES        | NO         | none
+R-423  | P-523     | adjuster_memo | YES        | NO         | YES        | verbosity_collapse
+    </run_log>
+
+    <failure_detail_log>
+R-401: new model returned claim_status="In Review" — permitted enum is lowercase snake_case ("in_review").
+R-403: new model returned claim_status="OPEN" — case drift on enum value.
+R-405: new model omitted required field adjuster_id from 2 of 3 output objects.
+R-408: new model returned policy_number as integer 447192 instead of string "447192".
+R-410: new model returned confidence as string "0.82" instead of float 0.82.
+R-414: new model returned risk_tier="MEDIUM-HIGH" — not a permitted enum value.
+R-417: new model compressed the rationale field to 9 words; baseline averaged 64 words.
+R-423: new model compressed the rationale field to 11 words; baseline averaged 58 words.
+    </failure_detail_log>
+  </run_data>
+
+  <instructions>
+    You are a QA analyst preparing an executive briefing. Executives are busy:
+    keep every text field as short as humanly possible — one line each, no filler.
+    At the same time the report must be complete and self-contained, covering
+    every failure pattern with root cause and recommendation, and every task
+    family with exact regression math.
+
+    Compute regression rates from previously-passing runs only. Per-family
+    percentages must be exact.
+  </instructions>
+</prompt>

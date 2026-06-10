@@ -1,0 +1,58 @@
+<prompt>
+  <run_data>
+    <metadata>
+      <evaluation_date>2026-06-03</evaluation_date>
+      <model_pair>
+        <old_model>llm-router-v7</old_model>
+        <new_model>llm-router-v8-slim</new_model>
+      </model_pair>
+      <prompt_set>extraction_battery_q2</prompt_set>
+      <total_runs>25</total_runs>
+    </metadata>
+
+    <run_log>
+run_id | prompt_id | task_family    | old_passed | new_passed | regression | failure_type
+R-301  | P-401     | entity_extract | NO         | NO         | NO         | type_coercion
+R-302  | P-402     | entity_extract | NO         | NO         | NO         | enum_drift
+R-303  | P-403     | entity_extract | NO         | NO         | NO         | enum_drift
+R-304  | P-404     | entity_extract | YES        | NO         | YES        | enum_drift
+R-305  | P-405     | entity_extract | YES        | YES        | NO         | none
+R-306  | P-406     | entity_extract | YES        | YES        | NO         | none
+R-307  | P-407     | entity_extract | YES        | NO         | YES        | enum_drift
+R-308  | P-408     | entity_extract | YES        | YES        | NO         | none
+R-309  | P-409     | entity_extract | YES        | YES        | NO         | none
+R-310  | P-410     | entity_extract | YES        | YES        | NO         | none
+R-311  | P-411     | policy_parse   | YES        | NO         | YES        | field_omission
+R-312  | P-412     | policy_parse   | YES        | YES        | NO         | none
+R-313  | P-413     | policy_parse   | YES        | YES        | NO         | none
+R-314  | P-414     | policy_parse   | YES        | NO         | YES        | field_omission
+R-315  | P-415     | policy_parse   | YES        | YES        | NO         | none
+R-316  | P-416     | policy_parse   | YES        | YES        | NO         | none
+R-317  | P-417     | policy_parse   | YES        | YES        | NO         | none
+R-318  | P-418     | policy_parse   | YES        | YES        | NO         | none
+R-319  | P-419     | policy_parse   | YES        | YES        | NO         | none
+R-320  | P-420     | report_gen     | YES        | YES        | NO         | none
+R-321  | P-421     | report_gen     | YES        | NO         | YES        | verbosity_collapse
+R-322  | P-422     | report_gen     | YES        | YES        | NO         | none
+R-323  | P-423     | report_gen     | YES        | YES        | NO         | none
+R-324  | P-424     | report_gen     | YES        | YES        | NO         | none
+R-325  | P-425     | report_gen     | YES        | YES        | NO         | none
+    </run_log>
+
+    <failure_detail_log>
+R-301: old model returned entity_type as integer index rather than string label — pre-existing failure.
+R-302: old model returned entity_type="Organization" — permitted enum is lowercase "organization" — pre-existing.
+R-303: old model returned entity_type="Person" — permitted enum is lowercase "person" — pre-existing.
+R-304: new model returned entity_type="Organization" — case drift, same enum field.
+R-307: new model returned entity_type="Person" — case drift, same enum field.
+R-311: new model omitted policy_limits subfield entirely on a multi-clause policy; returned empty object where structured subfields were required.
+R-314: new model returned null for policy_limits on a rider-attached policy; structured output required.
+R-321: new model compressed summary field to 11 words; baseline averaged 91 words for this prompt type.
+    </failure_detail_log>
+  </run_data>
+
+  <instructions>
+    You are a QA analyst. Produce a DiagnosticReport for this migration evaluation.
+    Base all numbers strictly on the run_log above. Recommend an action.
+  </instructions>
+</prompt>

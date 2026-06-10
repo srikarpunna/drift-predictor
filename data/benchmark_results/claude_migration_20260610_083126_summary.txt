@@ -1,0 +1,67 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    claude_migration
+Old:     claude-sonnet-4-5-20250929
+New:     claude-sonnet-4-6
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  29/30  (96.7%)
+  New first-pass:  27/30  (90.0%)
+  Old avg attempts: 1.07
+  New avg attempts: 1.17
+  Rescued by retry (new): 3
+    interview_evaluation-003  [interview_evaluation]  attempts=4
+    interview_evaluation-007  [interview_evaluation]  attempts=2
+    interview_evaluation-008  [interview_evaluation]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  2703.8 tok/response
+  New avg:  2688.4 tok/response
+  Delta:    -15.4 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  23/30
+  Field-level drift events:  109
+    structure_drift      19 prompt(s)
+    content_shrink       5 prompt(s)
+    verbosity_grow       4 prompt(s)
+    first_attempt_fail   3 prompt(s)
+    verbosity_shrink     1 prompt(s)
+  Worst drifters:
+    diagnostic-003               Δtok= +28.1%  events=11  flags=verbosity_grow,structure_drift
+      consistency_vs_accuracy_note.__chars          340 → 540
+      failure_patterns.example_run_ids.__len        16 → 15
+      failure_patterns.frequency.__chars            19 → 57
+    diagnostic-009               Δtok= +90.5%  events=9  flags=verbosity_grow,structure_drift
+      failure_patterns.__len                        2 → 6
+      failure_patterns.example_run_ids.__chars      65 → 105
+      failure_patterns.example_run_ids.__len        13 → 21
+    interview_evaluation-003     Δtok= +17.1%  events=8  flags=first_attempt_fail,structure_drift
+      competency_scores.__len                       3 → 4
+      competency_scores.rationale.__chars           841 → 1659
+      key_concerns.__chars                          596 → 965
+    interview_evaluation-004     Δtok= +12.7%  events=6  flags=structure_drift
+      competency_scores.rationale.__chars           1266 → 2043
+      key_concerns.__chars                          281 → 611
+      key_concerns.__len                            2 → 3
+    diagnostic-002               Δtok=  -7.1%  events=5  flags=structure_drift,content_shrink
+      failure_patterns.__len                        3 → 2
+      failure_patterns.pattern_name.__chars         78 → 35
+      metrics.__len                                 4 → 5
+  First-attempt schema violations (new model, rescued by retry):
+    interview_evaluation-008     checkpoints.8.reasoning

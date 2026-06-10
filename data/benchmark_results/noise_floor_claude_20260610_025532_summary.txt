@@ -1,0 +1,63 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor_claude
+Old:     claude-sonnet-4-5-20250929
+New:     claude-sonnet-4-5-20250929
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  29/30  (96.7%)
+  New first-pass:  29/30  (96.7%)
+  Old avg attempts: 1.03
+  New avg attempts: 1.03
+  Rescued by retry (new): 1
+    interview_evaluation-005  [interview_evaluation]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  2524.0 tok/response
+  New avg:  2498.3 tok/response
+  Delta:    -25.7 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  20/30
+  Field-level drift events:  44
+    structure_drift      18 prompt(s)
+    content_shrink       4 prompt(s)
+    verbosity_shrink     1 prompt(s)
+    verbosity_grow       1 prompt(s)
+    first_attempt_fail   1 prompt(s)
+  Worst drifters:
+    diagnostic-008               Δtok= -32.0%  events=7  flags=verbosity_shrink,structure_drift,content_shrink
+      failure_patterns.__len                        3 → 1
+      failure_patterns.example_run_ids.__chars      125 → 45
+      failure_patterns.example_run_ids.__len        25 → 9
+    diagnostic-009               Δtok= +48.8%  events=6  flags=verbosity_grow,structure_drift
+      failure_patterns.__len                        2 → 3
+      failure_patterns.frequency.__chars            36 → 64
+      failure_patterns.recommendation.__chars       933 → 1826
+    diagnostic-010               Δtok=  -5.6%  events=4  flags=structure_drift
+      metrics.__len                                 4 → 6
+      metrics.metric_name.__chars                   71 → 115
+      metrics.value.__chars                         44 → 69
+    diagnostic-006               Δtok= -11.0%  events=3  flags=structure_drift,content_shrink
+      failure_patterns.pattern_name.__chars         97 → 41
+      priority_fixes.__chars                        976 → 574
+      priority_fixes.__len                          5 → 3
+    interview_evaluation-001     Δtok=  +0.3%  events=3  flags=structure_drift
+      key_concerns.__chars                          235 → 333
+      key_concerns.__len                            2 → 3
+      key_strengths.__len                           4 → 5

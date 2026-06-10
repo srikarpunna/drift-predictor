@@ -1,0 +1,68 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    gemini_migration
+Old:     gemini-2.5-flash
+New:     gemini-3.1-flash-lite
+============================================================
+Total prompts:   30
+Old model pass:  30/30  (100.0%)
+New model pass:  30/30  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=10  old=10/10  new=10/10  reg=0
+  interview_evaluation       n=10  old=10/10  new=10/10  reg=0
+  support_audit              n=10  old=10/10  new=10/10  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  30/30  (100.0%)
+  New first-pass:  27/30  (90.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.10
+  Rescued by retry (new): 3
+    interview_evaluation-002  [interview_evaluation]  attempts=2
+    interview_evaluation-009  [interview_evaluation]  attempts=2
+    support_audit-002  [support_audit]  attempts=2
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1552.3 tok/response
+  New avg:  1322.8 tok/response
+  Delta:    -229.6 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  29/30
+  Field-level drift events:  122
+    content_shrink       26 prompt(s)
+    structure_drift      25 prompt(s)
+    verbosity_shrink     4 prompt(s)
+    first_attempt_fail   3 prompt(s)
+  Worst drifters:
+    interview_evaluation-006     Δtok= -12.4%  events=10  flags=structure_drift,content_shrink
+      candidate_level_assessed.__chars              7 → 2
+      competency_scores.__len                       5 → 2
+      competency_scores.competency.__chars          76 → 31
+    interview_evaluation-007     Δtok= -21.3%  events=8  flags=structure_drift,content_shrink
+      checkpoints.excerpt.__chars                   3670 → 2081
+      competency_scores.__len                       5 → 3
+      competency_scores.competency.__chars          76 → 45
+    interview_evaluation-008     Δtok= -13.9%  events=8  flags=structure_drift,content_shrink
+      checkpoints.reasoning.__chars                 2495 → 1443
+      competency_scores.rationale.__chars           599 → 285
+      key_strengths.__chars                         419 → 191
+    diagnostic-009               Δtok= -11.6%  events=7  flags=structure_drift,content_shrink
+      failure_patterns.__len                        2 → 1
+      failure_patterns.example_run_ids.__chars      40 → 80
+      failure_patterns.example_run_ids.__len        8 → 16
+    interview_evaluation-010     Δtok= -11.7%  events=7  flags=structure_drift,content_shrink
+      competency_scores.__len                       5 → 3
+      competency_scores.rationale.__chars           814 → 292
+      key_concerns.__chars                          285 → 125
+  First-attempt schema violations (new model, rescued by retry):
+    interview_evaluation-002     checkpoints.8.reasoning
+    interview_evaluation-009     checkpoints.8.reasoning
+    support_audit-002            Value error, followup_reason required when followup_required=True [type=value_er

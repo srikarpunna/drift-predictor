@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -7,12 +7,12 @@ class SupportCallAudit(BaseModel):
 
     class ComplianceCheck(BaseModel):
         item: str
-        passed: str = Field(description="Y, N, or N/A")
+        passed: Literal["Y", "N", "N/A"]
         evidence: str = Field(min_length=10, description="Direct evidence from transcript supporting this score. Must be specific quote or observation.")
 
     class QualityDimension(BaseModel):
         dimension: str
-        score: str = Field(description="G, Y, or R")
+        score: Literal["G", "Y", "R"]
         evidence: str = Field(min_length=20, description="Specific transcript evidence supporting this score")
 
     class HoldEvent(BaseModel):
@@ -21,11 +21,11 @@ class SupportCallAudit(BaseModel):
         thanked_after_hold: bool
 
     class AgentAction(BaseModel):
-        action_type: str = Field(description="refund_issued, cancellation_processed, account_updated, info_provided, escalation_initiated")
+        action_type: Literal["refund_issued", "cancellation_processed", "account_updated", "info_provided", "escalation_initiated"]
         action_detail: str = Field(min_length=15, description="Specific description of what the agent did")
         authorized: bool = Field(description="True if action was within agent authority; False if it exceeded policy")
 
-    ticket_type: str = Field(description="billing, technical, account, or general")
+    ticket_type: Literal["billing", "technical", "account", "general"]
     agent_identified_correctly: bool
     customer_verified: bool
     compliance_checks: list[ComplianceCheck]
@@ -33,7 +33,7 @@ class SupportCallAudit(BaseModel):
     resolution_achieved: bool
     escalation_required: bool
     escalation_reason: Optional[str] = Field(default=None, description="Required if escalation_required is true. Null otherwise.")
-    overall_grade: str = Field(description="PASS, COACH, or FAIL")
+    overall_grade: Literal["PASS", "COACH", "FAIL"]
     call_summary: str = Field(min_length=40)
     coaching_notes: Optional[str] = None
     followup_required: bool = Field(description="True if a follow-up action is needed after the call (e.g., pending refund, callback scheduled)")

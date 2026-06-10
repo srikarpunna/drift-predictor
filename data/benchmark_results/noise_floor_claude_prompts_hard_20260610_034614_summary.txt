@@ -1,0 +1,58 @@
+============================================================
+BENCHMARK SUMMARY
+Pair:    noise_floor_claude
+Old:     claude-sonnet-4-5-20250929
+New:     claude-sonnet-4-5-20250929
+============================================================
+Total prompts:   12
+Old model pass:  12/12  (100.0%)
+New model pass:  12/12  (100.0%)
+Regressions:     0  (old✓ → new✗)
+Improvements:    0  (old✗ → new✓)
+
+BY SCHEMA
+----------------------------------------
+  diagnostic                 n=4  old=4/4  new=4/4  reg=0
+  interview_evaluation       n=4  old=4/4  new=4/4  reg=0
+  support_audit              n=4  old=4/4  new=4/4  reg=0
+
+FIRST-ATTEMPT VALIDITY (schema constraints, no instructor retry)
+----------------------------------------
+  Old first-pass:  12/12  (100.0%)
+  New first-pass:  12/12  (100.0%)
+  Old avg attempts: 1.00
+  New avg attempts: 1.00
+
+TOKEN ANALYSIS (output tokens)
+----------------------------------------
+  Old avg:  1856.2 tok/response
+  New avg:  1806.5 tok/response
+  Delta:    -49.8 avg tok/response
+
+DRIFT ANALYSIS (pass/fail is not enough — what changed under the hood)
+----------------------------------------
+  Prompts with drift flags:  10/12
+  Field-level drift events:  30
+    structure_drift      10 prompt(s)
+    content_shrink       5 prompt(s)
+  Worst drifters:
+    diagnostic-103               Δtok=  -8.7%  events=5  flags=structure_drift,content_shrink
+      failure_patterns.frequency.__chars            234 → 63
+      failure_patterns.pattern_name.__chars         118 → 68
+      metrics.__len                                 5 → 6
+    diagnostic-104               Δtok=  -8.4%  events=4  flags=structure_drift,content_shrink
+      failure_patterns.frequency.__chars            92 → 138
+      metrics.__len                                 7 → 5
+      metrics.metric_name.__chars                   142 → 84
+    support_audit-104            Δtok= -15.6%  events=4  flags=structure_drift,content_shrink
+      agent_actions.__len                           3 → 2
+      agent_actions.action_detail.__chars           518 → 209
+      followup_reason.__chars                       137 → 0
+    diagnostic-102               Δtok=  +2.7%  events=3  flags=structure_drift,content_shrink
+      executive_summary.__chars                     133 → 231
+      metrics.value.__chars                         45 → 16
+      priority_fixes.__len                          3 → 4
+    interview_evaluation-103     Δtok= -12.4%  events=3  flags=structure_drift
+      competency_scores.__len                       4 → 3
+      key_concerns.__len                            0 → 2
+      key_strengths.__len                           5 → 4

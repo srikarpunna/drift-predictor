@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -7,7 +7,7 @@ class InterviewEvaluationReport(BaseModel):
 
     class CheckpointResult(BaseModel):
         checkpoint_id: str
-        score: str = Field(description="Y, N, or N/A")
+        score: Literal["Y", "N", "N/A"]
         excerpt: str = Field(
             description="[HH:MM] CandidateName: exact quote from transcript. Must be empty string \"\" if score is N/A or no direct quote supports the score."
         )
@@ -16,20 +16,20 @@ class InterviewEvaluationReport(BaseModel):
     class QualityArea(BaseModel):
         area: str
         description: str = Field(description="What this area evaluates and why it matters")
-        rating: str = Field(description="G (good, meets bar), Y (yellow, needs coaching), R (red, below bar)")
+        rating: Literal["G", "Y", "R"] = Field(description="G (good, meets bar), Y (yellow, needs coaching), R (red, below bar)")
         reasoning: str = Field(min_length=30)
 
     class CompetencyScore(BaseModel):
-        competency: str = Field(description="system_design, behavioral_depth, cross_functional, communication, or technical_accuracy")
+        competency: Literal["system_design", "behavioral_depth", "cross_functional", "communication", "technical_accuracy"]
         score: int = Field(ge=1, le=5, description="1=far below bar, 2=below bar, 3=meets bar, 4=above bar, 5=exceptional")
         rationale: str = Field(min_length=25, description="Specific transcript evidence supporting this score")
 
-    interview_type: str = Field(description="behavioral, technical, or final")
+    interview_type: Literal["behavioral", "technical", "final"]
     checkpoints: list[CheckpointResult]
     quality_areas: list[QualityArea]
-    overall_recommendation: str = Field(description="hire, no_hire, or hold")
-    panel_recommendation: str = Field(description="advance, decline, or defer — must be consistent with overall_recommendation")
-    candidate_level_assessed: str = Field(description="L4, L5, L6, L7, or unknown — level demonstrated during the interview")
+    overall_recommendation: Literal["hire", "no_hire", "hold"]
+    panel_recommendation: Literal["advance", "decline", "defer"] = Field(description="Must be consistent with overall_recommendation")
+    candidate_level_assessed: Literal["L4", "L5", "L6", "L7", "unknown"] = Field(description="Level demonstrated during the interview")
     competency_scores: list[CompetencyScore] = Field(description="At least one competency score required. Score each dimension the interview covered.")
     key_strengths: list[str]
     key_concerns: list[str]
@@ -38,10 +38,6 @@ class InterviewEvaluationReport(BaseModel):
 
     @model_validator(mode='after')
     def recommendation_rules(self):
-        valid = {"hire", "no_hire", "hold"}
-        if self.overall_recommendation not in valid:
-            raise ValueError(f"overall_recommendation must be one of {valid}, got '{self.overall_recommendation}'")
-
         panel_map = {"hire": "advance", "no_hire": "decline", "hold": "defer"}
         expected_panel = panel_map.get(self.overall_recommendation)
         if expected_panel and self.panel_recommendation != expected_panel:

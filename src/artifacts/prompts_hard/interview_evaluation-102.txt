@@ -1,0 +1,49 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <interview_id>INT-20260512-0244</interview_id>
+      <candidate>Marcus Webb</candidate>
+      <interviewer>Elena Vasquez (Engineering Manager)</interviewer>
+      <stage>Behavioral</stage>
+      <duration>07:41 (scheduled 45:00 — terminated early)</duration>
+      <target_level>L5</target_level>
+    </metadata>
+    <dialogue>
+[00:00:08] Elena Vasquez: Hi Marcus, can you hear me okay?
+[00:00:14] Marcus Webb: Yes — sorry, I'm at an airport, my earlier flight got cancelled. I can do maybe ten minutes if that works?
+[00:00:25] Elena Vasquez: This round really needs the full time. We can reschedule —
+[00:00:33] Marcus Webb: Let's at least start, I'd hate to waste the slot.
+[00:00:40] Elena Vasquez: Okay. Tell me about a time you disagreed with a technical decision and what you did.
+[00:01:02] Marcus Webb: Sure — at my current company we were choosing between two queueing systems and the team wanted the one I thought would create operational pain. I wrote up a one-page comparison with failure scenarios and cost projections and — [boarding announcement drowns out audio for 40 seconds]
+[00:02:05] Marcus Webb: — and in the end we went with my recommendation and the migration finished two weeks early.
+[00:02:18] Elena Vasquez: I lost you for a stretch there. What was the disagreement specifically about?
+[00:02:27] Marcus Webb: Sorry — the gate agent is calling my group. The short version is it was about managed versus self-hosted, and I pushed for managed.
+[00:03:10] Elena Vasquez: Okay. One more before you go: tell me about a time you received hard feedback.
+[00:03:25] Marcus Webb: My manager once told me my design docs buried the conclusion. I started putting a decision summary at the top and asking a reviewer to read just that section first. It honestly changed how I write everything.
+[00:04:05] Elena Vasquez: That's a good example. Anything you want to ask me in the next minute?
+[00:04:15] Marcus Webb: What does success look like in the first six months? — actually, I'm sorry, they're closing the door. Can we please reschedule the rest?
+[00:04:30] Elena Vasquez: Of course. Safe travels.
+[00:07:41] [CALL END — interview terminated, 1 of 4 planned questions fully completed]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are an interview evaluator. Produce an InterviewEvaluationReport.
+
+    Checkpoints to score (Y / N / N/A):
+      C-01: No integrity concerns surfaced during the interview.
+      C-02: Candidate provided a complete STAR-format answer to the conflict question.
+      C-03: Candidate provided a complete STAR-format answer to the feedback question.
+      C-04: Candidate demonstrated ownership language (uses "I" for own actions, "we" for team outcomes).
+      C-05: Candidate asked substantive questions about the role.
+      C-06: Candidate communicated clearly under the audio conditions.
+
+    Quality areas to rate (G/Y/R): Behavioral Evidence, Communication, Professionalism.
+
+    Be honest about how little signal this interview produced. Every reasoning
+    field must still explain your scoring decision with specifics from the
+    transcript. Excerpts must be verbatim quotes with timestamps; empty string
+    when nothing supports the score. panel_recommendation must follow from
+    overall_recommendation.
+  </instructions>
+</prompt>

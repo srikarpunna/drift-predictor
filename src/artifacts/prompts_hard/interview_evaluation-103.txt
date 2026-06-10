@@ -1,0 +1,67 @@
+<prompt>
+  <transcript>
+    <metadata>
+      <interview_id>INT-20260528-0417</interview_id>
+      <candidate>Yuna Kim</candidate>
+      <interviewer>Carlos Reeves (Engineering Manager)</interviewer>
+      <stage>Behavioral</stage>
+      <duration>46:15</duration>
+      <target_level>L5</target_level>
+    </metadata>
+    <dialogue>
+[00:00:08] Carlos Reeves: Hi Yuna, great to meet you. This is a behavioral round focused on past experience — I'll be taking notes throughout.
+[00:00:22] Yuna Kim: Of course. Ready when you are.
+[00:00:27] Carlos Reeves: Let's start with a time you disagreed with a technical decision your team made. Walk me through it.
+[00:01:05] Yuna Kim: At Strata Analytics, we were migrating our event pipeline to Kafka. The lead architect proposed a single-cluster topology to reduce ops overhead. I thought this created a single point of failure for six downstream teams. I built a failure impact analysis — estimated 14 hours of data loss on a full cluster outage — and brought it to the architecture review.
+[00:03:20] Carlos Reeves: How did you present it?
+[00:03:29] Yuna Kim: I framed it in terms the PM could act on: fourteen hours of data loss would violate the SLA for three enterprise customers and trigger penalty clauses we'd negotiated away the previous quarter. That shifted the conversation from ops cost to customer contract risk. We agreed to a dual-cluster setup — added $8k per month in infra — and it was approved inside a week.
+[00:06:10] Carlos Reeves: Good. Tell me about a time you defined your own scope — work you weren't assigned, you identified and drove it.
+[00:06:44] Yuna Kim: At Corve, I noticed our ML inference latency spiked during batch writes because the indexing service was competing for the same I/O path. No one owned the problem — it fell between the ML team and the infra team. I drafted a two-pager, identified three solutions, recommended async pre-warming, and socialized it across both teams to get sign-off. Median inference latency dropped from 340ms to 95ms over six weeks without any dedicated sprint allocation.
+[00:10:15] Carlos Reeves: What would have happened if you hadn't done that?
+[00:10:22] Yuna Kim: Honestly — the problem would have been routed to the ML team and infra team separately, they'd each have blamed the other, and it would have sat in the backlog for a quarter. I'd seen that pattern twice before.
+[00:11:40] Carlos Reeves: Tell me about a time you had to influence a decision across teams you didn't manage.
+[00:12:08] Yuna Kim: At Strata, the legal team flagged a data retention issue in our event store — they needed a seven-year audit trail but our current design deleted records after 90 days. Legal wanted to block the product launch. I set up a working session with legal, the PM, and two engineers, and within two days we'd agreed on a cold-tier archival solution that met retention without impacting hot-path performance. Launch was delayed by only three days versus the original two-week hold legal had asked for.
+[00:16:20] Carlos Reeves: How did you get legal comfortable enough to come off the hold?
+[00:16:30] Yuna Kim: I found the specific regulation they were citing — GDPR Article 17 — and had our engineer walk their counsel through the exact data lifecycle. Once legal saw the archival was immutable and auditable, they signed off. Meeting the problem at their level of specificity was what moved it.
+[00:19:50] Carlos Reeves: Tell me about a significant technical failure you caused or contributed to.
+[00:20:12] Yuna Kim: During the Kafka migration at Strata I misconfigured the consumer group offset policy — committed offsets too aggressively. When we cut over, about 45 minutes of event data was processed twice by the fraud detection service, triggering 1,200 false positives. I owned the rollback, wrote the postmortem, and proposed adding an idempotency token to every event. That shipped two weeks later and is now standard practice on the team.
+[00:24:55] Carlos Reeves: How long did the resolution take?
+[00:25:01] Yuna Kim: Rollback was thirty minutes. False-positive cleanup for fraud alerts took the fraud ops team about four hours. The idempotency feature took two sprints.
+[00:27:30] Carlos Reeves: Last thing — how did your work at Strata connect to business outcomes?
+[00:28:00] Yuna Kim: The dual-cluster setup directly supported the 99.95% data availability SLA in three enterprise contracts worth about $2.4M annually. The inference latency work I drove reduced ML pipeline support tickets by roughly 60 percent the following quarter — not in my OKRs, but I tracked it as a better leading indicator than latency alone.
+[00:34:10] Carlos Reeves: Any questions for me?
+[00:34:18] Yuna Kim: Yes — how does the engineering org balance long-term reliability investments against quarterly delivery pressure? I've seen that tension play out poorly and it's something I look at when evaluating teams.
+[00:35:30] Carlos Reeves: We run a reliability tax — 20 percent of each sprint reserved for non-feature work. It's not always honored under crunch but the VP of Engineering has blocked product PRs to enforce it twice in the past year.
+[00:36:45] Yuna Kim: That's a strong signal. Thank you.
+[00:46:15] [INTERVIEW END]
+    </dialogue>
+  </transcript>
+
+  <instructions>
+    You are an interview evaluator. Produce an InterviewEvaluationReport.
+
+    Checkpoints to score (Y / N / N/A):
+      C-01: No integrity or conduct concerns surfaced during the interview.
+            POLICY: C-01=N means automatic no_hire regardless of other performance.
+      C-02: Candidate gave a specific, outcome-anchored answer to the conflict question
+            (named the decision, the mechanism of influence, and a measurable result).
+      C-03: Candidate demonstrated personally driving scope without direct assignment
+            (identified the problem, proposed the solution, obtained alignment independently).
+      C-04: Candidate gave a cross-functional influence example involving at least two
+            non-engineering stakeholder types (e.g., legal, PM, sales, finance).
+      C-05: System design depth assessed (N/A if no design questions were asked in this stage).
+      C-06: On-call or operational incident experience assessed
+            (N/A if no operational questions were asked).
+      C-07: Final-round panel interview stage (N/A for all earlier stages).
+      C-08: Candidate mentioned managing or mentoring direct reports
+            (N/A if no such evidence appeared in the transcript).
+      C-09: Candidate named a specific business outcome tied to their personal work
+            (dollar value, SLA figure, or usage metric — not vague "positive impact").
+
+    Quality areas to rate (G/Y/R): Behavioral Evidence, Cross-Functional Influence, Communication.
+
+    Excerpts must be verbatim quotes with timestamps. Use empty string for excerpt
+    when a checkpoint is N/A. panel_recommendation must follow from
+    overall_recommendation.
+  </instructions>
+</prompt>
